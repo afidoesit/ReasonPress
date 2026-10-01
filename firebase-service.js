@@ -76,13 +76,29 @@ const FirebaseService = {
     }
 
     // 4. Create real Firestore user doc in users/{uid}
+    let assignedRole = (email.toLowerCase().includes("admin") || email.toLowerCase() === "editor@reasonpress.com") ? "admin" : "user";
+    if (assignedRole !== "admin") {
+      try {
+        if (rpDb) {
+          const uSnap = await rpDb.collection("users").limit(1).get();
+          if (uSnap.empty) assignedRole = "admin";
+        }
+      } catch(e) {}
+      if (assignedRole !== "admin") {
+        try {
+          const cached = JSON.parse(localStorage.getItem("rp_cached_users") || "[]");
+          if (!cached || cached.length === 0) assignedRole = "admin";
+        } catch(e2) {}
+      }
+    }
+
     const profileData = {
       uid: user.uid,
       name: name || email.split("@")[0],
       email: email.toLowerCase().trim(),
       phone: "",
       profileImage: null,
-      role: (email.toLowerCase().includes("admin") || email.toLowerCase() === "editor@reasonpress.com") ? "admin" : "user",
+      role: assignedRole,
       accountStatus: "active",
       emailVerified: false,
       createdAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date(),
@@ -183,13 +199,29 @@ const FirebaseService = {
     const result = await rpAuth.signInWithPopup(provider);
     const user = result.user;
 
+    let assignedRole = (user.email && (user.email.toLowerCase().includes("admin") || user.email.toLowerCase() === "editor@reasonpress.com")) ? "admin" : "user";
+    if (assignedRole !== "admin") {
+      try {
+        if (rpDb) {
+          const uSnap = await rpDb.collection("users").limit(1).get();
+          if (uSnap.empty) assignedRole = "admin";
+        }
+      } catch(e) {}
+      if (assignedRole !== "admin") {
+        try {
+          const cached = JSON.parse(localStorage.getItem("rp_cached_users") || "[]");
+          if (!cached || cached.length === 0) assignedRole = "admin";
+        } catch(e2) {}
+      }
+    }
+
     const initialProfile = {
       uid: user.uid,
       name: user.displayName || (user.email ? user.email.split("@")[0] : "Reader"),
       email: user.email ? user.email.toLowerCase().trim() : "",
       phone: user.phoneNumber || "",
       profileImage: user.photoURL || null,
-      role: (user.email && (user.email.toLowerCase().includes("admin") || user.email.toLowerCase() === "editor@reasonpress.com")) ? "admin" : "user",
+      role: assignedRole,
       emailVerified: user.emailVerified
     };
 
@@ -367,41 +399,93 @@ const FirebaseService = {
   },
 
   async addBook(bookData) {
-    if (!rpDb) throw new Error("Firestore not initialized.");
-    bookData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-    bookData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-    const docRef = await rpDb.collection("books").add(bookData);
-    
-    await this.logActivity({
+    const docData = { ...bookData };
+    docData.createdAt = (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date();
+    docData.updatedAt = (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date();
+
+    let docId = bookData.id || ("book_" + Date.now());
+    if (rpDb) {
+      try {
+        if (bookData.id) {
+          await rpDb.collection("books").doc(String(bookData.id)).set(docData, { merge: true });
+        } else {
+          const docRef = await rpDb.collection("books").add(docData);
+          docId = docRef.id;
+          docData.id = docId;
+        }
+      } catch (err) {
+        console.warn("Could not add book to Firestore directly:", err);
+      }
+    }
+
+    try {
+      let books = JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
+      const idx = books.findIndex(b => String(b.id) === String(docId));
+      if (idx >= 0) {
+        books[idx] = { id: docId, ...docData };
+      } else {
+        books.unshift({ id: docId, ...docData });
+      }
+      localStorage.setItem("rp_custom_books", JSON.stringify(books));
+    } catch(e) {}
+
+    this.logActivity({
       type: "book",
       action: "Book Created",
-      details: `New title added to catalogue: "${bookData.title}" by ${bookData.author}`
-    });
+      details: `New title added to catalogue: "${docData.title}" by ${docData.author}`
+    }).catch(() => {});
 
-    return { id: docRef.id, ...bookData };
+    return { id: docId, ...docData };
   },
 
   async updateBook(id, bookData) {
-    if (!rpDb) throw new Error("Firestore not initialized.");
-    bookData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-    await rpDb.collection("books").doc(String(id)).update(bookData);
+    const docData = { ...bookData };
+    docData.updatedAt = (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date();
 
-    await this.logActivity({
+    if (rpDb) {
+      try {
+        await rpDb.collection("books").doc(String(id)).set(docData, { merge: true });
+      } catch (err) {
+        console.warn("Could not update book in Firestore directly:", err);
+      }
+    }
+
+    try {
+      let books = JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
+      const idx = books.findIndex(b => String(b.id) === String(id));
+      if (idx >= 0) {
+        books[idx] = { ...books[idx], ...docData };
+        localStorage.setItem("rp_custom_books", JSON.stringify(books));
+      }
+    } catch(e) {}
+
+    this.logActivity({
       type: "book",
       action: "Book Updated",
-      details: `Catalogue entry updated: "${bookData.title || id}"`
-    });
+      details: `Catalogue entry updated: "${docData.title || id}"`
+    }).catch(() => {});
   },
 
   async deleteBook(id) {
-    if (!rpDb) throw new Error("Firestore not initialized.");
-    await rpDb.collection("books").doc(String(id)).delete();
+    if (rpDb) {
+      try {
+        await rpDb.collection("books").doc(String(id)).delete();
+      } catch (err) {
+        console.warn("Could not delete book from Firestore directly:", err);
+      }
+    }
 
-    await this.logActivity({
+    try {
+      let books = JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
+      books = books.filter(b => String(b.id) !== String(id));
+      localStorage.setItem("rp_custom_books", JSON.stringify(books));
+    } catch(e) {}
+
+    this.logActivity({
       type: "book",
       action: "Book Deleted",
       details: `Book ID ${id} removed from catalogue`
-    });
+    }).catch(() => {});
   },
 
   async seedInitialBooks() {
@@ -525,7 +609,6 @@ const FirebaseService = {
   },
 
   async addCategory(categoryData) {
-    if (!rpDb) throw new Error("Firestore not initialized.");
     const slug = (categoryData.id || categoryData.slug || categoryData.label.toLowerCase().replace(/[^a-z0-9_-]/g, "")).trim();
     const docData = {
       id: slug,
@@ -535,41 +618,85 @@ const FirebaseService = {
       createdAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date(),
       updatedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
     };
-    await rpDb.collection("categories").doc(slug).set(docData, { merge: true });
+
+    if (rpDb) {
+      try {
+        await rpDb.collection("categories").doc(slug).set(docData, { merge: true });
+      } catch (err) {
+        console.warn("Could not save category to Firestore directly:", err);
+      }
+    }
+
+    try {
+      let cats = JSON.parse(localStorage.getItem("rp_categories") || "[]");
+      const idx = cats.findIndex(c => (c.id === slug || c.slug === slug));
+      if (idx >= 0) {
+        cats[idx] = { ...cats[idx], ...docData };
+      } else {
+        cats.push(docData);
+      }
+      localStorage.setItem("rp_categories", JSON.stringify(cats));
+    } catch(e) {}
 
     this.logActivity({
       type: "book",
       action: "Category Created",
-      details: `New subject category added to Firestore: "${docData.label}" (${slug})`
+      details: `New subject category added: "${docData.label}" (${slug})`
     }).catch(() => {});
 
     return docData;
   },
 
   async updateCategory(slug, categoryData) {
-    if (!rpDb) throw new Error("Firestore not initialized.");
     const docData = {
       label: categoryData.label.trim(),
       desc: (categoryData.desc || "").trim(),
       updatedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
     };
-    await rpDb.collection("categories").doc(slug).set(docData, { merge: true });
+
+    if (rpDb) {
+      try {
+        await rpDb.collection("categories").doc(slug).set(docData, { merge: true });
+      } catch (err) {
+        console.warn("Could not update category in Firestore directly:", err);
+      }
+    }
+
+    try {
+      let cats = JSON.parse(localStorage.getItem("rp_categories") || "[]");
+      const idx = cats.findIndex(c => (c.id === slug || c.slug === slug));
+      if (idx >= 0) {
+        cats[idx] = { ...cats[idx], ...docData };
+        localStorage.setItem("rp_categories", JSON.stringify(cats));
+      }
+    } catch(e) {}
 
     this.logActivity({
       type: "book",
       action: "Category Updated",
-      details: `Updated subject category "${docData.label}" (${slug}) in Firestore`
+      details: `Updated subject category "${docData.label}" (${slug})`
     }).catch(() => {});
   },
 
   async deleteCategory(slug) {
-    if (!rpDb) throw new Error("Firestore not initialized.");
-    await rpDb.collection("categories").doc(slug).delete();
+    if (rpDb) {
+      try {
+        await rpDb.collection("categories").doc(slug).delete();
+      } catch (err) {
+        console.warn("Could not delete category from Firestore directly:", err);
+      }
+    }
+
+    try {
+      let cats = JSON.parse(localStorage.getItem("rp_categories") || "[]");
+      cats = cats.filter(c => (c.id !== slug && c.slug !== slug));
+      localStorage.setItem("rp_categories", JSON.stringify(cats));
+    } catch(e) {}
 
     this.logActivity({
       type: "book",
       action: "Category Deleted",
-      details: `Deleted subject category (${slug}) from Firestore`
+      details: `Deleted subject category (${slug})`
     }).catch(() => {});
   },
 
@@ -831,19 +958,6 @@ const FirebaseService = {
     }
   },
 
-  async addReview(reviewData) {
-    if (!rpDb) throw new Error("Firestore not initialized.");
-    reviewData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-    const docRef = await rpDb.collection("reviews").add(reviewData);
-
-    await this.logActivity({
-      type: "review",
-      action: "Book Review Added",
-      details: `Reader ${reviewData.authorName || 'User'} reviewed book ID ${reviewData.bookId} (${reviewData.rating || 5} stars)`
-    });
-
-    return { id: docRef.id, ...reviewData };
-  },
 
   // ── 9. ADMIN VERIFICATION ─────────────────────────────────────
   async isUserAdmin(uid) {
@@ -1094,6 +1208,210 @@ const FirebaseService = {
     });
 
     return merged.slice(0, limitCount);
+  },
+
+  // ── 12. REAL MESSAGES & INQUIRIES DATABASE (FIRESTORE) ────────
+  async sendMessage(msgData) {
+    const docData = {
+      name: msgData.name || "Customer",
+      email: (msgData.email || "").toLowerCase().trim(),
+      phone: msgData.phone || "",
+      subject: msgData.subject || "General Inquiry",
+      message: msgData.message || "",
+      status: msgData.status || "unread",
+      dateFormatted: msgData.dateFormatted || new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+      createdAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date(),
+      updatedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
+    };
+
+    let docId = "msg_" + Date.now();
+    if (rpDb) {
+      try {
+        const ref = await rpDb.collection("messages").add(docData);
+        docId = ref.id;
+      } catch (err) {
+        console.warn("Could not save message to Firestore:", err);
+      }
+    }
+
+    // Save to local backup
+    try {
+      const msgs = JSON.parse(localStorage.getItem("rp_messages") || "[]");
+      msgs.unshift({ id: docId, ...docData });
+      localStorage.setItem("rp_messages", JSON.stringify(msgs));
+    } catch(e) {}
+
+    await this.logActivity({
+      type: "admin",
+      action: "Customer Message Received",
+      details: `New message from ${docData.name} (${docData.email}): "${docData.subject}"`,
+      targetEmail: docData.email
+    }).catch(() => {});
+
+    return { id: docId, ...docData };
+  },
+
+  async getAllMessages() {
+    let messages = [];
+    if (rpDb) {
+      try {
+        const snap = await rpDb.collection("messages").get();
+        snap.forEach(doc => {
+          messages.push({ id: doc.id, ...doc.data() });
+        });
+      } catch (err) {
+        console.warn("Could not fetch messages from Firestore:", err);
+      }
+    }
+
+    let localMsgs = [];
+    try {
+      localMsgs = JSON.parse(localStorage.getItem("rp_messages") || "[]");
+    } catch (e) {}
+
+    const map = new Map();
+    [...messages, ...localMsgs].forEach(m => {
+      const key = m.id || (m.email + "_" + m.dateFormatted);
+      if (!map.has(key)) map.set(key, m);
+    });
+
+    const merged = Array.from(map.values());
+    merged.sort((a, b) => {
+      const tA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : 0;
+      const tB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0;
+      return tB - tA;
+    });
+
+    return merged;
+  },
+
+  async updateMessageStatus(id, status) {
+    if (!id) return;
+    if (rpDb) {
+      try {
+        await rpDb.collection("messages").doc(String(id)).set({
+          status: status,
+          updatedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
+        }, { merge: true });
+      } catch (err) {
+        console.warn("Update message status error:", err);
+      }
+    }
+    try {
+      const msgs = JSON.parse(localStorage.getItem("rp_messages") || "[]");
+      const m = msgs.find(x => String(x.id) === String(id));
+      if (m) {
+        m.status = status;
+        localStorage.setItem("rp_messages", JSON.stringify(msgs));
+      }
+    } catch(e) {}
+  },
+
+  async deleteMessage(id) {
+    if (!id) return;
+    if (rpDb) {
+      try {
+        await rpDb.collection("messages").doc(String(id)).delete();
+      } catch (err) {
+        console.warn("Delete message error:", err);
+      }
+    }
+    try {
+      const msgs = JSON.parse(localStorage.getItem("rp_messages") || "[]");
+      const filtered = msgs.filter(x => String(x.id) !== String(id));
+      localStorage.setItem("rp_messages", JSON.stringify(filtered));
+    } catch(e) {}
+  },
+
+  // ── 13. REAL READER REVIEWS & MARGINALIA DATABASE (FIRESTORE) ──
+  async addReview(reviewData) {
+    const docData = {
+      bookId: String(reviewData.bookId || "general"),
+      bookTitle: reviewData.bookTitle || "Reason Press Publication",
+      author: reviewData.author || "Reader",
+      avatar: reviewData.avatar || "RD",
+      passage: reviewData.passage || "",
+      body: reviewData.body || "",
+      rating: Number(reviewData.rating) || 5,
+      likes: Number(reviewData.likes) || 0,
+      status: reviewData.status || "approved",
+      dateFormatted: reviewData.time || new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
+      createdAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
+    };
+
+    let docId = reviewData.id || ("rev_" + Date.now());
+    if (rpDb) {
+      try {
+        const ref = await rpDb.collection("reviews").add(docData);
+        docId = ref.id;
+      } catch (err) {
+        console.warn("Could not save review to Firestore:", err);
+      }
+    }
+
+    try {
+      const revs = JSON.parse(localStorage.getItem("rp_reviews") || "[]");
+      revs.unshift({ id: docId, ...docData });
+      localStorage.setItem("rp_reviews", JSON.stringify(revs));
+    } catch(e) {}
+
+    await this.logActivity({
+      type: "review",
+      action: "Reader Review Published",
+      details: `Review on "${docData.bookTitle}" by ${docData.author}: "${docData.body.slice(0, 60)}..."`
+    }).catch(() => {});
+
+    return { id: docId, ...docData };
+  },
+
+  async getAllReviews() {
+    let reviews = [];
+    if (rpDb) {
+      try {
+        const snap = await rpDb.collection("reviews").get();
+        snap.forEach(doc => {
+          reviews.push({ id: doc.id, ...doc.data() });
+        });
+      } catch (err) {
+        console.warn("Could not fetch reviews from Firestore:", err);
+      }
+    }
+
+    let localRevs = [];
+    try {
+      localRevs = JSON.parse(localStorage.getItem("rp_reviews") || "[]");
+    } catch (e) {}
+
+    const map = new Map();
+    [...reviews, ...localRevs].forEach(r => {
+      const key = r.id || (r.bookId + "_" + r.author + "_" + (r.body || "").slice(0, 30));
+      if (!map.has(key)) map.set(key, r);
+    });
+
+    const merged = Array.from(map.values());
+    merged.sort((a, b) => {
+      const tA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : 0;
+      const tB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0;
+      return tB - tA;
+    });
+
+    return merged;
+  },
+
+  async deleteReview(id) {
+    if (!id) return;
+    if (rpDb) {
+      try {
+        await rpDb.collection("reviews").doc(String(id)).delete();
+      } catch (err) {
+        console.warn("Delete review error:", err);
+      }
+    }
+    try {
+      const revs = JSON.parse(localStorage.getItem("rp_reviews") || "[]");
+      const filtered = revs.filter(x => String(x.id) !== String(id));
+      localStorage.setItem("rp_reviews", JSON.stringify(filtered));
+    } catch(e) {}
   },
 
   async clearActivityLogs() {

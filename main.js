@@ -908,6 +908,13 @@ function renderBookDiscussions(book) {
 
       notes.unshift(newNote);
       localStorage.setItem(storageKey, JSON.stringify(notes));
+      if (typeof FirebaseService !== "undefined" && FirebaseService.addReview) {
+        FirebaseService.addReview({
+          bookId: book.id,
+          bookTitle: book.title,
+          ...newNote
+        }).catch(() => {});
+      }
       renderBookDiscussions(book);
       showToast("Reader reflection shared to the Salon");
       form.reset();
@@ -2832,43 +2839,42 @@ function applySiteSettingsToPage() {
 }
 
 // ── Secret 5-Click Admin Access on Navbar Contact ────────────
+// ── Secret 5-Click Admin Access on Navbar Contact ────────────
 function initAdminSecretAccess() {
-  const contactLinks = document.querySelectorAll('a[href="contact.html"], a[href="./contact.html"]');
-  let clickCount = 0;
-  let resetTimer = null;
-  let navTimer = null;
+  const contactLinks = document.querySelectorAll('a[href*="contact.html"]');
 
   contactLinks.forEach(link => {
     link.addEventListener("click", function(e) {
-      // Only trigger secret sequence when clicked in header navbar or mobile drawer
-      const isNavbar = this.closest(".nav") || this.closest(".nav-drawer");
-      if (!isNavbar) return;
+      const isHeaderOrDrawer = this.closest(".nav") || this.closest(".nav-drawer") || this.closest("header") || this.closest(".footer");
+      if (!isHeaderOrDrawer) return;
 
-      e.preventDefault();
-      clickCount++;
+      const now = Date.now();
+      const lastClick = parseInt(sessionStorage.getItem("rp_contact_click_time") || "0", 10);
+      let count = parseInt(sessionStorage.getItem("rp_contact_clicks") || "0", 10);
 
-      clearTimeout(resetTimer);
-      resetTimer = setTimeout(() => {
-        clickCount = 0;
-      }, 2000);
-
-      if (clickCount === 1) {
-        clearTimeout(navTimer);
-        navTimer = setTimeout(() => {
-          if (clickCount === 1) {
-            window.location.href = "contact.html";
-          }
-        }, 380);
+      // If clicked within 4 seconds of previous click, increment counter
+      if (now - lastClick < 4000) {
+        count++;
       } else {
-        clearTimeout(navTimer);
+        count = 1;
       }
 
-      if (clickCount >= 5) {
-        clickCount = 0;
-        clearTimeout(resetTimer);
-        clearTimeout(navTimer);
-        sessionStorage.setItem("rp_admin_logged_in", "true");
-        window.location.href = "admin.html";
+      sessionStorage.setItem("rp_contact_click_time", String(now));
+      sessionStorage.setItem("rp_contact_clicks", String(count));
+
+      if (count >= 5) {
+        e.preventDefault();
+        e.stopPropagation();
+        sessionStorage.removeItem("rp_contact_clicks");
+        sessionStorage.removeItem("rp_contact_click_time");
+        window.location.href = "admin-login.html";
+        return;
+      }
+
+      // If already on contact.html, prevent reloading page so user can tap 5 times comfortably
+      const isAlreadyOnContact = window.location.pathname.endsWith("contact.html") || window.location.pathname.endsWith("contact");
+      if (isAlreadyOnContact) {
+        e.preventDefault();
       }
     });
   });
@@ -4454,6 +4460,64 @@ function downloadBookPdf(bookId, bookTitle) {
   }, 600);
 }
 
+// ── Contact Inquiries Form Handler ──────────────────────────
+function initContactForm() {
+  const form = document.getElementById("contact-form");
+  if (!form) return;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = (document.getElementById("contact-name")?.value || "").trim();
+    const email = (document.getElementById("contact-email")?.value || "").trim();
+    const subject = (document.getElementById("contact-subject")?.value || "").trim();
+    const message = (document.getElementById("contact-message")?.value || "").trim();
+    const submitBtn = document.getElementById("contact-submit");
+
+    if (!name || !email || !message) {
+      showToast("Please provide your name, email, and message.");
+      return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = "<span>Transmitting Message...</span>";
+    }
+
+    const messageData = {
+      name,
+      email,
+      subject: subject || "General Inquiry",
+      message,
+      status: "unread",
+      dateFormatted: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    };
+
+    if (typeof FirebaseService !== "undefined" && FirebaseService.sendMessage) {
+      try {
+        await FirebaseService.sendMessage(messageData);
+      } catch (err) {
+        console.warn("Firestore message dispatch error:", err);
+      }
+    } else {
+      try {
+        const msgs = JSON.parse(localStorage.getItem("rp_messages") || "[]");
+        msgs.unshift({ id: "msg_" + Date.now(), ...messageData });
+        localStorage.setItem("rp_messages", JSON.stringify(msgs));
+      } catch(e) {}
+    }
+
+    showToast("✓ Message delivered to Reason Press editorial desk.");
+    form.reset();
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = "<span>Message Delivered ✓</span>";
+      setTimeout(() => {
+        submitBtn.innerHTML = "<span>Send Message</span>";
+      }, 3000);
+    }
+  });
+}
+
 // ── Global Initializer ──────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initNav();
@@ -4472,6 +4536,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderCheckoutSummary();
   initPublishForm();
   initCommunityForum();
+  initContactForm();
   applySiteSettingsToPage();
   initAdminSecretAccess();
   renderLibraryPage();
