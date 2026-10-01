@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account Sign In &amp; Registration — Reason Press</title>
+<meta name="description" content="Sign in or create your Reason Press account to manage your personal library, orders, and author manuscripts.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="styles.css">
+<style>
+body.admin-login-body {
+  background: var(--paper);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+.login-header {
+  padding: var(--space-6) var(--space-8);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--rule-light);
+}
+
+.login-card-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+}
+
+.login-card {
+  background: var(--paper-light);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  max-width: 460px;
+  width: 100%;
+  padding: var(--space-10) var(--space-8);
+  box-shadow: 0 16px 40px rgba(25, 42, 62, 0.06);
+}
+
+.login-brand-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 14px;
+  background: #172433;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-4);
+  box-shadow: 0 10px 24px rgba(23, 36, 51, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-brand-icon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(23, 36, 51, 0.24);
+}
+
+.login-alert {
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: var(--text-xs);
+  margin-bottom: var(--space-5);
+  display: none;
+  line-height: 1.5;
+}
+
+.login-alert--error {
+  background: #FEF2F2;
+  color: #991B1B;
+  border: 1px solid #F87171;
+}
+
+.login-alert--success {
+  background: #F0FDF4;
+  color: #166534;
+  border: 1px solid #86EFAC;
+}
+
+.login-alert--warning {
+  background: #FFFBEB;
+  color: #92400E;
+  border: 1px solid #FCD34D;
+}
+
+.auth-tabs-bar {
+  display: flex;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: var(--space-6);
+  background: var(--paper-mid);
+  border-radius: 4px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.auth-tab-toggle {
+  flex: 1;
+  font-size: 12px;
+  padding: 10px 8px;
+  border-radius: 3px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-muted);
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.auth-tab-toggle.active {
+  background: var(--ink);
+  color: var(--white);
+  box-shadow: 0 2px 8px rgba(25, 42, 62, 0.12);
+}
+
+.auth-link {
+  font-size: 11px;
+  color: var(--accent-dark);
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.btn-google-auth {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(25, 42, 62, 0.05);
+}
+
+.btn-google-auth:hover {
+  background: var(--paper-mid);
+  border-color: var(--ink-faint);
+  transform: translateY(-1px);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 18px 0;
+  color: var(--ink-faint);
+  font-size: 11px;
+}
+
+.auth-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--rule-light);
+}
+
+.auth-divider-text {
+  padding: 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  font-size: 10px;
+}
+</style>
+</head>
+<body class="admin-login-body">
+
+<header class="login-header">
+  <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);">
+    <img src="assets/favicon.png" alt="Reason Press" style="height:32px;">
+    <div style="font-family:var(--font-sans);font-weight:700;font-size:1.1rem;letter-spacing:-0.02em;">
+      Reason Press
+    </div>
+  </a>
+  <a href="index.html" class="btn btn--outline" style="font-size:11px;padding:8px 14px;">
+    <span>&larr; Return to Bookstore</span>
+  </a>
+</header>
+
+<main class="login-card-wrap">
+  <div class="login-card">
+    <div class="login-brand-icon" aria-label="Reason Press Emblem">
+      <svg width="34" height="34" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 6C10 4.89543 10.8954 4 12 4H21C22.1046 4 23 4.89543 23 6V26C23 27.1046 22.1046 28 21 28H12C10.8954 28 10 27.1046 10 26V6Z" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="10" y1="21.5" x2="23" y2="21.5" stroke="white" stroke-width="2.6" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Alert / Message Boxes -->
+    <div id="auth-alert-box" class="login-alert" role="alert"></div>
+
+    <!-- Dual Tab Selector: Sign In vs Create Account -->
+    <div class="auth-tabs-bar">
+      <button type="button" id="tab-btn-signin" class="auth-tab-toggle active" onclick="switchAuthTab('signin')">
+        Sign In
+      </button>
+      <button type="button" id="tab-btn-register" class="auth-tab-toggle" onclick="switchAuthTab('register')">
+        Create Account
+      </button>
+    </div>
+
+    <!-- 1. SIGN IN FORM -->
+    <div id="panel-signin">
+      <div style="text-align:center;margin-bottom:var(--space-5);">
+        <h1 style="font-family:var(--font-display);font-size:var(--text-2xl);font-weight:700;margin:0 0 6px;color:var(--ink);">
+          Welcome Back
+        </h1>
+        <p style="font-size:var(--text-xs);color:var(--ink-muted);margin:0;">
+          Access your personal library, orders, and author manuscripts.
+        </p>
+      </div>
+
+      <form id="firebase-signin-form" onsubmit="event.preventDefault(); handleFirebaseSignIn();">
+        <div class="form-field" style="margin-bottom:var(--space-3);">
+          <label class="form-label" for="signin-email">Email Address <span style="color:var(--accent);">*</span></label>
+          <input class="form-input" type="email" id="signin-email" placeholder="name@domain.com" required autocomplete="email" autofocus>
+        </div>
+
+        <div class="form-field" style="margin-bottom:var(--space-2);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <label class="form-label" for="signin-password" style="margin:0;">Password <span style="color:var(--accent);">*</span></label>
+            <button type="button" class="auth-link" onclick="handleForgotPassword()">Forgot password?</button>
+          </div>
+          <input class="form-input" type="password" id="signin-password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:var(--space-5);font-size:12px;color:var(--ink-muted);">
+          <input type="checkbox" id="signin-remember" checked style="accent-color:var(--accent);">
+          <label for="signin-remember">Stay signed in across sessions</label>
+        </div>
+
+        <button type="submit" class="btn btn--primary" id="btn-signin-submit" style="width:100%;justify-content:center;padding:12px;">
+          <span>Sign In to Reason Press &rarr;</span>
+        </button>
+
+        <div class="auth-divider">
+          <div class="auth-divider-line"></div>
+          <span class="auth-divider-text">or continue with</span>
+          <div class="auth-divider-line"></div>
+        </div>
+
+        <button type="button" class="btn-google-auth" onclick="handleGoogleSignIn()">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.02h3.87c2.26-2.09 3.67-5.17 3.67-9.12z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.87-3.02c-1.08.72-2.45 1.16-4.06 1.16-3.13 0-5.78-2.11-6.73-4.96H1.28v3.11C3.26 21.3 7.36 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.27 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.62H1.28C.46 8.24 0 10.06 0 12s.46 3.76 1.28 5.38l3.99-3.11z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.26 2.7 1.28 6.62l3.99 3.11c.95-2.85 3.6-4.98 6.73-4.98z"/>
+          </svg>
+          <span>Sign In with Google</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- 2. CREATE ACCOUNT FORM -->
+    <div id="panel-register" style="display:none;">
+      <div style="text-align:center;margin-bottom:var(--space-5);">
+        <h2 style="font-family:var(--font-display);font-size:var(--text-2xl);font-weight:700;margin:0 0 6px;color:var(--ink);">
+          Create Your Account
+        </h2>
+        <p style="font-size:var(--text-xs);color:var(--ink-muted);margin:0;">
+          Join our readership community and access DRM-free reading copies.
+        </p>
+      </div>
+
+      <form id="firebase-register-form" onsubmit="event.preventDefault(); handleFirebaseRegister();">
+        <div class="form-field" style="margin-bottom:var(--space-3);">
+          <label class="form-label" for="reg-name">Full Name <span style="color:var(--accent);">*</span></label>
+          <input class="form-input" type="text" id="reg-name" placeholder="Dr. Thomas Ashworth" required autocomplete="name">
+        </div>
+
+        <div class="form-field" style="margin-bottom:var(--space-3);">
+          <label class="form-label" for="reg-email">Email Address <span style="color:var(--accent);">*</span></label>
+          <input class="form-input" type="email" id="reg-email" placeholder="name@domain.com" required autocomplete="email">
+        </div>
+
+        <div class="form-field" style="margin-bottom:var(--space-3);">
+          <label class="form-label" for="reg-password">Password <span style="color:var(--accent);">*</span></label>
+          <input class="form-input" type="password" id="reg-password" placeholder="At least 6 characters" required autocomplete="new-password" minlength="6">
+        </div>
+
+        <div class="form-field" style="margin-bottom:var(--space-4);">
+          <label class="form-label" for="reg-password-confirm">Confirm Password <span style="color:var(--accent);">*</span></label>
+          <input class="form-input" type="password" id="reg-password-confirm" placeholder="Re-type your password" required autocomplete="new-password" minlength="6">
+        </div>
+
+        <button type="submit" class="btn btn--primary" id="btn-register-submit" style="width:100%;justify-content:center;padding:12px;">
+          <span>Create Account &amp; Send Verification &rarr;</span>
+        </button>
+
+        <div class="auth-divider">
+          <div class="auth-divider-line"></div>
+          <span class="auth-divider-text">or continue with</span>
+          <div class="auth-divider-line"></div>
+        </div>
+
+        <button type="button" class="btn-google-auth" onclick="handleGoogleSignIn()">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.02h3.87c2.26-2.09 3.67-5.17 3.67-9.12z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.87-3.02c-1.08.72-2.45 1.16-4.06 1.16-3.13 0-5.78-2.11-6.73-4.96H1.28v3.11C3.26 21.3 7.36 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.27 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.62H1.28C.46 8.24 0 10.06 0 12s.46 3.76 1.28 5.38l3.99-3.11z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.26 2.7 1.28 6.62l3.99 3.11c.95-2.85 3.6-4.98 6.73-4.98z"/>
+          </svg>
+          <span>Sign In with Google</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- 3. VERIFICATION BANNER / RESEND (Shown when logged in but unverified) -->
+    <div id="panel-verification" style="display:none;text-align:center;padding-top:var(--space-4);">
+      <div style="width:48px;height:48px;margin:0 auto 12px;background:var(--paper-mid);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--accent-dark);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+      <h3 style="font-family:var(--font-display);font-size:1.25rem;color:var(--ink);margin:0 0 6px;">Email Verification Sent</h3>
+      <p style="font-size:12px;color:var(--ink-muted);line-height:1.6;margin-bottom:16px;">
+        A verification link has been sent to <strong id="verification-target-email"></strong>.<br>
+        Please open your email client, click the verification link, and click the button below once completed.
+      </p>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <button type="button" class="btn btn--primary" style="font-size:12px;padding:8px 16px;" onclick="refreshVerificationStatus()">
+          <span>✓ I Have Verified</span>
+        </button>
+        <button type="button" class="btn btn--outline" style="font-size:12px;padding:8px 16px;" onclick="resendVerificationLink()">
+          <span>Resend Link</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer style="text-align:center;padding:var(--space-6);font-size:11px;color:var(--ink-faint);border-top:1px solid var(--rule-light);">
+  Reason Press &bull; BOOKS WITH PURPOSE &bull; Authenticated Environment
+</footer>
+
+<!-- Firebase SDK & Production Services -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-service.js"></script>
+
+<script>
+function showAlert(message, type = "error") {
+  const box = document.getElementById("auth-alert-box");
+  box.className = `login-alert login-alert--${type}`;
+  box.textContent = message;
+  box.style.display = "block";
+}
+
+function clearAlert() {
+  const box = document.getElementById("auth-alert-box");
+  box.style.display = "none";
+}
+
+function switchAuthTab(tab) {
+  clearAlert();
+  const signinPanel = document.getElementById("panel-signin");
+  const registerPanel = document.getElementById("panel-register");
+  const tabSignin = document.getElementById("tab-btn-signin");
+  const tabRegister = document.getElementById("tab-btn-register");
+
+  if (tab === "signin") {
+    signinPanel.style.display = "block";
+    registerPanel.style.display = "none";
+    tabSignin.classList.add("active");
+    tabRegister.classList.remove("active");
+  } else {
+    signinPanel.style.display = "none";
+    registerPanel.style.display = "block";
+    tabRegister.classList.add("active");
+    tabSignin.classList.remove("active");
+  }
+}
+
+async function handleFirebaseSignIn() {
+  clearAlert();
+  const email = document.getElementById("signin-email").value.trim();
+  const pass = document.getElementById("signin-password").value;
+  const submitBtn = document.getElementById("btn-signin-submit");
+
+  if (!email || !pass) {
+    showAlert("Please enter your email and password.");
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = "<span>Authenticating...</span>";
+
+  try {
+    const { user, profile } = await FirebaseService.loginUser(email, pass);
+    showAlert(`✓ Welcome, ${profile.name || user.email}!`, "success");
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const isAdminMode = urlParams.get("mode") === "admin" || (urlParams.get("redirect") || "").includes("admin");
+    if (isAdminMode) {
+      sessionStorage.setItem("rp_admin_logged_in", "true");
+    }
+    const redirectTarget = urlParams.get("redirect") || (isAdminMode ? "admin.html" : "index.html");
+
+    // Fast sub-second navigation
+    window.location.href = redirectTarget;
+
+  } catch (err) {
+    console.error("Firebase Sign In Error:", err);
+    let errorMsg = err.message || "Unable to sign in. Please verify your credentials.";
+    if (err.code === "auth/operation-not-allowed") {
+      errorMsg = "'Email/Password' provider is not enabled in your Firebase Console yet. Please open Firebase Console (reasonpress-0) > Authentication > Sign-in method, click 'Email/Password' and switch it to 'Enable'. Or click 'Sign In with Google' below.";
+    } else if (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential") {
+      errorMsg = "Invalid email or password. Please check your credentials or create an account.";
+    } else if (err.code === "auth/wrong-password") {
+      errorMsg = "Incorrect password. Please try again or reset your password.";
+    } else if (err.code === "auth/too-many-requests") {
+      errorMsg = "Too many failed login attempts. Please wait a moment or reset your password.";
+    } else if (err.code === "auth/network-request-failed") {
+      errorMsg = "Network error. Please check your internet connection and try again.";
+    }
+    showAlert(errorMsg, "error");
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = "<span>Sign In to Reason Press &rarr;</span>";
+  }
+}
+
+async function handleGoogleSignIn() {
+  clearAlert();
+  try {
+    const { user, profile } = await FirebaseService.loginWithGoogle();
+    showAlert(`✓ Welcome, ${profile?.name || user.displayName || user.email}!`, "success");
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const isAdminMode = urlParams.get("mode") === "admin" || (urlParams.get("redirect") || "").includes("admin");
+    if (isAdminMode) {
+      sessionStorage.setItem("rp_admin_logged_in", "true");
+    }
+    const redirectTarget = urlParams.get("redirect") || (isAdminMode ? "admin.html" : "index.html");
+
+    window.location.href = redirectTarget;
+  } catch (err) {
+    console.error("Google Sign-in Error:", err);
+    if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") {
+      return;
+    }
+    let msg = err.message || "Could not sign in with Google.";
+    if (err.code === "auth/operation-not-allowed") {
+      msg = "Google sign-in is not enabled in your Firebase Console yet. Please open Firebase Console (reasonpress-0) > Authentication > Sign-in method and enable 'Google'.";
+    }
+    showAlert(msg, "error");
+  }
+}
+
+async function handleFirebaseRegister() {
+  clearAlert();
+  const name = document.getElementById("reg-name").value.trim();
+  const email = document.getElementById("reg-email").value.trim();
+  const pass = document.getElementById("reg-password").value;
+  const passConfirm = document.getElementById("reg-password-confirm").value;
+  const submitBtn = document.getElementById("btn-register-submit");
+
+  if (!name || !email || !pass) {
+    showAlert("Please complete all required fields.");
+    return;
+  }
+
+  if (pass !== passConfirm) {
+    showAlert("Passwords do not match. Please re-type your password.");
+    return;
+  }
+
+  if (pass.length < 6) {
+    showAlert("Password must be at least 6 characters long.");
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = "<span>Creating Account &amp; Sending Verification...</span>";
+
+  try {
+    const { user, profile } = await FirebaseService.registerUser({ name, email, password: pass });
+    
+    // Show email verification panel
+    document.getElementById("panel-register").style.display = "none";
+    document.getElementById("panel-signin").style.display = "none";
+    document.getElementById("panel-verification").style.display = "block";
+    document.getElementById("verification-target-email").textContent = email;
+
+    showAlert(`Account created successfully! A verification email has been sent to ${email}.`, "success");
+  } catch (err) {
+    console.error("Firebase Registration Error:", err);
+    let msg = err.message || "Could not create account. Please try again.";
+    if (err.code === "auth/operation-not-allowed") {
+      msg = "'Email/Password' provider is not enabled in your Firebase Console yet. Please open Firebase Console (reasonpress-0) > Authentication > Sign-in method, click 'Email/Password' and switch it to 'Enable'. Or click 'Sign In with Google' below.";
+    } else if (err.code === "auth/email-already-in-use") {
+      msg = "An account with this email already exists. Please sign in instead.";
+      switchAuthTab("signin");
+      document.getElementById("signin-email").value = email;
+    } else if (err.code === "auth/invalid-email") {
+      msg = "Please provide a valid email address.";
+    } else if (err.code === "auth/weak-password") {
+      msg = "Password is too weak. Please choose a stronger password.";
+    }
+    showAlert(msg, "error");
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = "<span>Create Account &amp; Send Verification &rarr;</span>";
+  }
+}
+
+async function handleForgotPassword() {
+  const email = document.getElementById("signin-email").value.trim();
+  if (!email) {
+    showAlert("Please type your email address into the Email field, then click 'Forgot password?'.", "warning");
+    document.getElementById("signin-email").focus();
+    return;
+  }
+  try {
+    await FirebaseService.sendPasswordReset(email);
+    showAlert(`Password reset link sent to ${email}. Check your inbox.`, "success");
+  } catch (err) {
+    showAlert(err.message || "Could not send password reset email.", "error");
+  }
+}
+
+async function resendVerificationLink() {
+  try {
+    await FirebaseService.resendVerificationEmail();
+    showAlert("A new verification link has been sent to your email address.", "success");
+  } catch (err) {
+    showAlert(err.message || "Could not resend verification email.", "error");
+  }
+}
+
+async function refreshVerificationStatus() {
+  try {
+    const user = await FirebaseService.reloadUserAuth();
+    if (user && user.emailVerified) {
+      showAlert("✓ Email verified successfully! Loading your personal library...", "success");
+      setTimeout(() => { window.location.href = "library.html"; }, 800);
+    } else {
+      showAlert("Your email address is not yet verified. Please click the link in your email, then click this button again.", "warning");
+    }
+  } catch (err) {
+    showAlert("Could not verify status. Please try again.", "error");
+  }
+}
+
+// Auto-check on load if already logged in and handle Admin mode
+document.addEventListener("DOMContentLoaded", () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const isAdminMode = urlParams.get("mode") === "admin" || urlParams.get("redirect") === "admin.html";
+
+  if (isAdminMode) {
+    const heading = document.querySelector("#panel-signin h1");
+    if (heading) heading.textContent = "Editorial & Admin Console";
+    const sub = document.querySelector("#panel-signin p");
+    if (sub) {
+      sub.innerHTML = `
+        <span class="role-badge role-badge--admin" style="margin-bottom:8px;display:inline-flex;">ADMINISTRATOR ACCESS</span><br>
+        Sign in to manage the book catalogue, categories, orders, and user audit logs.
+        <div style="margin-top:8px;">
+          <a href="admin.html" style="font-size:12px;color:var(--accent-dark);font-weight:700;text-decoration:underline;">
+            Already authorized? Open Console Directly &rarr;
+          </a>
+        </div>
+      `;
+    }
+    const submitBtn = document.getElementById("btn-signin-submit");
+    if (submitBtn) submitBtn.innerHTML = "<span>Enter Editorial Console &rarr;</span>";
+  }
+
+  FirebaseService.initAuth((user, profile) => {
+    if (user && !document.getElementById("panel-verification").style.display.includes("block")) {
+      const redirect = urlParams.get("redirect") || (isAdminMode ? "admin.html" : null);
+      if (redirect && redirect !== "login.html") {
+        window.location.href = redirect;
+      }
+    }
+  });
+});
+</script>
+
+</body>
+</html>

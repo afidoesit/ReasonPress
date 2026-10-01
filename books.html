@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Catalogue — Reason Press</title>
+<meta name="description" content="Browse the complete Reason Press catalogue. Independently published books in philosophy, literature, essays, history, and science.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo" aria-label="Reason Press Home">
+      <img src="assets/favicon.png" alt="Reason Press Logo" class="nav__logo-img">
+      <div class="nav__logo-text">
+        <span class="nav__logo-name">Reason</span>
+        <span class="nav__logo-press">PRESS</span>
+      </div>
+    </a>
+    <div class="nav__links">
+      <a href="index.html" class="nav__link">Home</a>
+      <a href="books.html" class="nav__link nav__link--active">Books</a>
+      <a href="library.html" class="nav__link">My Library</a>
+      <a href="publish.html" class="nav__link">Publish</a>
+      <a href="community.html" class="nav__link">Community</a>
+      <a href="about.html" class="nav__link">About</a>
+      <a href="contact.html" class="nav__link">Contact</a>
+    </div>
+    <div class="nav__actions">
+      <!-- Universal Account / Sign-In Button -->
+      <div class="nav__account-wrapper" id="nav-account-wrap">
+        <button type="button" class="nav__account-btn" id="nav-account-btn" aria-label="User Account" aria-haspopup="true" aria-expanded="false" onclick="handleNavAccountClick()">
+          <span class="nav__account-avatar" id="nav-account-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <span class="nav__account-name" id="nav-account-name">Sign In</span>
+          <span class="nav__account-caret" aria-hidden="true">&caron;</span>
+        </button>
+        <div class="nav__account-dropdown" id="nav-account-dropdown" role="menu" style="display:none;"></div>
+      </div>
+      <a href="cart.html" class="nav__cart" aria-label="Reading Bag">
+        <span>Bag</span>
+        <span class="cart-count" style="display:none;">0</span>
+      </a>
+      <button class="nav__menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="nav-drawer">
+  <div id="mobile-account-slot" style="padding:var(--space-3) 0 var(--space-4);border-bottom:1px solid var(--rule-light);margin-bottom:var(--space-3);"></div>
+  <nav class="nav-drawer__links">
+    <a href="index.html" class="nav-drawer__link">Home</a>
+    <a href="books.html" class="nav-drawer__link">Books</a>
+    <a href="library.html" class="nav-drawer__link">My Library</a>
+    <a href="publish.html" class="nav-drawer__link">Publish</a>
+    <a href="community.html" class="nav-drawer__link">Community</a>
+    <a href="about.html" class="nav-drawer__link">About</a>
+    <a href="contact.html" class="nav-drawer__link">Contact</a>
+    <a href="cart.html" class="nav-drawer__link">Bag</a>
+  </nav>
+  <div style="font-size:var(--text-xs);color:var(--ink-faint);letter-spacing:0.12em;text-transform:uppercase;">
+    Reason Press . Caliph
+  </div>
+</div>
+
+<header class="page-header">
+  <div class="container">
+    <div class="page-header__label">The Catalogue</div>
+    <h1 class="page-header__title">All <em>Titles</em></h1>
+    <p class="page-header__desc">
+      Each volume is chosen for what it adds to human understanding. Available in Collector&apos;s Hardcovers and Digital PDF Editions.
+    </p>
+  </div>
+</header>
+
+<main>
+  <div class="container" style="padding-top:var(--space-8);">
+    <div class="books-controls">
+      <div class="books-tabs" role="tablist" aria-label="Book categories">
+        <button class="books-tab active" data-cat="all" role="tab" aria-selected="true" id="tab-all">All Titles</button>
+        <button class="books-tab" data-cat="philosophy" role="tab" aria-selected="false" id="tab-philosophy">Philosophy &amp; Ideas</button>
+        <button class="books-tab" data-cat="fiction" role="tab" aria-selected="false" id="tab-fiction">Literary Fiction</button>
+        <button class="books-tab" data-cat="essays" role="tab" aria-selected="false" id="tab-essays">Essays</button>
+        <button class="books-tab" data-cat="history" role="tab" aria-selected="false" id="tab-history">History</button>
+      </div>
+      <div class="books-sort">
+        <label for="sort-select" style="color:var(--ink-muted);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Display</label>
+        <select id="sort-select" aria-label="Sort books">
+          <option>Curated Order</option>
+          <option>Price: Low to High</option>
+          <option>Price: High to Low</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="books-grid" id="books-grid">
+
+      <!-- Book 1 -->
+      <div data-item data-cat="philosophy" class="reveal">
+        <div class="book-item" data-cat="philosophy">
+          <div class="book-item__cover-wrap">
+            <div class="book-cover book-cover--1">
+              <div class="book-cover__art"></div>
+              <div class="book-cover__content">
+                <div>
+                  <div class="book-cover__title">The Architecture of Thought</div>
+                  <div class="book-cover__author">Julian Vance</div>
+                </div>
+                <div class="book-cover__press">Reason Press</div>
+              </div>
+              <div class="book-cover__binding"></div>
+            </div>
+            <div class="book-item__overlay">
+              <a href="book.html?id=1" class="book-item__overlay-btn" id="grid-book-1">View Book</a>
+            </div>
+          </div>
+          <div class="book-item__meta">
+            <a href="book.html?id=1" class="book-item__title">The Architecture of Thought</a>
+            <div class="book-item__author">Julian Vance</div>
+            <div class="book-item__row">
+              <span class="book-item__category">Philosophy</span>
+              <span class="book-item__price">$28.00 / PDF $12</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Book 2 -->
+      <div data-item data-cat="essays" class="reveal reveal--delay-1">
+        <div class="book-item" data-cat="essays">
+          <div class="book-item__cover-wrap">
+            <div class="book-cover book-cover--2">
+              <div class="book-cover__art"></div>
+              <div class="book-cover__content">
+                <div>
+                  <div class="book-cover__title">Quiet Hours</div>
+                  <div class="book-cover__author">Anya Sharma</div>
+                </div>
+                <div class="book-cover__press">Reason Press</div>
+              </div>
+              <div class="book-cover__binding"></div>
+            </div>
+            <div class="book-item__overlay">
+              <a href="book.html?id=2" class="book-item__overlay-btn" id="grid-book-2">View Book</a>
+            </div>
+          </div>
+          <div class="book-item__meta">
+            <a href="book.html?id=2" class="book-item__title">Quiet Hours</a>
+            <div class="book-item__author">Anya Sharma</div>
+            <div class="book-item__row">
+              <span class="book-item__category">Essays</span>
+              <span class="book-item__price">$24.00 / PDF $10</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Book 3 -->
+      <div data-item data-cat="history" class="reveal reveal--delay-2">
+        <div class="book-item" data-cat="history">
+          <div class="book-item__cover-wrap">
+            <div class="book-cover book-cover--3">
+              <div class="book-cover__art"></div>
+              <div class="book-cover__content">
+                <div>
+                  <div class="book-cover__title">Terra Firma</div>
+                  <div class="book-cover__author">Marcus Croft</div>
+                </div>
+                <div class="book-cover__press">Reason Press</div>
+              </div>
+              <div class="book-cover__binding"></div>
+            </div>
+            <div class="book-item__overlay">
+              <a href="book.html?id=3" class="book-item__overlay-btn" id="grid-book-3">View Book</a>
+            </div>
+          </div>
+          <div class="book-item__meta">
+            <a href="book.html?id=3" class="book-item__title">Terra Firma</a>
+            <div class="book-item__author">Marcus Croft</div>
+            <div class="book-item__row">
+              <span class="book-item__category">History</span>
+              <span class="book-item__price">$32.00 / PDF $14</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Book 4 -->
+      <div data-item data-cat="fiction" class="reveal reveal--delay-3">
+        <div class="book-item" data-cat="fiction">
+          <div class="book-item__cover-wrap">
+            <div class="book-cover book-cover--4">
+              <div class="book-cover__art"></div>
+              <div class="book-cover__content">
+                <div>
+                  <div class="book-cover__title">The Weight of Light</div>
+                  <div class="book-cover__author">Eleanor Reed</div>
+                </div>
+                <div class="book-cover__press">Reason Press</div>
+              </div>
+              <div class="book-cover__binding"></div>
+            </div>
+            <div class="book-item__overlay">
+              <a href="book.html?id=4" class="book-item__overlay-btn" id="grid-book-4">View Book</a>
+            </div>
+          </div>
+          <div class="book-item__meta">
+            <a href="book.html?id=4" class="book-item__title">The Weight of Light</a>
+            <div class="book-item__author">Eleanor Reed</div>
+            <div class="book-item__row">
+              <span class="book-item__category">Fiction</span>
+              <span class="book-item__price">$26.00 / PDF $11</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Book 5 -->
+      <div data-item data-cat="essays" class="reveal">
+        <div class="book-item" data-cat="essays">
+          <div class="book-item__cover-wrap">
+            <div class="book-cover book-cover--5">
+              <div class="book-cover__art"></div>
+              <div class="book-cover__content">
+                <div>
+                  <div class="book-cover__title">Meridian</div>
+                  <div class="book-cover__author">Elias Thorne</div>
+                </div>
+                <div class="book-cover__press">Reason Press</div>
+              </div>
+              <div class="book-cover__binding"></div>
+            </div>
+            <div class="book-item__overlay">
+              <a href="book.html?id=5" class="book-item__overlay-btn" id="grid-book-5">View Book</a>
+            </div>
+          </div>
+          <div class="book-item__meta">
+            <a href="book.html?id=5" class="book-item__title">Meridian</a>
+            <div class="book-item__author">Elias Thorne</div>
+            <div class="book-item__row">
+              <span class="book-item__category">Essays</span>
+              <span class="book-item__price">$29.00 / PDF $13</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Book 6 -->
+      <div data-item data-cat="philosophy" class="reveal reveal--delay-1">
+        <div class="book-item" data-cat="philosophy">
+          <div class="book-item__cover-wrap">
+            <div class="book-cover book-cover--6">
+              <div class="book-cover__art"></div>
+              <div class="book-cover__content">
+                <div>
+                  <div class="book-cover__title">On Solitude</div>
+                  <div class="book-cover__author">Sarah Jensen</div>
+                </div>
+                <div class="book-cover__press">Reason Press</div>
+              </div>
+              <div class="book-cover__binding"></div>
+            </div>
+            <div class="book-item__overlay">
+              <a href="book.html?id=6" class="book-item__overlay-btn" id="grid-book-6">View Book</a>
+            </div>
+          </div>
+          <div class="book-item__meta">
+            <a href="book.html?id=6" class="book-item__title">On Solitude</a>
+            <div class="book-item__author">Sarah Jensen</div>
+            <div class="book-item__row">
+              <span class="book-item__category">Philosophy</span>
+              <span class="book-item__price">$22.00 / PDF $9</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Book 7 -->
+      <div data-item data-cat="fiction" class="reveal reveal--delay-2">
+        <div class="book-item" data-cat="fiction">
+          <div class="book-item__cover-wrap">
+            <div class="book-cover book-cover--7">
+              <div class="book-cover__art"></div>
+              <div class="book-cover__content">
+                <div>
+                  <div class="book-cover__title">The Blue Hour</div>
+                  <div class="book-cover__author">Clara Morales</div>
+                </div>
+                <div class="book-cover__press">Reason Press</div>
+              </div>
+              <div class="book-cover__binding"></div>
+            </div>
+            <div class="book-item__overlay">
+              <a href="book.html?id=7" class="book-item__overlay-btn" id="grid-book-7">View Book</a>
+            </div>
+          </div>
+          <div class="book-item__meta">
+            <a href="book.html?id=7" class="book-item__title">The Blue Hour</a>
+            <div class="book-item__author">Clara Morales</div>
+            <div class="book-item__row">
+              <span class="book-item__category">Fiction</span>
+              <span class="book-item__price">$27.00 / PDF $11.50</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Book 8 -->
+      <div data-item data-cat="philosophy" class="reveal reveal--delay-3">
+        <div class="book-item" data-cat="philosophy">
+          <div class="book-item__cover-wrap">
+            <div class="book-cover book-cover--8">
+              <div class="book-cover__art"></div>
+              <div class="book-cover__content">
+                <div>
+                  <div class="book-cover__title">The Ethics of Attention</div>
+                  <div class="book-cover__author">D.K. Mehta</div>
+                </div>
+                <div class="book-cover__press">Reason Press</div>
+              </div>
+              <div class="book-cover__binding"></div>
+            </div>
+            <div class="book-item__overlay">
+              <a href="book.html?id=8" class="book-item__overlay-btn" id="grid-book-8">View Book</a>
+            </div>
+          </div>
+          <div class="book-item__meta">
+            <a href="book.html?id=8" class="book-item__title">The Ethics of Attention</a>
+            <div class="book-item__author">D.K. Mehta</div>
+            <div class="book-item__row">
+              <span class="book-item__category">Philosophy</span>
+              <span class="book-item__price">$31.00 / PDF $13.50</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <div class="footer__logo-wrap">
+          <img src="assets/favicon.png" alt="Reason Press" class="footer__logo-img">
+          <div class="footer__logo-text">
+            <span class="footer__logo-name">Reason</span>
+            <span class="footer__logo-press">PRESS</span>
+          </div>
+        </div>
+        <p class="footer__brand-desc">An independent publishing house built around the idea that books should matter.</p>
+      </div>
+      <div>
+        <div class="footer__col-title">Catalogue</div>
+        <ul class="footer__links">
+          <li><a href="books.html" class="footer__link">All Books</a></li>
+          <li><a href="books.html?cat=philosophy" class="footer__link">Philosophy</a></li>
+          <li><a href="books.html?cat=fiction" class="footer__link">Fiction</a></li>
+          <li><a href="books.html?cat=essays" class="footer__link">Essays</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Community</div>
+        <ul class="footer__links">
+          <li><a href="community.html" class="footer__link">Reader Salon</a></li>
+          <li><a href="publish.html" class="footer__link">Publish With Us</a></li>
+          <li><a href="about.html" class="footer__link">Editorial Standards</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Information</div>
+        <ul class="footer__links">
+          <li><a href="about.html" class="footer__link">Shipping &amp; Delivery</a></li>
+          <li><a href="about.html" class="footer__link">Paper Standards</a></li>
+          <li><a href="contact.html" class="footer__link">Contact &amp; Press</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span class="footer__copy">&copy; 2026 Reason Press Ltd. All rights reserved. Reason Press . Caliph</span>
+      <div class="footer__social">
+        <a href="#" class="footer__social-link">Instagram</a>
+        <a href="#" class="footer__social-link">Twitter</a>
+        <a href="#" class="footer__social-link">Substack</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" role="status" aria-live="polite"></div>
+<!-- Firebase SDK & Production Services -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-service.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

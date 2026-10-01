@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact &amp; Submissions — Reason Press</title>
+<meta name="description" content="Get in touch with Reason Press. For orders, rights enquiries, press, and manuscript submissions.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo" aria-label="Reason Press Home">
+      <img src="assets/favicon.png" alt="Reason Press Logo" class="nav__logo-img">
+      <div class="nav__logo-text">
+        <span class="nav__logo-name">Reason</span>
+        <span class="nav__logo-press">PRESS</span>
+      </div>
+    </a>
+    <div class="nav__links">
+      <a href="index.html" class="nav__link">Home</a>
+      <a href="books.html" class="nav__link">Books</a>
+      <a href="library.html" class="nav__link">My Library</a>
+      <a href="publish.html" class="nav__link">Publish</a>
+      <a href="community.html" class="nav__link">Community</a>
+      <a href="about.html" class="nav__link">About</a>
+      <a href="contact.html" class="nav__link nav__link--active">Contact</a>
+    </div>
+    <div class="nav__actions">
+      <div class="nav__account-wrapper" id="nav-account-wrap"></div>
+      <a href="cart.html" class="nav__cart" aria-label="Reading Bag">
+        <span>Bag</span>
+        <span class="cart-count" style="display:none;">0</span>
+      </a>
+      <button class="nav__menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="nav-drawer">
+  <div class="nav-drawer__brand">Reason Press . Caliph</div>
+  <div id="mobile-account-slot" style="margin-bottom:var(--space-4);"></div>
+  <nav class="nav-drawer__links">
+    <a href="index.html" class="nav-drawer__link">Home</a>
+    <a href="books.html" class="nav-drawer__link">Books</a>
+    <a href="library.html" class="nav-drawer__link">My Library</a>
+    <a href="publish.html" class="nav-drawer__link">Publish</a>
+    <a href="community.html" class="nav-drawer__link">Community</a>
+    <a href="about.html" class="nav-drawer__link">About</a>
+    <a href="contact.html" class="nav-drawer__link">Contact</a>
+    <a href="cart.html" class="nav-drawer__link">Bag</a>
+  </nav>
+</div>
+
+<header class="page-header">
+  <div class="container">
+    <div class="page-header__label">Communications</div>
+    <h1 class="page-header__title">We would like<br>to <em>hear</em> from you.</h1>
+    <p class="page-header__desc">Whether it is regarding an order, a proposed manuscript, or a general question — every message is read directly by our team.</p>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="contact-layout">
+      <div>
+        <p class="contact-info__text">We are an independent editorial press based in Caliph. Please allow up to three working days for a detailed reply. For author publishing proposals, you may also use our dedicated author portal.</p>
+        <div class="contact-detail">
+          <div class="contact-detail__label">General Enquiries &amp; Orders</div>
+          <div class="contact-detail__value site-orders-email">orders@reasonpress.com</div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail__label">Editorial Submissions</div>
+          <div class="contact-detail__value site-contact-email">editor@reasonpress.com</div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail__label">Telephone &amp; Desk Inquiries</div>
+          <div class="contact-detail__value site-contact-phone">+44 (0)20 7946 0912 / +91 98765 43210</div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail__label">Press Office &amp; Distribution Hub</div>
+          <div class="contact-detail__value site-contact-address" style="line-height:1.7;">
+            Reason Press . Caliph / India Distribution Hub
+          </div>
+        </div>
+        <div style="margin-top:var(--space-10);padding-top:var(--space-10);border-top:1px solid var(--rule);">
+          <div class="contact-detail__label" style="margin-bottom:var(--space-4);">Journal &amp; Dispatches</div>
+          <div style="display:flex;gap:var(--space-6);">
+            <a href="#" style="font-size:var(--text-xs);color:var(--ink-muted);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;transition:color var(--t-fast);" id="contact-instagram">Instagram</a>
+            <a href="#" style="font-size:var(--text-xs);color:var(--ink-muted);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;transition:color var(--t-fast);" id="contact-twitter">Twitter</a>
+            <a href="#" style="font-size:var(--text-xs);color:var(--ink-muted);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;transition:color var(--t-fast);" id="contact-substack">Substack</a>
+          </div>
+        </div>
+      </div>
+      <div>
+        <form class="contact-form" id="contact-form" novalidate>
+          <div class="form-field">
+            <label class="form-label" for="contact-name">Your Name</label>
+            <input class="form-input" type="text" id="contact-name" name="name" autocomplete="name" placeholder="Full name" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="contact-email">Email Address</label>
+            <input class="form-input" type="email" id="contact-email" name="email" autocomplete="email" placeholder="name@domain.com" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="contact-subject">Topic</label>
+            <select class="form-select" id="contact-subject" name="subject">
+              <option value="">Please select a topic</option>
+              <option value="order">Order or Delivery Question</option>
+              <option value="manuscript">Manuscript Submission / Proposal</option>
+              <option value="rights">Rights &amp; Translations</option>
+              <option value="press">Press &amp; Review Copy Request</option>
+              <option value="bookstore">Independent Bookstore Account</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="contact-message">Message</label>
+            <textarea class="form-textarea" id="contact-message" name="message" rows="6" placeholder="Write your message here..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary" style="width:fit-content;" id="contact-submit"><span>Send Message</span></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <div class="footer__logo-wrap">
+          <img src="assets/favicon.png" alt="Reason Press" class="footer__logo-img">
+          <div class="footer__logo-text">
+            <span class="footer__logo-name">Reason</span>
+            <span class="footer__logo-press">PRESS</span>
+          </div>
+        </div>
+        <p class="footer__brand-desc">An independent publishing house built around the idea that books should matter.</p>
+      </div>
+      <div>
+        <div class="footer__col-title">Catalogue</div>
+        <ul class="footer__links">
+          <li><a href="books.html" class="footer__link">All Books</a></li>
+          <li><a href="books.html?cat=philosophy" class="footer__link">Philosophy</a></li>
+          <li><a href="books.html?cat=fiction" class="footer__link">Fiction</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Platform</div>
+        <ul class="footer__links">
+          <li><a href="publish.html" class="footer__link">Publish With Us</a></li>
+          <li><a href="community.html" class="footer__link">Reader Salon</a></li>
+          <li><a href="about.html" class="footer__link">About Reason Press</a></li>
+          <li><a href="contact.html" class="footer__link">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Policies</div>
+        <ul class="footer__links">
+          <li><a href="about.html" class="footer__link">Shipping &amp; PDF Delivery</a></li>
+          <li><a href="about.html" class="footer__link">Returns</a></li>
+          <li><a href="about.html" class="footer__link">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span class="footer__copy">&copy; 2026 Reason Press . Caliph. All rights reserved.</span>
+      <div class="footer__social">
+        <a href="#" class="footer__social-link">Instagram</a>
+        <a href="#" class="footer__social-link">Twitter</a>
+        <a href="#" class="footer__social-link">Substack</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" role="status" aria-live="polite"></div>
+<!-- Firebase SDK & Production Services -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-service.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

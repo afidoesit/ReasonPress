@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile &amp; Shipping Preferences — Reason Press</title>
+<meta name="description" content="Manage your Reason Press account information, default delivery address, and fast checkout preferences.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- GLOBAL NAVIGATION -->
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo" aria-label="Reason Press Home">
+      <img src="assets/favicon.png" alt="Reason Press Logo" class="nav__logo-img">
+      <div class="nav__logo-text">
+        <span class="nav__logo-name">Reason</span>
+        <span class="nav__logo-press">PRESS</span>
+      </div>
+    </a>
+    <div class="nav__links">
+      <a href="index.html" class="nav__link">Home</a>
+      <a href="books.html" class="nav__link">Books</a>
+      <a href="library.html" class="nav__link">My Library</a>
+      <a href="publish.html" class="nav__link">Publish</a>
+      <a href="community.html" class="nav__link">Community</a>
+      <a href="about.html" class="nav__link">About</a>
+      <a href="contact.html" class="nav__link">Contact</a>
+    </div>
+    <div class="nav__actions">
+      <!-- Universal Account / Sign-In Button -->
+      <div class="nav__account-wrapper" id="nav-account-wrap">
+        <button type="button" class="nav__account-btn" id="nav-account-btn" aria-label="User Account" aria-haspopup="true" aria-expanded="false" onclick="handleNavAccountClick()">
+          <span class="nav__account-avatar" id="nav-account-avatar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          <span class="nav__account-name" id="nav-account-name">Sign In</span>
+          <span class="nav__account-caret" aria-hidden="true">&caron;</span>
+        </button>
+        <div class="nav__account-dropdown" id="nav-account-dropdown" role="menu" style="display:none;"></div>
+      </div>
+      <a href="cart.html" class="nav__cart" aria-label="Reading Bag">
+        <span>Bag</span>
+        <span class="cart-count" style="display:none;">0</span>
+      </a>
+      <button class="nav__menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span class="nav__menu-icon"></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="nav-drawer" id="mobile-nav">
+  <div id="mobile-account-slot" style="padding:var(--space-3) 0 var(--space-4);border-bottom:1px solid var(--rule-light);margin-bottom:var(--space-3);"></div>
+  <nav class="nav-drawer__links">
+    <a href="index.html" class="nav-drawer__link">Home</a>
+    <a href="books.html" class="nav-drawer__link">Books</a>
+    <a href="library.html" class="nav-drawer__link">My Library</a>
+    <a href="profile.html" class="nav-drawer__link nav-drawer__link--active">My Profile</a>
+    <a href="publish.html" class="nav-drawer__link">Publish</a>
+    <a href="community.html" class="nav-drawer__link">Community</a>
+    <a href="about.html" class="nav-drawer__link">About</a>
+    <a href="contact.html" class="nav-drawer__link">Contact</a>
+    <a href="cart.html" class="nav-drawer__link">Bag</a>
+  </nav>
+</div>
+
+<header class="page-header" style="background:var(--paper-mid);border-bottom:1px solid var(--rule);">
+  <div class="container container--narrow">
+    <div class="auto-fill-pill" style="margin-bottom:var(--space-3);">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Fast 1-Click Checkout Integration Active
+    </div>
+    <div class="page-header__label">Account &bull; Preferences</div>
+    <h1 class="page-header__title">Reader <em>Profile</em> &amp; Address</h1>
+    <p class="page-header__desc" style="margin:0 auto;max-width:54ch;">
+      Add your delivery address and contact information once. When checking out, Reason Press will automatically pre-fill your details with zero retyping.
+    </p>
+  </div>
+</header>
+
+<main style="padding:var(--space-12) 0 var(--space-20);">
+  <div class="container container--narrow">
+
+    <!-- Logged Out Notice -->
+    <div id="profile-logged-out-notice" style="display:none;background:var(--paper);border:1px dashed var(--rule);padding:var(--space-8);border-radius:6px;text-align:center;margin-bottom:var(--space-8);">
+      <div style="width:48px;height:48px;margin:0 auto 12px;background:var(--paper-mid);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--accent-dark);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <h3 style="font-family:var(--font-display);font-size:1.3rem;margin:0 0 8px;color:var(--ink);">Please Sign In to Access Your Profile</h3>
+      <p style="font-size:var(--text-sm);color:var(--ink-muted);max-width:44ch;margin:0 auto 16px;">
+        Sign in to manage your saved delivery address, view order history, and access fast checkout.
+      </p>
+      <button type="button" class="btn btn--primary" onclick="openAccountModal()">
+        <span>Sign In to Reason Press &rarr;</span>
+      </button>
+    </div>
+
+    <!-- Logged In Form -->
+    <div id="profile-logged-in-content">
+      <form id="profile-details-form" onsubmit="event.preventDefault(); saveUserProfileDetails();">
+        
+        <!-- 1. Personal Identity -->
+        <section class="profile-card-section">
+          <div class="profile-card-header">
+            <div>
+              <h2 style="font-family:var(--font-display);font-size:1.3rem;margin:0 0 4px;color:var(--ink);">
+                01 &bull; Personal Information
+              </h2>
+              <div style="font-size:12px;color:var(--ink-muted);">Used for order dispatch notifications and digital PDF licenses.</div>
+            </div>
+            <span class="auto-fill-pill">Synced</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="pf-name">Full Name <span style="color:var(--accent);">*</span></label>
+              <input class="form-input" type="text" id="pf-name" name="name" placeholder="Your full name" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="pf-email">Email Address <span style="color:var(--accent);">*</span></label>
+              <input class="form-input" type="email" id="pf-email" name="email" placeholder="name@domain.com" required>
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-top:var(--space-4);">
+            <div class="form-field">
+              <label class="form-label" for="pf-phone">Phone / WhatsApp Number <span style="color:var(--accent);">*</span></label>
+              <input class="form-input" type="tel" id="pf-phone" name="phone" placeholder="+91 98765 43210" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="pf-role">Reader Account Tier</label>
+              <select class="form-select" id="pf-role">
+                <option value="reader">Reader &amp; Book Collector</option>
+                <option value="author">Author &amp; Manuscript Contributor</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Shipping & Delivery Destination -->
+        <section class="profile-card-section">
+          <div class="profile-card-header">
+            <div>
+              <h2 style="font-family:var(--font-display);font-size:1.3rem;margin:0 0 4px;color:var(--ink);">
+                02 &bull; Saved Delivery Address
+              </h2>
+              <div style="font-size:12px;color:var(--ink-muted);">
+                This address will automatically fill at checkout so you don't need to type it again!
+              </div>
+            </div>
+            <span class="auto-fill-pill">Auto-Fill Active</span>
+          </div>
+
+          <div class="form-field" style="margin-bottom:var(--space-4);">
+            <label class="form-label" for="pf-address">Street Address / House / Flat No. <span style="color:var(--accent);">*</span></label>
+            <input class="form-input" type="text" id="pf-address" name="address" placeholder="Flat 4B, St. Jude Apartments, Linking Road" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="pf-city">City / District <span style="color:var(--accent);">*</span></label>
+              <input class="form-input" type="text" id="pf-city" name="city" placeholder="e.g. Mumbai, New Delhi, Bengaluru" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="pf-pin">PIN Code (Postal Code) <span style="color:var(--accent);">*</span></label>
+              <input class="form-input" type="text" id="pf-pin" name="pin" placeholder="e.g. 400050" maxlength="10" required>
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-top:var(--space-4);">
+            <div class="form-field">
+              <label class="form-label" for="pf-state">State / Province</label>
+              <input class="form-input" type="text" id="pf-state" name="state" placeholder="e.g. Maharashtra, Karnataka, Delhi">
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="pf-country">Country</label>
+              <select class="form-select" id="pf-country" name="country">
+                <option value="IN" selected>India (Domestic Courier &amp; Speed Post)</option>
+                <option value="GB">United Kingdom (Royal Mail)</option>
+                <option value="US">United States (USPS Priority)</option>
+                <option value="CA">Canada</option>
+                <option value="AU">Australia</option>
+                <option value="DE">Germany</option>
+                <option value="other">Other International Destination</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Fast Checkout & Payment Preference -->
+        <section class="profile-card-section">
+          <div class="profile-card-header">
+            <div>
+              <h2 style="font-family:var(--font-display);font-size:1.3rem;margin:0 0 4px;color:var(--ink);">
+                03 &bull; Preferred Payment Method
+              </h2>
+              <div style="font-size:12px;color:var(--ink-muted);">Pre-selects your preferred payment method on the checkout screen.</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="pf-payment-pref">Default Payment Gateway</label>
+              <select class="form-select" id="pf-payment-pref">
+                <option value="gpay" selected>Google Pay (GPay UPI)</option>
+                <option value="phonepe">PhonePe UPI</option>
+                <option value="paytm">Paytm UPI</option>
+                <option value="cards">Credit / Debit Card (RuPay / Visa / MC)</option>
+                <option value="paypal">PayPal Express</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="pf-upi-id">Saved UPI ID / VPA</label>
+              <input class="form-input" type="text" id="pf-upi-id" placeholder="e.g. reader@okaxis">
+            </div>
+          </div>
+        </section>
+
+        <!-- Submit & Save Button -->
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-4);">
+          <button type="submit" class="btn btn--primary" id="save-profile-btn" style="padding:14px 28px;font-size:var(--text-base);">
+            <span>Save Profile &amp; Address &rarr;</span>
+          </button>
+          <a href="checkout.html" class="btn btn--outline" style="padding:14px 24px;">
+            <span>Go to Checkout with Saved Address &rarr;</span>
+          </a>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <a href="index.html" class="footer__logo">
+          <img src="assets/favicon.png" alt="Reason Press Logo" class="footer__logo-img">
+          <div class="footer__logo-text">
+            <span class="footer__logo-name">Reason</span>
+            <span class="footer__logo-press">PRESS</span>
+          </div>
+        </a>
+        <p class="footer__desc">
+          An independent publishing house dedicated to serious philosophy, critical essays, and enduring literature. Bound with archival care in Caliph.
+        </p>
+      </div>
+      <div>
+        <div class="footer__col-title">Navigation</div>
+        <ul class="footer__links">
+          <li><a href="books.html" class="footer__link">All Books</a></li>
+          <li><a href="library.html" class="footer__link">My Library</a></li>
+          <li><a href="profile.html" class="footer__link">My Profile</a></li>
+          <li><a href="publish.html" class="footer__link">Publish With Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">The Press</div>
+        <ul class="footer__links">
+          <li><a href="about.html" class="footer__link">About Us</a></li>
+          <li><a href="contact.html" class="footer__link">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Formats &amp; Delivery</div>
+        <ul class="footer__links">
+          <li><a href="about.html" class="footer__link">Collector&apos;s Hardcovers</a></li>
+          <li><a href="about.html" class="footer__link">Digital PDF &amp; ePub</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span class="footer__copy">&copy; 2026 Reason Press Ltd. Reason Press . Caliph</span>
+    </div>
+  </div>
+</footer>
+</div>
+
+<div class="toast" role="status" aria-live="polite"></div>
+<!-- Firebase SDK & Production Services -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-service.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

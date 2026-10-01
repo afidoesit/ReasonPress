@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Personal Library &amp; Reader — Reason Press</title>
+<meta name="description" content="Access your purchased Reason Press volumes, DRM-free vector PDFs, and distraction-free in-browser reading room.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* Library Page Custom Styling */
+.library-hero-banner {
+  background: var(--paper-mid);
+  border-bottom: 1px solid var(--rule);
+  padding: var(--space-10) 0 var(--space-8);
+}
+
+.library-profile-card {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: var(--space-6) var(--space-8);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.profile-avatar-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.profile-avatar-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--accent);
+}
+
+.library-stats-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.library-stat-card {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: var(--space-4);
+}
+
+.library-stat-card__num {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.library-stat-card__label {
+  font-size: 11px;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+.library-bookshelf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+
+.library-book-card {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.library-book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.library-book-card__top {
+  padding: var(--space-5);
+  background: var(--paper-mid);
+  display: flex;
+  gap: var(--space-4);
+  border-bottom: 1px solid var(--rule-light);
+  align-items: center;
+}
+
+.library-book-card__body {
+  padding: var(--space-5);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+/* Dedicated In-Page Reader Container */
+.library-embedded-reader {
+  display: none;
+  background: #1E293B;
+  color: #FFFFFF;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+  margin-bottom: var(--space-10);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.library-embedded-reader.active {
+  display: block;
+}
+
+.reader-toolbar {
+  background: #0F172A;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.reader-stage-canvas {
+  background: #FAF8F5;
+  padding: 48px 24px;
+  display: flex;
+  justify-content: center;
+  max-height: 75vh;
+  overflow-y: auto;
+  transition: background 0.3s ease;
+}
+
+.reader-munken-sheet {
+  max-width: 720px;
+  width: 100%;
+  background: #FFFFFF;
+  color: #1E293B;
+  padding: 56px 64px;
+  border-radius: 2px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  font-family: var(--font-serif);
+  line-height: 1.9;
+  font-size: 17px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.reader-bottom-nav {
+  background: #0F172A;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #94A3B8;
+  font-size: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+</style>
+</head>
+<body>
+
+<!-- GLOBAL NAVIGATION -->
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo" aria-label="Reason Press Home">
+      <img src="assets/favicon.png" alt="Reason Press Logo" class="nav__logo-img">
+      <div class="nav__logo-text">
+        <span class="nav__logo-name">Reason</span>
+        <span class="nav__logo-press">PRESS</span>
+      </div>
+    </a>
+    <div class="nav__links">
+      <a href="index.html" class="nav__link">Home</a>
+      <a href="books.html" class="nav__link">Books</a>
+      <a href="library.html" class="nav__link nav__link--active" id="nav-library-link">My Library</a>
+      <a href="publish.html" class="nav__link">Publish</a>
+      <a href="community.html" class="nav__link">Community</a>
+      <a href="about.html" class="nav__link">About</a>
+      <a href="contact.html" class="nav__link">Contact</a>
+    </div>
+    <div class="nav__actions">
+      <!-- Universal Account / Sign-In Button -->
+      <div class="nav__account-wrapper" id="nav-account-wrap">
+        <button type="button" class="nav__account-btn" id="nav-account-btn" aria-label="User Account" aria-haspopup="true" aria-expanded="false" onclick="handleNavAccountClick()">
+          <span class="nav__account-avatar" id="nav-account-avatar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          <span class="nav__account-name" id="nav-account-name">Sign In</span>
+          <span class="nav__account-caret" aria-hidden="true">&caron;</span>
+        </button>
+        <div class="nav__account-dropdown" id="nav-account-dropdown" role="menu" style="display:none;"></div>
+      </div>
+
+      <a href="cart.html" class="nav__cart" aria-label="Reading Bag">
+        <span>Bag</span>
+        <span class="cart-count" style="display:none;">0</span>
+      </a>
+      <button class="nav__menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span class="nav__menu-icon"></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="nav-drawer" id="mobile-nav">
+  <div id="mobile-account-slot" style="padding:var(--space-3) 0 var(--space-4);border-bottom:1px solid var(--rule-light);margin-bottom:var(--space-3);">
+    <!-- Dynamically rendered mobile account button -->
+  </div>
+  <nav class="nav-drawer__links">
+    <a href="index.html" class="nav-drawer__link">Home</a>
+    <a href="books.html" class="nav-drawer__link">Books</a>
+    <a href="library.html" class="nav-drawer__link nav-drawer__link--active">My Library</a>
+    <a href="publish.html" class="nav-drawer__link">Publish</a>
+    <a href="community.html" class="nav-drawer__link">Community</a>
+    <a href="about.html" class="nav-drawer__link">About</a>
+    <a href="contact.html" class="nav-drawer__link">Contact</a>
+    <a href="cart.html" class="nav-drawer__link">Bag</a>
+  </nav>
+  <div style="font-size:var(--text-xs);color:var(--ink-faint);letter-spacing:0.12em;text-transform:uppercase;">
+    Reason Press . Caliph
+  </div>
+</div>
+
+<main>
+  <!-- 1. NOT SIGNED IN VIEW -->
+  <section id="library-logged-out-view" style="display:none;padding:var(--space-16) 0;">
+    <div class="container container--narrow">
+      <div style="background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:var(--space-10) var(--space-8);box-shadow:0 8px 30px rgba(0,0,0,0.05);text-align:center;">
+        <div style="width:72px;height:72px;border-radius:50%;background:var(--paper-mid);border:2px solid var(--accent);color:var(--accent-dark);font-size:24px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:var(--space-4);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-dark);margin-bottom:6px;">
+          Reader Sanctuary &bull; Account Required
+        </div>
+        <h1 style="font-family:var(--font-display);font-size:clamp(var(--text-2xl),4vw,var(--text-4xl));margin:0 0 var(--space-3);color:var(--ink);">
+          My Personal Reading Library
+        </h1>
+        <p style="font-size:var(--text-base);color:var(--ink-muted);max-width:52ch;margin:0 auto var(--space-8);line-height:1.6;font-family:var(--font-serif);">
+          Sign in to access your acquired editions, read high-resolution vector PDFs in your distraction-free browser reader, and track your author submissions.
+        </p>
+
+        <!-- Inline Sign In / Register Card -->
+        <div style="max-width:440px;margin:0 auto;text-align:left;background:var(--paper-mid);border:1px solid var(--rule);border-radius:4px;overflow:hidden;">
+          <div style="display:flex;border-bottom:1px solid var(--rule);">
+            <button type="button" id="lib-auth-tab-signin" class="auth-tab-btn active" style="flex:1;text-align:center;" onclick="switchLibraryAuthTab('signin')">
+              Sign In
+            </button>
+            <button type="button" id="lib-auth-tab-register" class="auth-tab-btn" style="flex:1;text-align:center;" onclick="switchLibraryAuthTab('register')">
+              Create Account
+            </button>
+          </div>
+
+          <div style="padding:var(--space-6);">
+            <!-- Sign In Form -->
+            <form id="lib-form-signin" onsubmit="event.preventDefault(); handleLibrarySignIn();">
+              <div class="form-field" style="margin-bottom:var(--space-4);">
+                <label class="form-label" for="lib-signin-email">Email Address</label>
+                <input class="form-input" type="email" id="lib-signin-email" placeholder="name@domain.com" required>
+              </div>
+              <div class="form-field" style="margin-bottom:var(--space-4);">
+                <label class="form-label" for="lib-signin-pass">Password</label>
+                <input class="form-input" type="password" id="lib-signin-pass" placeholder="••••••••" required>
+              </div>
+              <button type="submit" class="btn btn--primary" id="lib-signin-btn" style="width:100%;justify-content:center;">
+                <span>Sign In to My Library &rarr;</span>
+              </button>
+              <div class="auth-divider">
+                <div class="auth-divider-line"></div>
+                <span class="auth-divider-text">or continue with</span>
+                <div class="auth-divider-line"></div>
+              </div>
+              <button type="button" class="btn-google-auth" onclick="handleLibraryGoogleSignIn()">
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.02h3.87c2.26-2.09 3.67-5.17 3.67-9.12z"/>
+                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.87-3.02c-1.08.72-2.45 1.16-4.06 1.16-3.13 0-5.78-2.11-6.73-4.96H1.28v3.11C3.26 21.3 7.36 24 12 24z"/>
+                  <path fill="#FBBC05" d="M5.27 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.62H1.28C.46 8.24 0 10.06 0 12s.46 3.76 1.28 5.38l3.99-3.11z"/>
+                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.26 2.7 1.28 6.62l3.99 3.11c.95-2.85 3.6-4.98 6.73-4.98z"/>
+                </svg>
+                <span>Sign In with Google</span>
+              </button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="lib-form-register" style="display:none;" onsubmit="event.preventDefault(); handleLibraryRegister();">
+              <div class="form-field" style="margin-bottom:var(--space-3);">
+                <label class="form-label" for="lib-reg-name">Full Name <span style="color:var(--accent);">*</span></label>
+                <input class="form-input" type="text" id="lib-reg-name" placeholder="Dr. Thomas Ashworth" required>
+              </div>
+              <div class="form-field" style="margin-bottom:var(--space-3);">
+                <label class="form-label" for="lib-reg-email">Email Address <span style="color:var(--accent);">*</span></label>
+                <input class="form-input" type="email" id="lib-reg-email" placeholder="thomas.ashworth@domain.com" required>
+              </div>
+              <div class="form-field" style="margin-bottom:var(--space-4);">
+                <label class="form-label" for="lib-reg-pass">Create Password (6+ chars) <span style="color:var(--accent);">*</span></label>
+                <input class="form-input" type="password" id="lib-reg-pass" placeholder="At least 6 characters" minlength="6" required>
+              </div>
+              <button type="submit" class="btn btn--primary" style="width:100%;justify-content:center;">
+                <span>Create Free Reader Account &rarr;</span>
+              </button>
+              <div class="auth-divider">
+                <div class="auth-divider-line"></div>
+                <span class="auth-divider-text">or continue with</span>
+                <div class="auth-divider-line"></div>
+              </div>
+              <button type="button" class="btn-google-auth" onclick="handleLibraryGoogleSignIn()">
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.02h3.87c2.26-2.09 3.67-5.17 3.67-9.12z"/>
+                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.87-3.02c-1.08.72-2.45 1.16-4.06 1.16-3.13 0-5.78-2.11-6.73-4.96H1.28v3.11C3.26 21.3 7.36 24 12 24z"/>
+                  <path fill="#FBBC05" d="M5.27 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.62H1.28C.46 8.24 0 10.06 0 12s.46 3.76 1.28 5.38l3.99-3.11z"/>
+                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.26 2.7 1.28 6.62l3.99 3.11c.95-2.85 3.6-4.98 6.73-4.98z"/>
+                </svg>
+                <span>Sign Up with Google</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. SIGNED IN VIEW -->
+  <section id="library-logged-in-view" style="display:none;">
+    <!-- Profile & Membership Banner -->
+    <div class="library-hero-banner">
+      <div class="container">
+        <div class="library-profile-card">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar-circle" id="profile-avatar-initials">RP</div>
+            <div>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+                <h1 style="font-family:var(--font-display);font-size:var(--text-2xl);margin:0;color:var(--ink);" id="profile-display-name">
+                  Reader Account
+                </h1>
+                <span class="badge-tag" id="profile-role-badge" style="background:#DCFCE7;color:#166534;font-size:11px;">
+                  Reader &amp; Collector
+                </span>
+              </div>
+              <div style="font-size:var(--text-xs);color:var(--ink-muted);" id="profile-display-email">
+                reader@reasonpress.com
+              </div>
+              <div style="font-size:11px;color:var(--ink-faint);margin-top:2px;">
+                Member since <span id="profile-joined-date">2026</span> &bull; Archival Reading Tier
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:var(--space-3);align-items:center;flex-wrap:wrap;">
+            <a href="profile.html" class="btn btn--outline" style="font-size:12px;padding:10px 18px;background:var(--paper-mid);">
+              <span>My Profile &amp; Address</span>
+            </a>
+            <a href="books.html" class="btn btn--primary" style="font-size:12px;padding:10px 18px;">
+              <span>+ Add Books to Library</span>
+            </a>
+            <button type="button" class="btn btn--outline" onclick="logoutUser()" style="font-size:12px;padding:10px 18px;">
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Reader Metrics Strip -->
+        <div class="library-stats-strip">
+          <div class="library-stat-card">
+            <div class="library-stat-card__num" id="stat-books-count">2</div>
+            <div class="library-stat-card__label">Acquired Titles</div>
+          </div>
+          <div class="library-stat-card">
+            <div class="library-stat-card__num" style="color:#16A34A;">Ready</div>
+            <div class="library-stat-card__label">DRM-Free Vector PDFs</div>
+          </div>
+          <div class="library-stat-card">
+            <div class="library-stat-card__num" style="color:var(--accent-dark);">Ch. 1</div>
+            <div class="library-stat-card__label">Active Reading Marker</div>
+          </div>
+          <div class="library-stat-card">
+            <div class="library-stat-card__num" style="color:#2563EB;">Munken</div>
+            <div class="library-stat-card__label">Calibrated Typesetting</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive Reading Room & Bookshelf Section -->
+    <div class="container" style="padding-top:var(--space-10);padding-bottom:var(--space-16);">
+
+      <!-- Embedded Full In-Browser eBook / PDF Reader Canvas -->
+      <div class="library-embedded-reader" id="library-embedded-reader">
+        <div class="reader-toolbar">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <div>
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#94A3B8;">
+                Distraction-Free Reading Room
+              </div>
+              <h2 id="emb-reader-title" style="font-family:var(--font-display);font-size:1.25rem;margin:2px 0 0;color:#FFFFFF;font-weight:700;">
+                The Architecture of Thought
+              </h2>
+              <div id="emb-reader-author" style="font-size:11px;color:#94A3B8;">
+                By Julian Vance &bull; Reason Press Archival Edition
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls: Chapters, Fonts, Themes, Close -->
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <select id="emb-chapter-select" onchange="changeReaderChapter(this.value)" style="background:rgba(255,255,255,0.12);color:#FFFFFF;border:1px solid rgba(255,255,255,0.25);padding:6px 12px;border-radius:3px;font-size:12px;">
+              <option value="0">Chapter 1: The Scaffolding of Perception</option>
+              <option value="1">Chapter 2: Schemata and Computational Shadows</option>
+              <option value="2">Chapter 3: The Threshold of Meaning</option>
+              <option value="3">Chapter 4: The Vault of Reason</option>
+            </select>
+            <button type="button" onclick="adjustReaderFontSize(-1)" class="pdf-btn" title="Decrease font size">A-</button>
+            <button type="button" onclick="adjustReaderFontSize(1)" class="pdf-btn" title="Increase font size">A+</button>
+            <button type="button" onclick="toggleReaderTheme()" id="emb-theme-btn" class="pdf-btn" title="Toggle Sepia / Night / Paper theme">Theme</button>
+            <button type="button" onclick="closeEmbeddedReader()" class="pdf-btn" style="background:#EF4444;color:#FFFFFF;border-color:#DC2626;" title="Close Reader">&times; Close</button>
+          </div>
+        </div>
+
+        <div class="reader-stage-canvas" id="library-reader-viewport">
+          <div class="reader-munken-sheet" id="library-reader-sheet">
+            <div id="library-reader-content">
+              <!-- Populated dynamically with chapter text -->
+            </div>
+          </div>
+        </div>
+
+        <div class="reader-bottom-nav">
+          <button type="button" onclick="stepReaderChapter(-1)" class="pdf-btn">&larr; Previous Chapter</button>
+          <span id="reader-page-indicator">Chapter 1 of 4 &bull; Section 1</span>
+          <button type="button" onclick="stepReaderChapter(1)" class="pdf-btn">Next Chapter &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Bookshelf Header -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-4);border-bottom:1px solid var(--rule);padding-bottom:var(--space-4);">
+        <div>
+          <h2 style="font-family:var(--font-display);font-size:var(--text-2xl);margin:0 0 4px;color:var(--ink);">
+            My Purchased Editions
+          </h2>
+          <p style="font-size:var(--text-xs);color:var(--ink-muted);margin:0;">
+            All volumes include lifetime in-browser reading privileges and downloadable DRM-free vector PDFs.
+          </p>
+        </div>
+        <div style="display:flex;gap:var(--space-2);">
+          <span class="badge-tag" style="background:#DCFCE7;color:#166534;font-size:11px;">
+            ✓ All Licenses Active
+          </span>
+        </div>
+      </div>
+
+      <!-- Books Grid -->
+      <div class="library-bookshelf-grid" id="library-page-books-grid">
+        <!-- Rendered dynamically by main.js -->
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Universal Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <a href="index.html" class="footer__logo">
+          <img src="assets/favicon.png" alt="Reason Press Logo" class="footer__logo-img">
+          <div class="footer__logo-text">
+            <span class="footer__logo-name">Reason</span>
+            <span class="footer__logo-press">PRESS</span>
+          </div>
+        </a>
+        <p class="footer__desc">
+          An independent publishing house dedicated to serious philosophy, critical essays, and enduring literature. Bound with archival care in Caliph.
+        </p>
+      </div>
+      <div>
+        <div class="footer__col-title">Navigation</div>
+        <ul class="footer__links">
+          <li><a href="books.html" class="footer__link">All Books</a></li>
+          <li><a href="library.html" class="footer__link">My Library</a></li>
+          <li><a href="publish.html" class="footer__link">Publish With Us</a></li>
+          <li><a href="community.html" class="footer__link">Community</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">The Press</div>
+        <ul class="footer__links">
+          <li><a href="about.html" class="footer__link">About Us</a></li>
+          <li><a href="contact.html" class="footer__link">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Formats &amp; Delivery</div>
+        <ul class="footer__links">
+          <li><a href="about.html" class="footer__link">Collector&apos;s Hardcovers</a></li>
+          <li><a href="about.html" class="footer__link">Digital PDF &amp; ePub</a></li>
+          <li><a href="about.html" class="footer__link">Free Shipping over $60</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span class="footer__copy">&copy; 2026 Reason Press Ltd. All rights reserved. Reason Press . Caliph</span>
+      <div class="footer__social">
+        <a href="#" class="footer__social-link">Instagram</a>
+        <a href="#" class="footer__social-link">Twitter</a>
+        <a href="#" class="footer__social-link">Substack</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+
+<div class="toast" role="status" aria-live="polite"></div>
+<!-- Firebase SDK & Production Services -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-service.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

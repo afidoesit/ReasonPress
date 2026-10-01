@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reason Press — Books with Purpose</title>
+<meta name="description" content="Reason Press is an independent publishing house dedicated to books that matter. Thoughtfully written, beautifully made, purposefully shared.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo" aria-label="Reason Press Home">
+      <img src="assets/favicon.png" alt="Reason Press Logo" class="nav__logo-img">
+      <div class="nav__logo-text">
+        <span class="nav__logo-name">Reason</span>
+        <span class="nav__logo-press">PRESS</span>
+      </div>
+    </a>
+    <div class="nav__links">
+      <a href="index.html" class="nav__link nav__link--active">Home</a>
+      <a href="books.html" class="nav__link">Books</a>
+      <a href="library.html" class="nav__link" id="nav-library-link">My Library</a>
+      <a href="publish.html" class="nav__link">Publish</a>
+      <a href="community.html" class="nav__link">Community</a>
+      <a href="about.html" class="nav__link">About</a>
+      <a href="contact.html" class="nav__link">Contact</a>
+    </div>
+    <div class="nav__actions">
+      <!-- Universal Account / Sign-In Button -->
+      <div class="nav__account-wrapper" id="nav-account-wrap">
+        <button type="button" class="nav__account-btn" id="nav-account-btn" aria-label="User Account" aria-haspopup="true" aria-expanded="false" onclick="handleNavAccountClick()">
+          <span class="nav__account-avatar" id="nav-account-avatar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          <span class="nav__account-name" id="nav-account-name">Sign In</span>
+          <span class="nav__account-caret" aria-hidden="true">&caron;</span>
+        </button>
+        <div class="nav__account-dropdown" id="nav-account-dropdown" role="menu" style="display:none;">
+          <!-- Dynamically populated by main.js based on auth state -->
+        </div>
+      </div>
+
+      <a href="cart.html" class="nav__cart" aria-label="Reading Bag">
+        <span>Bag</span>
+        <span class="cart-count" style="display:none;">0</span>
+      </a>
+      <button class="nav__menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="nav-drawer" id="mobile-nav">
+  <div id="mobile-account-slot" style="padding:var(--space-3) 0 var(--space-4);border-bottom:1px solid var(--rule-light);margin-bottom:var(--space-3);">
+    <!-- Dynamically rendered mobile account button -->
+  </div>
+  <nav class="nav-drawer__links">
+    <a href="index.html" class="nav-drawer__link">Home</a>
+    <a href="books.html" class="nav-drawer__link">Books</a>
+    <a href="library.html" class="nav-drawer__link">My Library</a>
+    <a href="publish.html" class="nav-drawer__link">Publish</a>
+    <a href="community.html" class="nav-drawer__link">Community</a>
+    <a href="about.html" class="nav-drawer__link">About</a>
+    <a href="contact.html" class="nav-drawer__link">Contact</a>
+    <a href="cart.html" class="nav-drawer__link">Bag</a>
+  </nav>
+  <div style="font-size:var(--text-xs);color:var(--ink-faint);letter-spacing:0.12em;text-transform:uppercase;">
+    Reason Press . Caliph
+  </div>
+</div>
+
+<!-- HERO (Clean & Attractive Editorial 3D Redesign) -->
+<section class="hero" aria-label="Hero">
+  <div class="hero__ambient-glow" aria-hidden="true"></div>
+
+  <div class="hero__inner">
+    <div class="hero__grid">
+      <!-- Left Column: Clean Editorial Manifesto & CTAs (No Eyebrow Clutter) -->
+      <div class="hero__content">
+        <h1 class="hero__title" style="margin-top:0;">
+          Books that Demand<br>to be <em>Read &amp; Endured.</em>
+        </h1>
+
+        <p class="hero__subtitle">
+          An independent publishing house built on the conviction that books should provoke thought, expand understanding, and outlast fleeting noise. Available in linen cloth Hardcovers and calibrated DRM-free Digital PDFs.
+        </p>
+
+        <div class="hero__actions">
+          <a href="books.html" class="btn btn--primary" id="hero-explore-btn">
+            <span class="btn-text-desktop">Explore 2026 Catalogue</span>
+            <span class="btn-text-mobile">Explore Books</span>
+            <span class="btn-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a href="publish.html" class="btn btn--outline" id="hero-publish-btn">
+            <span>Submit Manuscript (PDF)</span>
+          </a>
+        </div>
+
+        <!-- Social Proof & Physical Craft Metrics -->
+        <div class="hero__metrics">
+          <div class="hero__metric-item">
+            <div class="hero__metric-num">47</div>
+            <div class="hero__metric-label">Curated Titles</div>
+          </div>
+          <div class="hero__metric-sep"></div>
+          <div class="hero__metric-item">
+            <div class="hero__metric-num">100%</div>
+            <div class="hero__metric-label">Acid-Free Paper</div>
+          </div>
+          <div class="hero__metric-sep"></div>
+          <div class="hero__metric-item">
+            <div class="hero__metric-num">Dual</div>
+            <div class="hero__metric-label">Print + Vector PDF</div>
+          </div>
+          <div class="hero__metric-sep"></div>
+          <div class="hero__metric-item">
+            <div class="hero__metric-num">4.9 / 5</div>
+            <div class="hero__metric-label">Review Score</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive 3D Perspective Book Showcase (Showing Newly Published) -->
+      <div class="hero__showcase" id="hero-showcase-stage">
+        <div class="hero-3d-stage">
+          <div class="hero-3d-aura" id="hero-3d-aura"></div>
+
+          <!-- 3D Interactive Book Mockup (Clean luxury front-facing cover with zero side spine) -->
+          <div class="hero-3d-book" id="hero-interactive-book" onclick="handleHero3DClick()" role="button" tabindex="0" title="Click to inspect this release">
+            <div class="hero-3d-book__cover" id="hero-3d-cover-face">
+              <div class="hero-3d-book__emboss-border"></div>
+              <div class="hero-3d-book__badge" id="hero-3d-badge-text">ARCHIVAL FIRST EDITION</div>
+              <div class="hero-3d-book__content" id="hero-3d-content-box">
+                <div class="hero-3d-book__title" id="hero-3d-title">The Architecture of Thought</div>
+                <div class="hero-3d-book__author" id="hero-3d-author">Julian Vance</div>
+                <div class="hero-3d-book__press">REASON PRESS &bull; CALIPH</div>
+              </div>
+              <div class="hero-3d-book__sheen"></div>
+            </div>
+            <div class="hero-3d-book__ribbon" id="hero-3d-ribbon"></div>
+            <div class="hero-3d-book__pages"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- BRAND STRIP -->
+<div class="brand-strip">
+  <div class="container">
+    <div class="brand-strip__inner">
+      <div class="brand-strip__motto">
+        "Ideas that demand to be <em>read.</em>"
+      </div>
+      <div class="brand-strip__desc">
+        We produce a limited catalogue of forty-seven titles across philosophy, literature, and culture &mdash; available in Collector&apos;s Hardcover editions and instant Digital PDF releases.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DYNAMIC ROTATING QUOTES ON READING -->
+<section class="quote-banner" aria-label="Quotes on Reading">
+  <div class="container">
+    <div id="quote-rotator" class="quote-rotator">
+      <!-- Populated dynamically with smooth auto-fading quotes by main.js -->
+    </div>
+  </div>
+</section>
+
+<!-- CONTINUOUS MOVING BANNER -->
+<div class="marquee-section" aria-hidden="true">
+  <div class="marquee-track">
+    <div class="marquee-item"><span class="marquee-dot"></span> Philosophy &amp; Ideas</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Literary Fiction</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Digital PDF &amp; Physical Hardcovers</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Reader Salon Community</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Essays &amp; Reflection</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> History &amp; Memory</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Author Submissions Open</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Philosophy &amp; Ideas</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Literary Fiction</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Digital PDF &amp; Physical Hardcovers</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Reader Salon Community</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Essays &amp; Reflection</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> History &amp; Memory</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Author Submissions Open</div>
+  </div>
+  <div class="marquee-track" aria-hidden="true">
+    <div class="marquee-item"><span class="marquee-dot"></span> Philosophy &amp; Ideas</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Literary Fiction</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Digital PDF &amp; Physical Hardcovers</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Reader Salon Community</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Essays &amp; Reflection</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> History &amp; Memory</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Author Submissions Open</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Philosophy &amp; Ideas</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Literary Fiction</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Digital PDF &amp; Physical Hardcovers</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Reader Salon Community</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Essays &amp; Reflection</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> History &amp; Memory</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Author Submissions Open</div>
+  </div>
+</div>
+
+<!-- BOOK WALL -->
+<section class="section section--lg" aria-labelledby="bookwall-heading">
+  <div class="container">
+    <div class="section-label reveal">
+      <span class="section-label__line"></span>
+      <span class="section-label__text">Featured Titles</span>
+    </div>
+    <h2 id="bookwall-heading" style="font-family:var(--font-display);font-size:clamp(var(--text-3xl),4.5vw,var(--text-5xl));font-weight:600;max-width:24ch;line-height:1.2;margin-bottom:var(--space-16);" class="reveal reveal--delay-1">
+      Every book a world.<br><span style="font-style:italic;color:var(--accent);">Carefully chosen, made to last.</span>
+    </h2>
+    <div class="book-wall">
+
+      <div class="book-wall__item reveal" onclick="location.href='book.html?id=1'" id="wall-book-1" tabindex="0" role="button" aria-label="The Architecture of Thought by Julian Vance">
+        <div class="book-cover book-cover--1 book-wall__cover">
+          <div class="book-cover__art"></div>
+          <div class="book-cover__content">
+            <div>
+              <div class="book-cover__title">The Architecture of Thought</div>
+              <div class="book-cover__author">Julian Vance</div>
+            </div>
+            <div class="book-cover__press">Reason Press</div>
+          </div>
+          <div class="book-cover__binding"></div>
+        </div>
+        <div class="book-wall__info">
+          <div class="book-wall__title">The Architecture of Thought</div>
+          <div class="book-wall__author">Julian Vance</div>
+          <div class="book-wall__meta-row">
+            <span class="book-wall__price">$28.00 / PDF $12</span>
+            <span class="badge-format">Print + PDF</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="book-wall__item reveal reveal--delay-1" onclick="location.href='book.html?id=2'" id="wall-book-2" tabindex="0" role="button" aria-label="Quiet Hours by Anya Sharma">
+        <div class="book-cover book-cover--2 book-wall__cover">
+          <div class="book-cover__art"></div>
+          <div class="book-cover__content">
+            <div>
+              <div class="book-cover__title">Quiet Hours</div>
+              <div class="book-cover__author">Anya Sharma</div>
+            </div>
+            <div class="book-cover__press">Reason Press</div>
+          </div>
+          <div class="book-cover__binding"></div>
+        </div>
+        <div class="book-wall__info">
+          <div class="book-wall__title">Quiet Hours</div>
+          <div class="book-wall__author">Anya Sharma</div>
+          <div class="book-wall__meta-row">
+            <span class="book-wall__price">$24.00 / PDF $10</span>
+            <span class="badge-format">Print + PDF</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="book-wall__item reveal reveal--delay-2" onclick="location.href='book.html?id=3'" id="wall-book-3" tabindex="0" role="button" aria-label="Terra Firma by Marcus Croft">
+        <div class="book-cover book-cover--3 book-wall__cover">
+          <div class="book-cover__art"></div>
+          <div class="book-cover__content">
+            <div>
+              <div class="book-cover__title">Terra Firma</div>
+              <div class="book-cover__author">Marcus Croft</div>
+            </div>
+            <div class="book-cover__press">Reason Press</div>
+          </div>
+          <div class="book-cover__binding"></div>
+        </div>
+        <div class="book-wall__info">
+          <div class="book-wall__title">Terra Firma</div>
+          <div class="book-wall__author">Marcus Croft</div>
+          <div class="book-wall__meta-row">
+            <span class="book-wall__price">$32.00 / PDF $14</span>
+            <span class="badge-format">Print + PDF</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="book-wall__item reveal reveal--delay-1" onclick="location.href='book.html?id=4'" id="wall-book-4" tabindex="0" role="button" aria-label="The Weight of Light by Eleanor Reed">
+        <div class="book-cover book-cover--4 book-wall__cover">
+          <div class="book-cover__art"></div>
+          <div class="book-cover__content">
+            <div>
+              <div class="book-cover__title">The Weight of Light</div>
+              <div class="book-cover__author">Eleanor Reed</div>
+            </div>
+            <div class="book-cover__press">Reason Press</div>
+          </div>
+          <div class="book-cover__binding"></div>
+        </div>
+        <div class="book-wall__info">
+          <div class="book-wall__title">The Weight of Light</div>
+          <div class="book-wall__author">Eleanor Reed</div>
+          <div class="book-wall__meta-row">
+            <span class="book-wall__price">$26.00 / PDF $11</span>
+            <span class="badge-format">Print + PDF</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="book-wall__item reveal reveal--delay-2" onclick="location.href='book.html?id=5'" id="wall-book-5" tabindex="0" role="button" aria-label="Meridian by Elias Thorne">
+        <div class="book-cover book-cover--5 book-wall__cover">
+          <div class="book-cover__art"></div>
+          <div class="book-cover__content">
+            <div>
+              <div class="book-cover__title">Meridian</div>
+              <div class="book-cover__author">Elias Thorne</div>
+            </div>
+            <div class="book-cover__press">Reason Press</div>
+          </div>
+          <div class="book-cover__binding"></div>
+        </div>
+        <div class="book-wall__info">
+          <div class="book-wall__title">Meridian</div>
+          <div class="book-wall__author">Elias Thorne</div>
+          <div class="book-wall__meta-row">
+            <span class="book-wall__price">$29.00 / PDF $13</span>
+            <span class="badge-format">Print + PDF</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="book-wall__item reveal reveal--delay-3" onclick="location.href='book.html?id=6'" id="wall-book-6" tabindex="0" role="button" aria-label="On Solitude by Sarah Jensen">
+        <div class="book-cover book-cover--6 book-wall__cover">
+          <div class="book-cover__art"></div>
+          <div class="book-cover__content">
+            <div>
+              <div class="book-cover__title">On Solitude</div>
+              <div class="book-cover__author">Sarah Jensen</div>
+            </div>
+            <div class="book-cover__press">Reason Press</div>
+          </div>
+          <div class="book-cover__binding"></div>
+        </div>
+        <div class="book-wall__info">
+          <div class="book-wall__title">On Solitude</div>
+          <div class="book-wall__author">Sarah Jensen</div>
+          <div class="book-wall__meta-row">
+            <span class="book-wall__price">$22.00 / PDF $9</span>
+            <span class="badge-format">Print + PDF</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div style="text-align:center;margin-top:var(--space-16);" class="reveal">
+      <a href="books.html" class="btn btn--outline" id="view-all-btn">Browse Full Catalogue &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="categories" aria-labelledby="categories-heading">
+  <div style="padding:var(--space-10) 0 0;max-width:var(--max-width);margin:0 auto;">
+    <div style="padding:0 var(--space-8);" class="reveal">
+      <div class="section-label" style="margin-bottom:var(--space-6);">
+        <span class="section-label__line"></span>
+        <span class="section-label__text">Subjects</span>
+      </div>
+      <h2 id="categories-heading" style="font-family:var(--font-display);font-size:var(--text-3xl);font-weight:600;margin-bottom:var(--space-8);color:var(--ink);">Browse by Subject</h2>
+    </div>
+  </div>
+  <div class="categories__grid">
+    <a href="books.html?cat=philosophy" class="category-item" id="cat-philosophy">
+      <span class="category-item__num">01</span>
+      <span class="category-item__name">Philosophy<br>&amp; Ideas</span>
+      <span class="category-item__count">12 titles</span>
+    </a>
+    <a href="books.html?cat=fiction" class="category-item" id="cat-fiction">
+      <span class="category-item__num">02</span>
+      <span class="category-item__name">Literary<br>Fiction</span>
+      <span class="category-item__count">9 titles</span>
+    </a>
+    <a href="books.html?cat=essays" class="category-item" id="cat-essays">
+      <span class="category-item__num">03</span>
+      <span class="category-item__name">Essays &amp;<br>Reflection</span>
+      <span class="category-item__count">7 titles</span>
+    </a>
+    <a href="books.html?cat=history" class="category-item" id="cat-history">
+      <span class="category-item__num">04</span>
+      <span class="category-item__name">History &amp;<br>Memory</span>
+      <span class="category-item__count">11 titles</span>
+    </a>
+    <a href="books.html?cat=science" class="category-item" id="cat-science">
+      <span class="category-item__num">05</span>
+      <span class="category-item__name">Science &amp;<br>Society</span>
+      <span class="category-item__count">8 titles</span>
+    </a>
+    <a href="books.html" class="category-item" id="cat-art">
+      <span class="category-item__num">06</span>
+      <span class="category-item__name">Art &amp;<br>Aesthetics</span>
+      <span class="category-item__count">6 titles</span>
+    </a>
+  </div>
+</section>
+
+<!-- COMMUNITY SALON TEASER -->
+<section class="section" style="background:var(--paper-mid);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-16);align-items:center;">
+      <div>
+        <div class="section-label">
+          <span class="section-label__line"></span>
+          <span class="section-label__text">Reader Discourse</span>
+        </div>
+        <h2 style="font-family:var(--font-display);font-size:clamp(var(--text-3xl),3.5vw,var(--text-4xl));font-weight:600;margin-bottom:var(--space-4);">
+          Not just an online store.<br><em style="color:var(--accent);">A literary sanctuary.</em>
+        </h2>
+        <p style="font-family:var(--font-serif);font-size:var(--text-lg);color:var(--ink-muted);line-height:1.7;margin-bottom:var(--space-6);">
+          Reason Press is designed as a community for readers to engage with ideas. Share margin notes, debate thesis chapters, read free PDF previews, and join conversations directly with authors.
+        </p>
+        <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;">
+          <a href="community.html" class="btn btn--primary"><span>Visit the Reader Salon</span></a>
+          <a href="publish.html" class="btn btn--outline">Publish Your Book</a>
+        </div>
+      </div>
+      <div style="background:var(--paper);border:1px solid var(--rule);padding:var(--space-8);border-radius:2px;">
+        <div style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-dark);margin-bottom:var(--space-3);">
+          Featured Marginalia
+        </div>
+        <blockquote style="font-family:var(--font-serif);font-size:var(--text-xl);font-style:italic;line-height:1.6;color:var(--ink);margin-bottom:var(--space-4);">
+          &ldquo;When you turn down the volume of the world, you discover the steady, rhythmic pulse of your own consciousness asking to be heard.&rdquo;
+        </blockquote>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:var(--text-xs);color:var(--ink-muted);">
+          <span>From <em>Quiet Hours</em> by Anya Sharma</span>
+          <span style="color:var(--accent);font-weight:600;">22 Reader Reactions</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <div class="footer__logo-wrap">
+          <img src="assets/favicon.png" alt="Reason Press" class="footer__logo-img">
+          <div class="footer__logo-text">
+            <span class="footer__logo-name">Reason</span>
+            <span class="footer__logo-press">PRESS</span>
+          </div>
+        </div>
+        <p class="footer__brand-desc">An independent publishing house built around the idea that books should matter. Thoughtfully written, purposefully made.</p>
+      </div>
+      <div>
+        <div class="footer__col-title">Catalogue</div>
+        <ul class="footer__links">
+          <li><a href="books.html" class="footer__link">All Books</a></li>
+          <li><a href="books.html?cat=philosophy" class="footer__link">Philosophy</a></li>
+          <li><a href="books.html?cat=fiction" class="footer__link">Fiction</a></li>
+          <li><a href="books.html?cat=essays" class="footer__link">Essays</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Platform</div>
+        <ul class="footer__links">
+          <li><a href="publish.html" class="footer__link">Publish With Us</a></li>
+          <li><a href="community.html" class="footer__link">The Reader Salon</a></li>
+          <li><a href="about.html" class="footer__link">About Reason Press</a></li>
+          <li><a href="contact.html" class="footer__link">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Formats &amp; Delivery</div>
+        <ul class="footer__links">
+          <li><a href="about.html" class="footer__link">Collector&apos;s Hardcovers</a></li>
+          <li><a href="about.html" class="footer__link">Digital PDF &amp; ePub</a></li>
+          <li><a href="about.html" class="footer__link">Free Shipping over $60</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span class="footer__copy">&copy; 2026 Reason Press Ltd. All rights reserved. Reason Press . Caliph</span>
+      <div class="footer__social">
+        <a href="#" class="footer__social-link" id="social-instagram">Instagram</a>
+        <a href="#" class="footer__social-link" id="social-twitter">Twitter</a>
+        <a href="#" class="footer__social-link" id="social-substack">Substack</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+
+
+
+<div class="toast" role="status" aria-live="polite"></div>
+<!-- Firebase SDK & Production Services -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-service.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

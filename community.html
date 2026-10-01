@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Reader Salon &amp; Community — Reason Press</title>
+<meta name="description" content="Reason Press Reader Salon. A literary community for thoughtful readers to share marginalia, debate ideas, and connect with authors.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo" aria-label="Reason Press Home">
+      <img src="assets/favicon.png" alt="Reason Press Logo" class="nav__logo-img">
+      <div class="nav__logo-text">
+        <span class="nav__logo-name">Reason</span>
+        <span class="nav__logo-press">PRESS</span>
+      </div>
+    </a>
+    <div class="nav__links">
+      <a href="index.html" class="nav__link">Home</a>
+      <a href="books.html" class="nav__link">Books</a>
+      <a href="library.html" class="nav__link">My Library</a>
+      <a href="publish.html" class="nav__link">Publish</a>
+      <a href="community.html" class="nav__link nav__link--active">Community</a>
+      <a href="about.html" class="nav__link">About</a>
+      <a href="contact.html" class="nav__link">Contact</a>
+    </div>
+    <div class="nav__actions">
+      <!-- Universal Account / Sign-In Button -->
+      <div class="nav__account-wrapper" id="nav-account-wrap">
+        <button type="button" class="nav__account-btn" id="nav-account-btn" aria-label="User Account" aria-haspopup="true" aria-expanded="false" onclick="handleNavAccountClick()">
+          <span class="nav__account-avatar" id="nav-account-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <span class="nav__account-name" id="nav-account-name">Sign In</span>
+          <span class="nav__account-caret" aria-hidden="true">&caron;</span>
+        </button>
+        <div class="nav__account-dropdown" id="nav-account-dropdown" role="menu" style="display:none;"></div>
+      </div>
+      <a href="cart.html" class="nav__cart" aria-label="Reading Bag">
+        <span>Bag</span>
+        <span class="cart-count" style="display:none;">0</span>
+      </a>
+      <button class="nav__menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="nav-drawer">
+  <div id="mobile-account-slot" style="padding:var(--space-3) 0 var(--space-4);border-bottom:1px solid var(--rule-light);margin-bottom:var(--space-3);"></div>
+  <nav class="nav-drawer__links">
+    <a href="index.html" class="nav-drawer__link">Home</a>
+    <a href="books.html" class="nav-drawer__link">Books</a>
+    <a href="library.html" class="nav-drawer__link">My Library</a>
+    <a href="publish.html" class="nav-drawer__link">Publish</a>
+    <a href="community.html" class="nav-drawer__link nav-drawer__link--active">Community</a>
+    <a href="about.html" class="nav-drawer__link">About</a>
+    <a href="contact.html" class="nav-drawer__link">Contact</a>
+    <a href="cart.html" class="nav-drawer__link">Bag</a>
+  </nav>
+  <div style="font-size:var(--text-xs);color:var(--ink-faint);letter-spacing:0.12em;text-transform:uppercase;">
+    Reason Press . Caliph
+  </div>
+</div>
+
+<header class="page-header">
+  <div class="container container--narrow" style="text-align:center;">
+    <div class="page-header__label">r/ReasonPress &bull; Reader &amp; Author Exchange</div>
+    <h1 class="page-header__title">The Reason <em>Community.</em></h1>
+    <p class="page-header__desc" style="margin: 0 auto var(--space-6); max-width: 58ch;">
+      A Reddit-style space where inquiring minds ask questions, debate concepts, suggest future publications or translations directly to our editors, and upvote the best discourse.
+    </p>
+    <div style="display:flex; justify-content:center; gap:var(--space-4); flex-wrap:wrap;">
+      <button class="btn btn--primary" id="toggle-create-post-btn" onclick="togglePostForm()">
+        <span>+ Ask Question / Suggestion</span>
+      </button>
+      <a href="publish.html" class="btn btn--outline">
+        <span>Publish Your Own Book &rarr;</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="section section--sm">
+    <div class="container container--narrow">
+
+      <!-- Create Post / Suggestion Form Card (Toggled or inline) -->
+      <div class="forum-create-card" id="create-post-card" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-4);">
+          <h3 style="font-family:var(--font-display); font-size:var(--text-xl); font-weight:600; color:var(--ink);">
+            Create a Community Post
+          </h3>
+          <button type="button" onclick="togglePostForm()" style="background:none; border:none; font-size:20px; color:var(--ink-muted); cursor:pointer;" aria-label="Close form">&times;</button>
+        </div>
+
+        <form id="community-create-form" onsubmit="event.preventDefault(); submitCommunityPost();">
+          <!-- Post Type Selector (Reddit Flairs) -->
+          <label class="form-label" style="margin-bottom:var(--space-2);">Choose Post Type / Flair <span style="color:var(--accent);">*</span></label>
+          <div class="forum-type-selector">
+            <button type="button" class="forum-type-btn active" data-type="question" onclick="selectPostType('question')">
+              Question
+            </button>
+            <button type="button" class="forum-type-btn" data-type="suggestion" onclick="selectPostType('suggestion')">
+              Book Suggestion
+            </button>
+            <button type="button" class="forum-type-btn" data-type="discussion" onclick="selectPostType('discussion')">
+              Book Discussion
+            </button>
+          </div>
+          <input type="hidden" id="post-type" value="question">
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="post-author">Your Handle / Name <span style="color:var(--accent);">*</span></label>
+              <input class="form-input" type="text" id="post-author" placeholder="e.g. u/reader_sophia" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="post-book">Related Title (Optional)</label>
+              <select class="form-select" id="post-book">
+                <option value="General Publishing &amp; Craft">General / All Books</option>
+                <option value="The Architecture of Thought">The Architecture of Thought</option>
+                <option value="Quiet Hours">Quiet Hours</option>
+                <option value="Terra Firma">Terra Firma</option>
+                <option value="The Weight of Light">The Weight of Light</option>
+                <option value="Meridian">Meridian</option>
+                <option value="On Solitude">On Solitude</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="post-title">Title <span style="color:var(--accent);">*</span></label>
+            <input class="form-input" type="text" id="post-title" placeholder="Ask a specific question or give a publication suggestion..." required>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="post-content">Details &amp; Context <span style="color:var(--accent);">*</span></label>
+            <textarea class="form-textarea" id="post-content" rows="4" placeholder="Explain your question or reasoning for this book suggestion..." required></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:var(--space-3); margin-top:var(--space-4);">
+            <button type="button" class="btn btn--outline" onclick="togglePostForm()">Cancel</button>
+            <button type="submit" class="btn btn--primary">
+              <span>Post to Community &rarr;</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Reddit-Style Forum Navigation & Filters -->
+      <div class="forum-nav">
+        <!-- Sort tabs -->
+        <div class="forum-filters" id="sort-filters">
+          <button class="forum-filter-btn active" data-sort="hot" onclick="changeForumSort('hot')">Trending</button>
+          <button class="forum-filter-btn" data-sort="top" onclick="changeForumSort('top')">Top Rated</button>
+          <button class="forum-filter-btn" data-sort="new" onclick="changeForumSort('new')">Recent</button>
+        </div>
+
+        <!-- Flair filters -->
+        <div class="forum-filters" id="flair-filters">
+          <button class="forum-filter-btn active" data-filter="all" onclick="changeForumFilter('all')">All</button>
+          <button class="forum-filter-btn" data-filter="question" onclick="changeForumFilter('question')">Questions</button>
+          <button class="forum-filter-btn" data-filter="suggestion" onclick="changeForumFilter('suggestion')">Suggestions</button>
+          <button class="forum-filter-btn" data-filter="discussion" onclick="changeForumFilter('discussion')">Discussions</button>
+        </div>
+      </div>
+
+      <!-- Reddit-Style Posts Feed -->
+      <div id="forum-posts-container" class="forum-feed">
+        <!-- Loaded dynamically from localStorage/default dataset by main.js -->
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <div class="footer__logo-wrap">
+          <img src="assets/favicon.png" alt="Reason Press" class="footer__logo-img">
+          <div class="footer__logo-text">
+            <span class="footer__logo-name">Reason</span>
+            <span class="footer__logo-press">PRESS</span>
+          </div>
+        </div>
+        <p class="footer__brand-desc">An independent publishing house built around the idea that books should matter. Thoughtfully written, purposefully made.</p>
+      </div>
+      <div>
+        <div class="footer__col-title">Catalogue</div>
+        <ul class="footer__links">
+          <li><a href="books.html" class="footer__link">All Books</a></li>
+          <li><a href="books.html?cat=philosophy" class="footer__link">Philosophy</a></li>
+          <li><a href="books.html?cat=fiction" class="footer__link">Fiction</a></li>
+          <li><a href="books.html?cat=essays" class="footer__link">Essays</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Authors</div>
+        <ul class="footer__links">
+          <li><a href="publish.html" class="footer__link">Publish With Us</a></li>
+          <li><a href="publish.html" class="footer__link">Submit Manuscript (PDF/DOCX)</a></li>
+          <li><a href="about.html" class="footer__link">Editorial Standards</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Community</div>
+        <ul class="footer__links">
+          <li><a href="community.html" class="footer__link">r/ReasonPress Community</a></li>
+          <li><a href="community.html" class="footer__link">Ask Questions</a></li>
+          <li><a href="community.html" class="footer__link">Book Suggestions</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span class="footer__copy">&copy; 2026 Reason Press Ltd. All rights reserved. Reason Press . Caliph</span>
+      <div class="footer__social">
+        <a href="#" class="footer__social-link">Instagram</a>
+        <a href="#" class="footer__social-link">Twitter</a>
+        <a href="#" class="footer__social-link">Substack</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" role="status" aria-live="polite"></div>
+<!-- Firebase SDK & Production Services -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-service.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

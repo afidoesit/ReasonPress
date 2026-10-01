@@ -1,0 +1,3359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editorial &amp; Operations Console — Reason Press</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Universal Professional Admin Styles */
+    body.admin-body {
+      background: #0B1120;
+      color: #F8FAFC;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    .admin-main-wrap {
+      background: #F8FAFC;
+      color: #0F172A;
+      min-height: calc(100vh - 128px);
+    }
+
+    .admin-header {
+      background: #0B1120;
+      color: #F8FAFC;
+      padding: 0 28px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #1E293B;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .admin-nav {
+      display: flex;
+      background: #0F172A;
+      border-bottom: 1px solid #1E293B;
+      padding: 0 28px;
+      gap: 6px;
+      overflow-x: auto;
+      position: sticky;
+      top: 64px;
+      z-index: 90;
+    }
+
+    .admin-nav-btn {
+      padding: 14px 18px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: none;
+      color: #94A3B8;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .admin-nav-btn:hover {
+      color: #F8FAFC;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .admin-nav-btn.active {
+      color: #38BDF8;
+      border-bottom-color: #38BDF8;
+      background: rgba(56, 189, 248, 0.08);
+      font-weight: 700;
+    }
+
+    .admin-stat-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 20px 22px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+    }
+
+    .admin-stat-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      transform: translateY(-1px);
+    }
+
+    .admin-stat-card__num {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #0F172A;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .admin-stat-card__label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748B;
+    }
+
+    .admin-panel {
+      display: none;
+    }
+
+    .admin-panel:first-of-type {
+      display: block;
+    }
+
+    .admin-header {
+      background: var(--ink);
+      color: var(--white);
+      padding: 0 var(--space-8);
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--accent);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .admin-badge {
+      background: var(--accent);
+      color: var(--white);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      padding: 3px 8px;
+      border-radius: 2px;
+      text-transform: uppercase;
+    }
+
+    .admin-user-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--paper);
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #86EFAC;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4ADE80;
+      box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+      animation: pulse-green 2s infinite;
+    }
+
+    @keyframes pulse-green {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+      }
+
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(74, 222, 128, 0);
+      }
+
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+      }
+    }
+
+    .admin-nav {
+      display: flex;
+      background: var(--paper-mid);
+      border-bottom: 1px solid var(--rule);
+      padding: 0 var(--space-8);
+      gap: var(--space-2);
+      overflow-x: auto;
+      position: sticky;
+      top: 68px;
+      z-index: 90;
+    }
+
+    .admin-nav-btn {
+      padding: 14px 18px;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      border: none;
+      background: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: all var(--t-fast);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .admin-nav-btn:hover {
+      color: var(--ink);
+    }
+
+    .admin-nav-btn.active {
+      color: var(--accent-dark);
+      border-bottom-color: var(--accent);
+      background: rgba(254, 115, 89, 0.08);
+    }
+
+    .nav-badge {
+      background: var(--accent);
+      color: var(--white);
+      padding: 1px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .nav-badge--amber {
+      background: #D97706;
+    }
+
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+    }
+
+    .admin-stat-card {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      padding: var(--space-5);
+      box-shadow: 0 2px 8px rgba(25, 42, 62, 0.03);
+      transition: transform var(--t-fast), box-shadow var(--t-fast);
+    }
+
+    .admin-stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(25, 42, 62, 0.06);
+    }
+
+    .admin-stat-card__num {
+      font-family: var(--font-display);
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 4px;
+    }
+
+    .admin-stat-card__label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    .admin-content-card {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      padding: var(--space-8);
+      box-shadow: 0 4px 16px rgba(25, 42, 62, 0.03);
+      margin-bottom: var(--space-8);
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-xs);
+    }
+
+    .admin-table th {
+      background: var(--paper-dark);
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      border-bottom: 2px solid var(--rule);
+    }
+
+    .admin-table td {
+      padding: 14px;
+      border-bottom: 1px solid var(--rule-light);
+      color: var(--ink);
+      vertical-align: middle;
+    }
+
+    .admin-table tr:hover td {
+      background: rgba(254, 115, 89, 0.02);
+    }
+
+    /* Submission Card */
+    .submission-card {
+      background: var(--paper-light);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: var(--space-6);
+      margin-bottom: var(--space-4);
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      gap: var(--space-6);
+      align-items: center;
+      transition: all var(--t-fast);
+    }
+
+    .submission-card:hover {
+      border-color: var(--accent-light);
+      box-shadow: 0 6px 20px rgba(25, 42, 62, 0.05);
+    }
+
+    .submission-card.status-approved {
+      border-left: 4px solid #16A34A;
+    }
+
+    .submission-card.status-pending {
+      border-left: 4px solid #D97706;
+    }
+
+    .submission-card.status-declined {
+      border-left: 4px solid #DC2626;
+      opacity: 0.7;
+    }
+
+    .sub-meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      background: var(--paper-mid);
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* Status dropdown */
+    .status-select {
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 999px;
+      border: 1px solid var(--rule);
+      cursor: pointer;
+    }
+
+    .status-select.Confirmed {
+      background: #EBF4FC;
+      color: #1E6091;
+      border-color: #B5D6F2;
+    }
+
+    .status-select.Processing {
+      background: #FFF9C4;
+      color: #795548;
+      border-color: #FFF176;
+    }
+
+    .status-select.Dispatched {
+      background: #F3E5F5;
+      color: #6A1B9A;
+      border-color: #CE93D8;
+    }
+
+    .status-select.Delivered {
+      background: #E8F5E9;
+      color: #2E7D32;
+      border-color: #A5D6A7;
+    }
+
+    .status-select.Cancelled {
+      background: #FFEBEE;
+      color: #C62828;
+      border-color: #FFCDD2;
+    }
+
+    /* Modals */
+    .admin-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(25, 42, 62, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--t-fast);
+    }
+
+    .admin-modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .admin-modal {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .admin-modal__header {
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--paper-mid);
+    }
+
+    .admin-modal__body {
+      padding: var(--space-6);
+    }
+
+    /* User Management & Activity Log Styles */
+    .user-avatar-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--paper-mid);
+      border: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--ink);
+      text-transform: uppercase;
+    }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .role-badge--admin {
+      background: #DCFCE7;
+      color: #15803D;
+      border: 1px solid #86EFAC;
+    }
+
+    .role-badge--user {
+      background: #F1F5F9;
+      color: #475569;
+      border: 1px solid #CBD5E1;
+    }
+
+    .log-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .log-badge--auth {
+      background: #DBEAFE;
+      color: #1E40AF;
+      border: 1px solid #93C5FD;
+    }
+
+    .log-badge--role_change {
+      background: #F3E8FF;
+      color: #6B21A8;
+      border: 1px solid #D8B4FE;
+    }
+
+    .log-badge--order {
+      background: #DCFCE7;
+      color: #166534;
+      border: 1px solid #86EFAC;
+    }
+
+    .log-badge--book {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px solid #FCD34D;
+    }
+
+    .log-badge--submission {
+      background: #E0E7FF;
+      color: #3730A3;
+      border: 1px solid #A5B4FC;
+    }
+
+    .log-badge--profile {
+      background: #F1F5F9;
+      color: #334155;
+      border: 1px solid #CBD5E1;
+    }
+
+    .log-badge--general {
+      background: #F3F4F6;
+      color: #374151;
+      border: 1px solid #E5E7EB;
+    }
+
+    .signedin-card {
+      background: linear-gradient(135deg, #FFFDF8 0%, #F5EFEB 100%);
+      border: 1px solid #E4D9C8;
+      border-left: 4px solid var(--accent);
+      border-radius: 4px;
+      padding: var(--space-5) var(--space-6);
+      margin-bottom: var(--space-6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+      box-shadow: 0 2px 8px rgba(25, 42, 62, 0.04);
+    }
+
+    @media (max-width: 900px) {
+      .admin-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .submission-card {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-table {
+        display: block;
+        overflow-x: auto;
+      }
+
+      #manuscript-reader-content {
+        grid-template-columns: 1fr !important;
+      }
+
+      #manuscript-reader-content>div:first-child {
+        border-right: none !important;
+        border-bottom: 1px solid var(--rule);
+        padding-right: 0 !important;
+        padding-bottom: var(--space-4);
+      }
+    }
+  </style>
+  <script>
+    function switchAdminTab(rawTabName) {
+      let tabName = rawTabName;
+      if (tabName === "overview") tabName = "dashboard";
+      if (tabName === "user-accounts") tabName = "users";
+      if (tabName === "activity-logs") tabName = "logs";
+      if (tabName === "author-submissions") tabName = "submissions";
+      if (tabName === "customer-orders") tabName = "orders";
+      if (tabName === "books-catalogue") tabName = "books";
+
+      document.querySelectorAll(".admin-nav-btn").forEach(btn => {
+        const bTab = btn.dataset.tab;
+        const isActive = bTab === tabName || 
+          (tabName === "dashboard" && bTab === "overview") ||
+          (tabName === "users" && bTab === "user-accounts") ||
+          (tabName === "logs" && bTab === "activity-logs") ||
+          (tabName === "submissions" && bTab === "author-submissions") ||
+          (tabName === "orders" && bTab === "customer-orders") ||
+          (tabName === "books" && bTab === "books-catalogue");
+        btn.classList.toggle("active", isActive);
+      });
+      document.querySelectorAll(".admin-panel").forEach(p => p.style.display = "none");
+      const target = document.getElementById("panel-" + tabName);
+      if (target) {
+        target.style.display = "block";
+      }
+    }
+    window.switchAdminTab = switchAdminTab;
+
+    async function handleAdminLogout() {
+      if (typeof FirebaseService !== "undefined") {
+        await FirebaseService.logoutUser().catch(() => { });
+      }
+      sessionStorage.removeItem("rp_admin_logged_in");
+      localStorage.removeItem("rp_current_user");
+      window.location.href = "login.html";
+    }
+    window.handleAdminLogout = handleAdminLogout;
+  </script>
+</head>
+
+<body class="admin-body">
+
+  <!-- Admin Bar Header -->
+  <header class="admin-header">
+    <div class="admin-brand">
+      <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:#FFFFFF;">
+        <img src="assets/favicon.png" alt="Reason Press" style="height:28px;">
+        <span style="font-family:-apple-system, BlinkMacSystemFont, sans-serif;font-weight:700;font-size:1.15rem;letter-spacing:-0.02em;">Reason Press</span>
+      </a>
+      <span class="admin-badge" style="background:#2563EB;color:#FFFFFF;font-size:10px;font-weight:700;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase;">Console</span>
+      <div class="live-indicator" style="display:flex;align-items:center;gap:6px;font-size:11px;color:#86EFAC;">
+        <span class="pulse-dot"></span>
+        <span>Live Sync Active</span>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="admin-user-pill" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;color:#F1F5F9;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>admin</span>
+      </div>
+      <a href="index.html" class="btn btn--outline" style="border-color:rgba(255,255,255,0.25);color:#F1F5F9;padding:6px 14px;font-size:11px;display:inline-flex;align-items:center;gap:6px;">
+        <span>Return to Bookstore</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+      <button type="button" onclick="handleAdminLogout()" class="btn btn--outline" style="border-color:#EF4444;color:#FCA5A5;padding:6px 14px;font-size:11px;background:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Sign Out</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Tab Navigation Bar -->
+  <nav class="admin-nav" role="tablist">
+    <button class="admin-nav-btn active" data-tab="dashboard" onclick="switchAdminTab('dashboard')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>Overview</span>
+    </button>
+    <button class="admin-nav-btn" data-tab="books" onclick="switchAdminTab('books')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>Books Catalogue</span>
+      <span id="admin-books-badge" class="nav-badge" style="background:#2563EB;">0</span>
+    </button>
+    <button class="admin-nav-btn" data-tab="categories" onclick="switchAdminTab('categories')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      <span>Categories</span>
+    </button>
+    <button class="admin-nav-btn" data-tab="submissions" onclick="switchAdminTab('submissions')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>Author Submissions</span>
+      <span id="admin-submissions-badge" class="nav-badge nav-badge--amber">0</span>
+    </button>
+    <button class="admin-nav-btn" data-tab="orders" onclick="switchAdminTab('orders')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span>Customer Orders</span>
+      <span id="admin-orders-badge" class="nav-badge" style="background:#10B981;">0</span>
+    </button>
+    <button class="admin-nav-btn" data-tab="users" onclick="switchAdminTab('users')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Users &amp; Roles</span>
+      <span id="admin-users-badge" class="nav-badge" style="background:#2563EB;">0</span>
+    </button>
+    <button class="admin-nav-btn" data-tab="logs" onclick="switchAdminTab('logs')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      <span>Activity Logs</span>
+      <span id="admin-logs-badge" class="nav-badge" style="background:#7C3AED;">0</span>
+    </button>
+    <button class="admin-nav-btn" data-tab="settings" onclick="switchAdminTab('settings')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <main class="admin-main-wrap" style="padding: 32px 0 60px;">
+    <div class="container" style="max-width:1200px;">
+
+      <!-- Top Stats Overview -->
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card" style="border-color:#BFDBFE;">
+          <div class="admin-stat-card__label" style="color:#2563EB;">Registered Users</div>
+          <div class="admin-stat-card__num" id="stat-users-count" style="color:#1D4ED8;">0</div>
+        </div>
+        <div class="admin-stat-card" style="border-color:#DDD6FE;">
+          <div class="admin-stat-card__label" style="color:#7C3AED;">Live Activity Logs</div>
+          <div class="admin-stat-card__num" id="stat-logs-count" style="color:#6D28D9;">0</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-card__label">Active Catalogue</div>
+          <div class="admin-stat-card__num" id="stat-books-count">0</div>
+        </div>
+        <div class="admin-stat-card" style="border-color:var(--accent-light);">
+          <div class="admin-stat-card__label" style="color:var(--accent-dark);">Pending Submissions</div>
+          <div class="admin-stat-card__num" id="stat-submissions-count" style="color:var(--accent-dark);">0</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-card__label">Subject Categories</div>
+          <div class="admin-stat-card__num" id="stat-cats-count">0</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-card__label">Customer Orders</div>
+          <div class="admin-stat-card__num" id="stat-orders-count">0</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-card__label">Gross Revenue (INR)</div>
+          <div class="admin-stat-card__num" id="stat-revenue" style="color:#16A34A;">₹0</div>
+        </div>
+      </div>
+
+      <!-- TAB 1: Dashboard Overview -->
+      <section class="admin-panel" id="panel-dashboard">
+        <div class="admin-content-card">
+          <div
+            style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-6);">
+            <div>
+              <h2 style="font-family:var(--font-display);font-size:var(--text-2xl);font-weight:600;margin-bottom:4px;">
+                Publishing House Executive Summary
+              </h2>
+              <p style="font-size:var(--text-xs);color:var(--ink-muted);">
+                Manage submitted manuscripts awaiting approval, published titles, customer fulfillment, and site content
+                in real time.
+              </p>
+            </div>
+            <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;">
+              <button class="btn btn--primary" onclick="switchAdminTab('submissions')">
+                <span>Review Submissions Queue &rarr;</span>
+              </button>
+              <button class="btn btn--outline" onclick="openAddBookModal()">
+                <span>+ Add Book</span>
+              </button>
+              <button class="btn btn--outline" onclick="openAddCategoryModal()">
+                <span>+ Add Category</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pending Submissions Callout -->
+          <div id="dash-submissions-alert"
+            style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:4px;padding:var(--space-5);margin-bottom:var(--space-6);display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span style="font-size:24px;"></span>
+              <div>
+                <strong style="color:#92400E;font-size:13px;" id="dash-alert-title">Author Submissions Awaiting
+                  Approval</strong>
+                <div style="font-size:12px;color:#78350F;">Review book credentials and approve to publish directly into
+                  the public book catalogue.</div>
+              </div>
+            </div>
+            <button class="btn btn--primary"
+              style="background:#92400E;border-color:#92400E;font-size:11px;padding:8px 16px;"
+              onclick="switchAdminTab('submissions')">
+              <span>Open Approvals &rarr;</span>
+            </button>
+          </div>
+
+          <!-- Quick Activity Feeds -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);">
+            <div>
+              <h3
+                style="font-family:var(--font-display);font-size:var(--text-lg);font-weight:600;margin-bottom:var(--space-3);padding-bottom:var(--space-2);border-bottom:1px solid var(--rule-light);">
+                Recent Customer Orders
+              </h3>
+              <div id="dash-recent-orders-list">
+                <!-- Dynamically filled -->
+              </div>
+            </div>
+
+            <div>
+              <h3
+                style="font-family:var(--font-display);font-size:var(--text-lg);font-weight:600;margin-bottom:var(--space-3);padding-bottom:var(--space-2);border-bottom:1px solid var(--rule-light);">
+                Published Catalogue Highlights
+              </h3>
+              <div id="dash-recent-books-list">
+                <!-- Dynamically filled -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: Author Submissions & Editorial Approvals (NEW TAB) -->
+      <section class="admin-panel" id="panel-submissions" style="display:none;">
+        <div class="admin-content-card">
+          <div
+            style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-6);">
+            <div>
+              <h2 style="font-family:var(--font-display);font-size:var(--text-2xl);font-weight:600;margin-bottom:4px;">
+                Author Submissions &amp; Editorial Approvals
+              </h2>
+              <p style="font-size:var(--text-xs);color:var(--ink-muted);">
+                When an author submits their book on the Publish page, it arrives here for editorial appraisal.
+                <strong>Only when you approve it will it be published to the live catalogue.</strong>
+              </p>
+            </div>
+            <div style="display:flex;gap:var(--space-2);">
+              <select id="sub-filter-status" class="form-select" style="font-size:12px;padding:6px 12px;"
+                onchange="filterAdminSubmissions()">
+                <option value="all">All Submissions</option>
+                <option value="pending" selected>Pending Review</option>
+                <option value="approved">Approved &amp; Published</option>
+                <option value="declined">Declined</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="submissions-list-container">
+            <!-- Populated dynamically with submission cards -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: Books Management -->
+      <section class="admin-panel" id="panel-books" style="display:none;">
+        <div class="admin-content-card">
+          <div
+            style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-6);">
+            <div>
+              <h2 style="font-family:var(--font-display);font-size:var(--text-2xl);font-weight:600;margin-bottom:4px;">
+                Live Catalogue Titles
+              </h2>
+              <p style="font-size:var(--text-xs);color:var(--ink-muted);">
+                Manage existing titles, custom cover art, pricing, inventory stock, and placement badges.
+              </p>
+            </div>
+            <button type="button" class="btn btn--primary" onclick="openAddBookModal()">
+              <span>+ Add New Book Title</span>
+            </button>
+          </div>
+
+          <div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-4);flex-wrap:wrap;">
+            <input type="text" id="books-search-input" class="form-input"
+              placeholder="Search by title, author, or ISBN..." style="max-width:320px;" oninput="filterAdminBooks()">
+            <select id="books-cat-filter" class="form-select" style="max-width:220px;" onchange="filterAdminBooks()">
+              <option value="all">All Categories</option>
+            </select>
+          </div>
+
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width:70px;">Cover</th>
+                <th>Book Title &amp; Author</th>
+                <th>Category</th>
+                <th>Prices (Hardcover / PDF)</th>
+                <th>Stock</th>
+                <th>Placement Badges</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-books-tbody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 4: Categories Management -->
+      <section class="admin-panel" id="panel-categories" style="display:none;">
+        <div class="admin-content-card">
+          <div
+            style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-6);">
+            <div>
+              <h2 style="font-family:var(--font-display);font-size:var(--text-2xl);font-weight:600;margin-bottom:4px;">
+                Subject Categories
+              </h2>
+              <p style="font-size:var(--text-xs);color:var(--ink-muted);">
+                Manage navigation categories and subject classifications across the catalogue.
+              </p>
+            </div>
+            <button type="button" class="btn btn--primary" onclick="openAddCategoryModal()">
+              <span>+ Create Category</span>
+            </button>
+          </div>
+
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Slug / Identifier</th>
+                <th>Category Display Name</th>
+                <th>Description / Scope</th>
+                <th>Books Assigned</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-categories-tbody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 5: Customer Orders Management -->
+      <section class="admin-panel" id="panel-orders" style="display:none;">
+        <div class="admin-content-card">
+          <div
+            style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-6);">
+            <div>
+              <h2 style="font-family:var(--font-display);font-size:var(--text-2xl);font-weight:600;margin-bottom:4px;">
+                Customer Orders &amp; Fulfillment
+              </h2>
+              <p style="font-size:var(--text-xs);color:var(--ink-muted);">
+                Track customer orders placed via Google Pay, PhonePe, Cards, Net Banking, or PayPal. Update dispatch
+                status and track fulfillment.
+              </p>
+            </div>
+            <div style="display:flex;gap:var(--space-2);">
+              <button class="btn btn--outline" style="font-size:11px;padding:8px 12px;"
+                onclick="renderAdminOrders()">Refresh Orders</button>
+            </div>
+          </div>
+
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Order ID &amp; Date</th>
+                <th>Customer Details</th>
+                <th>Delivery Destination</th>
+                <th>Purchased Editions</th>
+                <th>Payment &amp; Total</th>
+                <th>Fulfillment Status</th>
+              </tr>
+            </thead>
+            <tbody id="admin-orders-tbody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 6: Press & Site Settings -->
+      <section class="admin-panel" id="panel-settings" style="display:none;">
+        <div class="admin-content-card" style="max-width:800px;">
+          <h2
+            style="font-family:var(--font-display);font-size:var(--text-2xl);font-weight:600;margin-bottom:var(--space-2);">
+            Press Manifesto &amp; Contact Information
+          </h2>
+          <p style="font-size:var(--text-xs);color:var(--ink-muted);margin-bottom:var(--space-6);">
+            Edit publishing house manifesto, telephone lines, official emails, and headquarters address. Changes sync to
+            About and Contact pages instantly.
+          </p>
+
+          <form id="admin-settings-form" onsubmit="event.preventDefault(); saveAdminSettings();">
+            <div class="form-field">
+              <label class="form-label" for="set-press-name">Publishing House Name</label>
+              <input class="form-input" type="text" id="set-press-name" value="Reason Press">
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="set-motto">Brand Tagline</label>
+              <input class="form-input" type="text" id="set-motto" value="BOOKS WITH PURPOSE">
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="set-manifesto-heading">Manifesto Heading</label>
+              <input class="form-input" type="text" id="set-manifesto-heading"
+                value="We publish books that refuse to evaporate.">
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="set-manifesto-text">Manifesto / About Statement</label>
+              <textarea class="form-textarea" id="set-manifesto-text" rows="4"></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label" for="set-editorial-email">Editorial Submissions Email</label>
+                <input class="form-input" type="email" id="set-editorial-email" value="editor@reasonpress.com">
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="set-orders-email">Customer Orders Email</label>
+                <input class="form-input" type="email" id="set-orders-email" value="orders@reasonpress.com">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label" for="set-phone">Phone / WhatsApp Line</label>
+                <input class="form-input" type="text" id="set-phone" value="+44 (0)20 7946 0912 / +91 98765 43210">
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="set-turnaround">Manuscript Review Turnaround</label>
+                <input class="form-input" type="text" id="set-turnaround" value="10–14 business days">
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="set-address">Headquarters Address &amp; Delivery Hub</label>
+              <input class="form-input" type="text" id="set-address"
+                value="Reason Press . Caliph / India Distribution Hub">
+            </div>
+
+            <button type="submit" class="btn btn--primary" style="margin-top:var(--space-4);">
+              <span>Save About &amp; Contact Info &rarr;</span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- TAB 7: User Accounts & Roles Management -->
+      <section class="admin-panel" id="panel-users" style="display:none;">
+        <div class="admin-content-card">
+          <div
+            style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-6);">
+            <div>
+              <h2 style="font-family:var(--font-display);font-size:var(--text-2xl);font-weight:600;margin-bottom:4px;">
+                User Accounts &amp; Role Permissions
+              </h2>
+              <p style="font-size:var(--text-xs);color:var(--ink-muted);">
+                Manage real user accounts registered via Firebase Authentication and Cloud Firestore. Promote signed-in
+                accounts to Administrator with 1 click, assign roles, and audit access.
+              </p>
+            </div>
+            <div style="display:flex;gap:var(--space-2);">
+              <button class="btn btn--outline" style="font-size:11px;padding:8px 14px;" onclick="refreshAdminUsers()">
+                <span>Refresh Users</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Current Signed-in Account Quick Card -->
+          <div class="signedin-card" id="signedin-account-card">
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div class="user-avatar-circle" id="signedin-avatar"
+                style="width:44px;height:44px;font-size:16px;background:var(--ink);color:var(--white);"></div>
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <strong style="font-size:14px;color:var(--ink);" id="signedin-name">Signed In User</strong>
+                  <span id="signedin-role-badge" class="role-badge role-badge--admin">ADMIN</span>
+                </div>
+                <div style="font-size:12px;color:var(--ink-muted);" id="signedin-email">user@domain.com</div>
+                <div style="font-size:10px;color:var(--ink-faint);margin-top:2px;" id="signedin-uid">UID: loading...
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;" id="signedin-actions-wrap">
+              <button type="button" id="btn-toggle-current-admin" class="btn btn--primary"
+                style="background:#16A34A;border-color:#16A34A;font-size:11px;padding:9px 16px;"
+                onclick="handleToggleCurrentAccountAdmin()">
+                <span>Make This Signed-in Account Admin</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Promote by Email / UID Bar -->
+          <div
+            style="background:var(--paper-mid);border:1px solid var(--rule);border-radius:4px;padding:var(--space-4) var(--space-5);margin-bottom:var(--space-6);">
+            <div
+              style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:8px;">
+              Grant Administrator Role to Any Account:
+            </div>
+            <form onsubmit="event.preventDefault(); handlePromoteUserForm();"
+              style="display:flex;gap:var(--space-3);flex-wrap:wrap;">
+              <input type="text" id="user-promote-input" class="form-input"
+                placeholder="Enter user's email address or Firestore UID..." style="flex:1;min-width:240px;" required>
+              <button type="submit" class="btn btn--primary"
+                style="font-size:12px;padding:10px 18px;white-space:nowrap;">
+                <span>Grant Admin Role &rarr;</span>
+              </button>
+            </form>
+            <div style="font-size:10px;color:var(--ink-faint);margin-top:6px;">
+              Tip: If the user hasn't signed up yet, this will pre-authorize their email address so they automatically
+              get Admin access when they sign up!
+            </div>
+          </div>
+
+          <!-- Users Table Filters -->
+          <div
+            style="display:flex;gap:var(--space-3);margin-bottom:var(--space-4);flex-wrap:wrap;align-items:center;justify-content:space-between;">
+            <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;flex:1;">
+              <input type="text" id="users-search-input" class="form-input"
+                placeholder="Search by name, email, or UID..." style="max-width:320px;" oninput="filterAdminUsers()">
+              <select id="users-role-filter" class="form-select" style="max-width:200px;" onchange="filterAdminUsers()">
+                <option value="all">All Roles</option>
+                <option value="admin">Administrators Only ()</option>
+                <option value="user">Regular Readers Only ()</option>
+              </select>
+            </div>
+            <div style="font-size:12px;color:var(--ink-muted);" id="users-count-summary">
+              Showing all accounts
+            </div>
+          </div>
+
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width:40px;">Avatar</th>
+                <th>User Name &amp; Email</th>
+                <th>Firestore UID</th>
+                <th>Registration Date</th>
+                <th>Last Login</th>
+                <th>Role</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-users-tbody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 8: Live User Activity & Audit Logs -->
+      <section class="admin-panel" id="panel-logs" style="display:none;">
+        <div class="admin-content-card">
+          <div
+            style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-6);">
+            <div>
+              <h2 style="font-family:var(--font-display);font-size:var(--text-2xl);font-weight:600;margin-bottom:4px;">
+                Live User Activity &amp; Audit Logs
+              </h2>
+              <p style="font-size:var(--text-xs);color:var(--ink-muted);">
+                Real-time audit log of user logins, registrations, order checkouts, manuscript submissions, and
+                administrator role promotions in Cloud Firestore.
+              </p>
+            </div>
+            <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
+              <button class="btn btn--primary" style="font-size:11px;padding:8px 14px;" onclick="refreshAdminLogs()">
+                <span>Live Refresh</span>
+              </button>
+              <button class="btn btn--outline" style="font-size:11px;padding:8px 14px;" onclick="exportAdminLogs()">
+                <span>Export JSON</span>
+              </button>
+              <button class="btn btn--outline"
+                style="font-size:11px;padding:8px 14px;color:#DC2626;border-color:#FCA5A5;" onclick="clearAdminLogs()">
+                <span>Clear Feed</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Logs Filter Controls -->
+          <div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-4);flex-wrap:wrap;align-items:center;">
+            <input type="text" id="logs-search-input" class="form-input"
+              placeholder="Search by email, name, action, or details..." style="max-width:340px;"
+              oninput="filterAdminLogs()">
+            <select id="logs-type-filter" class="form-select" style="max-width:240px;" onchange="filterAdminLogs()">
+              <option value="all">All Event Types</option>
+              <option value="auth">Auth (Logins &amp; Sign-ups)</option>
+              <option value="role_change">Admin Role Changes</option>
+              <option value="order">Customer Orders</option>
+              <option value="book">Catalogue &amp; Books</option>
+              <option value="submission">Author Manuscripts</option>
+              <option value="profile">Profile Updates</option>
+            </select>
+            <div style="margin-left:auto;font-size:12px;color:var(--ink-muted);" id="logs-count-summary">
+              0 logs recorded
+            </div>
+          </div>
+
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width:140px;">Timestamp</th>
+                <th style="width:110px;">Event Category</th>
+                <th>User Identity</th>
+                <th>Action &amp; Details</th>
+                <th>Device &amp; IP Details</th>
+              </tr>
+            </thead>
+            <tbody id="admin-logs-tbody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Add / Edit Book Modal -->
+  <div class="admin-modal-overlay" id="book-modal">
+    <div class="admin-modal">
+      <div class="admin-modal__header">
+        <h3 id="book-modal-title" style="font-family:var(--font-display);font-size:var(--text-xl);margin:0;">
+          Add Book Title
+        </h3>
+        <button type="button" onclick="closeBookModal()"
+          style="background:none;border:none;font-size:24px;cursor:pointer;">&times;</button>
+      </div>
+      <div class="admin-modal__body">
+        <form id="book-edit-form" onsubmit="event.preventDefault(); saveBookForm();">
+          <input type="hidden" id="edit-book-id">
+
+          <div class="form-field">
+            <label class="form-label" for="book-title">Title <span style="color:var(--accent);">*</span></label>
+            <input class="form-input" type="text" id="book-title" required
+              placeholder="e.g. The Architecture of Thought">
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="book-subtitle">Subtitle</label>
+            <input class="form-input" type="text" id="book-subtitle"
+              placeholder="e.g. A philosophical inquiry into structure">
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="book-author">Author <span style="color:var(--accent);">*</span></label>
+              <input class="form-input" type="text" id="book-author" required placeholder="Author full name">
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="book-category">Category <span style="color:var(--accent);">*</span></label>
+              <select class="form-select" id="book-category" required>
+                <!-- Filled from categories -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="book-price-hardcover-inr">Hardcover Price (₹ INR) <span
+                  style="color:var(--accent);">*</span></label>
+              <input class="form-input" type="number" id="book-price-hardcover-inr" required value="1999">
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="book-price-digital-inr">Digital PDF Price (₹ INR) <span
+                  style="color:var(--accent);">*</span></label>
+              <input class="form-input" type="number" id="book-price-digital-inr" required value="899">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="book-stock">Physical Stock Count</label>
+              <input class="form-input" type="number" id="book-stock" value="50">
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="book-cover-preset">Jacket Style Preset (1–8)</label>
+              <select class="form-select" id="book-cover-preset">
+                <option value="1">Preset 1 (Slate Navy Typographic)</option>
+                <option value="2">Preset 2 (Amber Minimalist)</option>
+                <option value="3">Preset 3 (Terracotta Earth)</option>
+                <option value="4">Preset 4 (Olive Green Monograph)</option>
+                <option value="5">Preset 5 (Indigo Classic)</option>
+                <option value="6">Preset 6 (Warm Ochre)</option>
+                <option value="7">Preset 7 (Charcoal Geometry)</option>
+                <option value="8">Preset 8 (Coral Accent)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Custom Cover Upload -->
+          <div class="form-field">
+            <label class="form-label" for="book-cover-file">Upload Custom Cover Image (Optional)</label>
+            <input type="file" id="book-cover-file" class="form-input" accept="image/*"
+              onchange="handleAdminCoverUpload(this)">
+            <div id="book-cover-preview-wrap" style="display:none;margin-top:8px;">
+              <img id="book-cover-preview-img" style="height:90px;border-radius:2px;border:1px solid var(--rule);">
+              <button type="button" onclick="removeAdminCoverUpload()"
+                style="margin-left:8px;font-size:11px;color:var(--accent-dark);cursor:pointer;background:none;border:none;">&times;
+                Remove custom image</button>
+            </div>
+            <input type="hidden" id="book-cover-custom-base64">
+          </div>
+
+          <!-- Badges -->
+          <div style="display:flex;gap:var(--space-6);margin-bottom:var(--space-4);">
+            <label style="display:flex;align-items:center;gap:8px;font-size:var(--text-xs);cursor:pointer;">
+              <input type="checkbox" id="book-is-featured" style="accent-color:var(--accent);" checked>
+              <span><strong>Featured Title</strong> (Display on Homepage Wall)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:var(--text-xs);cursor:pointer;">
+              <input type="checkbox" id="book-is-new" style="accent-color:var(--accent);" checked>
+              <span><strong>New Release</strong> (Show 'New' Badge)</span>
+            </label>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="book-desc">Description</label>
+            <textarea class="form-textarea" id="book-desc" rows="3"
+              placeholder="Overview of philosophical inquiry or narrative..."></textarea>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:var(--space-3);margin-top:var(--space-6);">
+            <button type="button" class="btn btn--outline" onclick="closeBookModal()">Cancel</button>
+            <button type="submit" class="btn btn--primary">
+              <span>Save Book to Live Catalogue &rarr;</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Category Modal -->
+  <div class="admin-modal-overlay" id="category-modal">
+    <div class="admin-modal" style="max-width:480px;">
+      <div class="admin-modal__header">
+        <h3 style="font-family:var(--font-display);font-size:var(--text-xl);margin:0;">Create Subject Category</h3>
+        <button type="button" onclick="closeCategoryModal()"
+          style="background:none;border:none;font-size:24px;cursor:pointer;">&times;</button>
+      </div>
+      <div class="admin-modal__body">
+        <form id="category-form" onsubmit="event.preventDefault(); saveCategoryForm();">
+          <input type="hidden" id="edit-cat-id">
+          <div class="form-field">
+            <label class="form-label" for="cat-name">Category Label <span style="color:var(--accent);">*</span></label>
+            <input class="form-input" type="text" id="cat-name" placeholder="e.g. Cognitive Philosophy" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="cat-slug">URL Slug <span style="color:var(--accent);">*</span></label>
+            <input class="form-input" type="text" id="cat-slug" placeholder="e.g. cognitive" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="cat-desc">Scope Description</label>
+            <textarea class="form-textarea" id="cat-desc" rows="2" placeholder="Brief scope of works..."></textarea>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:var(--space-3);margin-top:var(--space-4);">
+            <button type="button" class="btn btn--outline" onclick="closeCategoryModal()">Cancel</button>
+            <button type="submit" class="btn btn--primary"><span>Save Category</span></button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manuscript Reader & Editorial Clearance Modal -->
+  <div class="admin-modal-overlay" id="manuscript-reader-modal">
+    <div class="admin-modal" style="max-width:960px;width:95%;max-height:92vh;display:flex;flex-direction:column;">
+      <div class="admin-modal__header" style="background:var(--ink);color:var(--white);flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <div>
+            <h3
+              style="font-family:var(--font-display);font-size:var(--text-lg);font-weight:600;margin:0;color:var(--white);">
+              Editorial Appraisal &amp; Manuscript Reader
+            </h3>
+            <div style="font-size:11px;color:rgba(255,255,255,0.7);">
+              Reason Press Editorial Review Desk &bull; Read &amp; Review Cover Art Before Approving Publication
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="closeManuscriptReaderModal()"
+          style="background:none;border:none;color:var(--white);font-size:26px;cursor:pointer;line-height:1;padding:4px 8px;"
+          aria-label="Close Reader">&times;</button>
+      </div>
+
+      <div class="admin-modal__body" style="padding:var(--space-6);background:#FAF8F5;overflow-y:auto;flex:1;">
+        <div id="manuscript-reader-content" style="display:flex;flex-direction:column;gap:var(--space-5);">
+          <!-- Dynamically injected PDF reader content -->
+        </div>
+      </div>
+
+      <div
+        style="padding:var(--space-4) var(--space-6);background:var(--paper-mid);border-top:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-3);flex-shrink:0;">
+        <div id="reader-eval-status"
+          style="font-size:12px;font-weight:600;color:var(--ink-muted);display:flex;align-items:center;gap:6px;">
+          <span style="color:#16A34A;">●</span>
+          <span>Editorial Status: <strong style="color:var(--ink);" id="reader-status-label">Manuscript Read &amp;
+              Evaluated</strong></span>
+        </div>
+        <div style="display:flex;gap:var(--space-3);align-items:center;flex-wrap:wrap;">
+          <button type="button" class="btn btn--outline" style="color:#DC2626;border-color:#FCA5A5;font-size:12px;"
+            onclick="declineCurrentSubmissionFromReader()">
+            <span>✕ Decline Proposal</span>
+          </button>
+          <button type="button" class="btn btn--outline" style="font-size:12px;" onclick="closeManuscriptReaderModal()">
+            <span>Close Reader</span>
+          </button>
+          <button type="button" id="reader-approve-btn" class="btn btn--primary"
+            style="background:#16A34A;border-color:#16A34A;padding:10px 22px;font-size:12px;"
+            onclick="openReleaseConfirmModal(currentReadingSubId)">
+            <span>✓ Approve &amp; Release to Website &rarr;</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDITORIAL CATALOGUE RELEASE CONFIRMATION MODAL -->
+  <div class="admin-modal-overlay" id="release-confirm-modal">
+    <div class="admin-modal" style="max-width:540px;">
+      <div class="admin-modal__header" style="background:var(--ink);color:var(--white);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8 21 9 17 14 18 20 12 17 6 20 7 14 3 9 9 8 12 2"/></svg>
+          <div>
+            <h3 style="font-family:var(--font-display);font-size:var(--text-lg);margin:0;color:var(--white);">
+              Editorial Catalogue Release
+            </h3>
+            <div style="font-size:11px;color:rgba(255,255,255,0.7);">
+              Clear Manuscript PDF &amp; Publish to Public Book Catalogue
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="closeReleaseConfirmModal()"
+          style="background:none;border:none;color:var(--white);font-size:24px;cursor:pointer;">&times;</button>
+      </div>
+      <div class="admin-modal__body">
+        <div id="release-modal-summary"
+          style="display:flex;gap:var(--space-4);margin-bottom:var(--space-5);padding:var(--space-4);background:var(--paper-mid);border:1px solid var(--rule);border-radius:4px;">
+          <!-- Populated dynamically with book cover and title -->
+        </div>
+
+        <form id="release-confirm-form" onsubmit="event.preventDefault(); confirmAndExecuteRelease();">
+          <input type="hidden" id="release-sub-id">
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="release-cat">Subject Category</label>
+              <select class="form-select" id="release-cat" required>
+                <!-- Filled from categories -->
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="release-isbn">Assigned ISBN</label>
+              <input class="form-input" type="text" id="release-isbn" value="978-1-9999-4102-1" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="release-price-hardcover">Hardcover Price (₹ INR)</label>
+              <input class="form-input" type="number" id="release-price-hardcover" value="1999" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="release-price-pdf">Digital PDF Price (₹ INR)</label>
+              <input class="form-input" type="number" id="release-price-pdf" value="899" required>
+            </div>
+          </div>
+
+          <div class="release-checklist-card">
+            <div
+              style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:8px;">
+              Editorial Clearance Checklist:
+            </div>
+            <label class="release-check-item">
+              <input type="checkbox" id="check-pdf-verified" checked required>
+              <span>Manuscript PDF reviewed and verified for publication</span>
+            </label>
+            <label class="release-check-item">
+              <input type="checkbox" id="check-rights-cleared" checked required>
+              <span>Author publishing rights and credentials cleared</span>
+            </label>
+            <label class="release-check-item">
+              <input type="checkbox" id="check-homepage-wall" checked>
+              <span>Feature on Homepage Book Wall</span>
+            </label>
+            <label class="release-check-item">
+              <input type="checkbox" id="check-new-badge" checked>
+              <span>Tag with 'New Release' badge</span>
+            </label>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:var(--space-3);margin-top:var(--space-6);">
+            <button type="button" class="btn btn--outline" onclick="closeReleaseConfirmModal()">Cancel</button>
+            <button type="submit" class="btn btn--primary" id="execute-release-btn"
+              style="background:#16A34A;border-color:#16A34A;padding:12px 24px;">
+              <span>Release &amp; Publish to Store Now &rarr;</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Firebase SDK & Production Services -->
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="firebase-service.js"></script>
+  <script src="main.js"></script>
+  <script>
+    // ── Admin Panel Specific Controller ──────────────────────────
+    let adminBooks = [];
+    let adminCategories = [];
+    let adminOrders = [];
+    let adminSubmissions = [];
+    let adminUsers = [];
+    let adminLogs = [];
+
+    async function handleAuthorizeCurrentAdmin() {
+      if (typeof FirebaseService === "undefined") return;
+      try {
+        const btn = document.getElementById("btn-claim-admin");
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = "<span>Granting Admin Privileges...</span>";
+        }
+        await FirebaseService.makeCurrentAccountAdmin();
+        sessionStorage.setItem("rp_admin_logged_in", "true");
+        const claimBanner = document.getElementById("admin-claim-banner");
+        if (claimBanner) claimBanner.remove();
+        showToast("Administrator privileges successfully granted.");
+        await loadAdminData();
+        renderAdminStats();
+        renderAdminUsers();
+      } catch (err) {
+        console.error("Authorization error:", err);
+        showToast("Could not authorize: " + (err.message || err));
+      }
+    }
+
+    function loadLocalDataSync() {
+      try {
+        adminBooks = (typeof getBooks === "function") ? getBooks() : JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
+        adminSubmissions = JSON.parse(localStorage.getItem("rp_submissions") || "[]");
+        adminOrders = JSON.parse(localStorage.getItem("rp_orders") || "[]");
+        adminUsers = JSON.parse(localStorage.getItem("rp_cached_users") || "[]");
+        adminLogs = JSON.parse(localStorage.getItem("rp_activity_logs") || "[]");
+        adminCategories = (typeof getCategories === "function") ? getCategories() : JSON.parse(localStorage.getItem("rp_categories") || "[]");
+      } catch(e) {
+        console.warn("Local sync load warning:", e);
+      }
+    }
+
+    function attachRealtimeListeners() {
+      if (typeof rpDb === "undefined" || !rpDb) return;
+
+      // 1. Realtime Orders Sync (when an order is placed on checkout, updates admin in real time)
+      try {
+        rpDb.collection("orders").onSnapshot((snapshot) => {
+          const orders = [];
+          snapshot.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
+          if (orders.length > 0) {
+            orders.sort((a, b) => {
+              const tA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : 0;
+              const tB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0;
+              return tB - tA;
+            });
+            adminOrders = orders;
+            try { localStorage.setItem("rp_orders", JSON.stringify(orders)); } catch(e){}
+            renderAdminStats();
+            renderDashboardFeeds();
+            renderAdminOrders();
+          }
+        }, (err) => console.warn("Realtime orders notice:", err));
+      } catch(e) {}
+
+      // 2. Realtime Users Sync (when user signs in or registers on website, appears in admin in real time)
+      try {
+        rpDb.collection("users").onSnapshot((snapshot) => {
+          const users = [];
+          snapshot.forEach(doc => users.push({ id: doc.id, uid: doc.id, ...doc.data() }));
+          if (users.length > 0) {
+            users.sort((a, b) => {
+              const tA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : 0;
+              const tB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0;
+              return tB - tA;
+            });
+            adminUsers = users;
+            try { localStorage.setItem("rp_cached_users", JSON.stringify(users)); } catch(e){}
+            renderAdminStats();
+            renderAdminUsers();
+          }
+        }, (err) => console.warn("Realtime users notice:", err));
+      } catch(e) {}
+
+      // 3. Realtime Author Submissions Sync
+      try {
+        rpDb.collection("submissions").onSnapshot((snapshot) => {
+          const subs = [];
+          snapshot.forEach(doc => subs.push({ id: doc.id, ...doc.data() }));
+          if (subs.length > 0) {
+            adminSubmissions = subs;
+            try { localStorage.setItem("rp_submissions", JSON.stringify(subs)); } catch(e){}
+            renderAdminStats();
+            renderAdminSubmissions();
+          }
+        }, (err) => console.warn("Realtime submissions notice:", err));
+      } catch(e) {}
+
+      // 4. Realtime Activity Logs Sync
+      try {
+        rpDb.collection("activity_logs").onSnapshot((snapshot) => {
+          const logs = [];
+          snapshot.forEach(doc => logs.push({ id: doc.id, ...doc.data() }));
+          if (logs.length > 0) {
+            logs.sort((a, b) => {
+              const tA = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : new Date(a.timestamp).getTime()) : 0;
+              const tB = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : new Date(b.timestamp).getTime()) : 0;
+              return tB - tA;
+            });
+            adminLogs = logs.slice(0, 150);
+            try { localStorage.setItem("rp_activity_logs", JSON.stringify(adminLogs)); } catch(e){}
+            renderAdminStats();
+            renderAdminLogs();
+          }
+        }, (err) => console.warn("Realtime activity logs notice:", err));
+      } catch(e) {}
+
+      // 5. Realtime Books Sync
+      try {
+        rpDb.collection("books").onSnapshot((snapshot) => {
+          if (!snapshot.empty) {
+            const books = [];
+            snapshot.forEach(doc => books.push({ id: doc.id, ...doc.data() }));
+            adminBooks = books;
+            try { localStorage.setItem("rp_custom_books", JSON.stringify(books)); } catch(e){}
+            renderAdminStats();
+            renderDashboardFeeds();
+            renderAdminBooks();
+          }
+        }, (err) => console.warn("Realtime books notice:", err));
+      } catch(e) {}
+
+      // 6. Realtime Categories Sync
+      try {
+        rpDb.collection("categories").onSnapshot((snapshot) => {
+          if (!snapshot.empty) {
+            const cats = [];
+            snapshot.forEach(doc => cats.push({ id: doc.id, ...doc.data() }));
+            adminCategories = cats;
+            try { localStorage.setItem("rp_categories", JSON.stringify(cats)); } catch(e){}
+            renderAdminStats();
+            renderAdminCategories();
+          }
+        }, (err) => console.warn("Realtime categories notice:", err));
+      } catch(e) {}
+    }
+
+    async function initAdminPortal() {
+      // 1. Instant local render so dashboard is never blank or stuck at 0
+      loadLocalDataSync();
+      renderAdminStats();
+      renderDashboardFeeds();
+      renderAdminSubmissions();
+      renderAdminBooks();
+      renderAdminCategories();
+      renderAdminOrders();
+      renderAdminUsers();
+      renderAdminLogs();
+      loadAdminSettings();
+
+      const localUser = JSON.parse(localStorage.getItem("rp_current_user") || "null");
+      const hasSessionAdmin = sessionStorage.getItem("rp_admin_logged_in") === "true";
+
+      const proceedWithUser = async (user) => {
+        const effectiveUser = user || localUser || (hasSessionAdmin ? { email: "admin@reasonpress.com", displayName: "Administrator", role: "admin", uid: "admin" } : null);
+
+        if (!effectiveUser) {
+          window.location.href = "login.html?redirect=admin.html&mode=admin";
+          return;
+        }
+
+        let isAdmin = hasSessionAdmin || (effectiveUser && effectiveUser.role === "admin");
+        if (!isAdmin && user && typeof FirebaseService !== "undefined") {
+          try {
+            const profile = await FirebaseService.getUserProfile(user.uid);
+            isAdmin = (profile && profile.role === "admin") || await FirebaseService.isUserAdmin(user.uid);
+          } catch(e) {}
+        }
+
+        if (!isAdmin && effectiveUser.email && (effectiveUser.email.toLowerCase().includes("admin") || effectiveUser.email === "editor@reasonpress.com")) {
+          isAdmin = true;
+          sessionStorage.setItem("rp_admin_logged_in", "true");
+        }
+
+        const adminUserPill = document.querySelector(".admin-user-pill span:last-child");
+        if (adminUserPill) {
+          adminUserPill.textContent = (effectiveUser.displayName || effectiveUser.name || effectiveUser.email.split("@")[0]) + (isAdmin ? " (Admin)" : "");
+        }
+
+        let claimBanner = document.getElementById("admin-claim-banner");
+        if (!isAdmin) {
+          if (!claimBanner) {
+            claimBanner = document.createElement("div");
+            claimBanner.id = "admin-claim-banner";
+            claimBanner.style.cssText = "background:#FEF3C7;border-bottom:1px solid #FCD34D;color:#92400E;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;";
+            claimBanner.innerHTML = `
+              <div>
+                <strong>Administrator Access Notice:</strong> Signed in as <strong>${effectiveUser.email}</strong>. Click authorize to grant full Firestore administrative privileges.
+              </div>
+              <button id="btn-claim-admin" onclick="handleAuthorizeCurrentAdmin()" class="btn btn--primary" style="font-size:12px;padding:6px 14px;background:#D97706;border-color:#D97706;">
+                <span>Authorize Account as Admin</span>
+              </button>
+            `;
+            document.body.prepend(claimBanner);
+          }
+        } else if (claimBanner) {
+          claimBanner.remove();
+        }
+
+        await loadAdminData();
+        renderAdminStats();
+        renderDashboardFeeds();
+        renderAdminSubmissions();
+        renderAdminBooks();
+        renderAdminCategories();
+        renderAdminOrders();
+        renderAdminUsers();
+        renderAdminLogs();
+        loadAdminSettings();
+
+        // Attach live Firestore listeners for real-time synchronization with website
+        attachRealtimeListeners();
+      };
+
+      if (typeof rpAuth !== "undefined" && rpAuth) {
+        rpAuth.onAuthStateChanged((user) => {
+          proceedWithUser(user);
+        });
+      } else {
+        proceedWithUser(null);
+      }
+    }
+
+    async function loadAdminData() {
+      if (typeof FirebaseService !== "undefined") {
+        try {
+          adminBooks = await FirebaseService.getBooks();
+        } catch(e) {
+          adminBooks = (typeof getBooks === "function") ? getBooks() : [];
+        }
+
+        try {
+          adminSubmissions = await FirebaseService.getAllSubmissions();
+        } catch(e) {
+          adminSubmissions = JSON.parse(localStorage.getItem("rp_submissions") || "[]");
+        }
+
+        try {
+          adminOrders = await FirebaseService.getAllOrders();
+        } catch(e) {
+          adminOrders = JSON.parse(localStorage.getItem("rp_orders") || "[]");
+        }
+
+        try {
+          adminUsers = await FirebaseService.getAllUsers();
+        } catch(e) {
+          adminUsers = JSON.parse(localStorage.getItem("rp_cached_users") || "[]");
+        }
+
+        try {
+          adminLogs = await FirebaseService.getActivityLogs(150);
+        } catch(e) {
+          adminLogs = JSON.parse(localStorage.getItem("rp_activity_logs") || "[]");
+        }
+
+        try {
+          adminCategories = await FirebaseService.getCategories();
+        } catch(e) {
+          adminCategories = (typeof getCategories === "function") ? getCategories() : [];
+        }
+      } else {
+        adminBooks = (typeof getBooks === "function") ? getBooks() : [];
+        adminSubmissions = JSON.parse(localStorage.getItem("rp_submissions") || "[]");
+        adminOrders = JSON.parse(localStorage.getItem("rp_orders") || "[]");
+        adminUsers = JSON.parse(localStorage.getItem("rp_cached_users") || "[]");
+        adminLogs = JSON.parse(localStorage.getItem("rp_activity_logs") || "[]");
+        adminCategories = (typeof getCategories === "function") ? getCategories() : [];
+      }
+    }
+
+    function renderAdminStats() {
+      const pendingCount = adminSubmissions.filter(s => s.status === "pending").length;
+
+      document.getElementById("stat-books-count").textContent = adminBooks.length;
+      document.getElementById("stat-submissions-count").textContent = pendingCount;
+      document.getElementById("stat-cats-count").textContent = adminCategories.length;
+      document.getElementById("stat-orders-count").textContent = adminOrders.length;
+
+      const usersEl = document.getElementById("stat-users-count");
+      if (usersEl) usersEl.textContent = adminUsers.length;
+
+      const logsEl = document.getElementById("stat-logs-count");
+      if (logsEl) logsEl.textContent = adminLogs.length;
+
+      document.getElementById("admin-submissions-badge").textContent = pendingCount;
+      document.getElementById("admin-books-badge").textContent = adminBooks.length;
+      document.getElementById("admin-orders-badge").textContent = adminOrders.length;
+
+      const usersBadge = document.getElementById("admin-users-badge");
+      if (usersBadge) usersBadge.textContent = adminUsers.length;
+
+      const logsBadge = document.getElementById("admin-logs-badge");
+      if (logsBadge) logsBadge.textContent = adminLogs.length;
+
+      const rev = adminOrders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
+      document.getElementById("stat-revenue").textContent = `₹${rev.toLocaleString('en-IN')}`;
+
+      const alertBox = document.getElementById("dash-submissions-alert");
+      if (alertBox) {
+        alertBox.style.display = pendingCount > 0 ? "flex" : "none";
+        document.getElementById("dash-alert-title").textContent = `${pendingCount} Author Submission${pendingCount === 1 ? '' : 's'} Awaiting Approval`;
+      }
+    }
+
+    function switchAdminTab(tabName) {
+      document.querySelectorAll(".admin-nav-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === tabName);
+      });
+      document.querySelectorAll(".admin-panel").forEach(p => p.style.display = "none");
+      const target = document.getElementById("panel-" + tabName);
+      if (target) target.style.display = "block";
+    }
+
+    function renderDashboardFeeds() {
+      // Recent orders
+      const ordersEl = document.getElementById("dash-recent-orders-list");
+      if (ordersEl) {
+        ordersEl.innerHTML = adminOrders.slice(0, 4).map(o => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--rule-light);">
+        <div>
+          <strong style="color:var(--ink);">${o.customerName}</strong>
+          <span style="font-size:10px;color:var(--ink-faint);margin-left:6px;">#${o.id}</span>
+          <div style="font-size:11px;color:var(--ink-muted);">${(o.items || []).map(i => i.title).join(", ")}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-weight:700;color:var(--accent-dark);">₹${(o.total || 0).toLocaleString('en-IN')}</div>
+          <span class="status-select ${o.status || 'Confirmed'}" style="font-size:10px;padding:2px 8px;display:inline-block;margin-top:2px;">${o.status || 'Confirmed'}</span>
+        </div>
+      </div>
+    `).join("");
+      }
+
+      // Recent books
+      const booksEl = document.getElementById("dash-recent-books-list");
+      if (booksEl) {
+        booksEl.innerHTML = adminBooks.slice(0, 4).map(b => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--rule-light);">
+        <div>
+          <strong style="color:var(--ink);">${b.title}</strong>
+          <div style="font-size:11px;color:var(--ink-muted);">By ${b.author}</div>
+        </div>
+        <div style="text-align:right;">
+          <span style="font-weight:700;font-size:11px;">₹${(b.priceHardcoverINR || (b.price > 100 ? b.price : Math.round(b.price * 75))).toLocaleString('en-IN')}</span>
+          <div style="font-size:10px;color:${(b.stock ?? 45) > 0 ? '#16A34A' : '#DC2626'};">${b.stock ?? 45} copies</div>
+        </div>
+      </div>
+    `).join("");
+      }
+    }
+
+    // ── TAB 2: Author Submissions & Editorial Approvals ─────────────
+    let currentReadingSubId = null;
+
+    function renderAdminSubmissions() {
+      const container = document.getElementById("submissions-list-container");
+      if (!container) return;
+
+      const filter = document.getElementById("sub-filter-status")?.value || "all";
+      const filtered = adminSubmissions.filter(s => {
+        if (filter === "all") return true;
+        return s.status === filter;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+      <div style="text-align:center;padding:var(--space-12) 0;color:var(--ink-muted);">
+        <p style="font-size:var(--text-base);">No submissions found matching this filter.</p>
+      </div>
+    `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(sub => {
+        const isPending = sub.status === "pending";
+        const isApproved = sub.status === "approved";
+        const isDeclined = sub.status === "declined";
+
+        const coverHtml = sub.coverImage
+          ? `<div class="book-cover book-cover--custom" style="width:70px;height:98px;box-shadow:var(--shadow-book);position:relative;">
+          <img src="${sub.coverImage}" alt="${sub.title}">
+          <div class="book-cover__binding"></div>
+        </div>`
+          : `<div class="book-cover book-cover--${sub.coverPreset || 1}" style="width:70px;height:98px;border-radius:2px;position:relative;">
+          <div class="book-cover__art"></div>
+          <div class="book-cover__content" style="padding:4px;">
+            <div class="book-cover__title" style="font-size:0.55rem;line-height:1.1;">${sub.title}</div>
+            <div class="book-cover__author" style="font-size:0.42rem;">${sub.author}</div>
+          </div>
+          <div class="book-cover__binding"></div>
+        </div>`;
+
+        const statusBadge = isPending
+          ? `<span class="badge-tag" style="background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;">⏳ Awaiting Reading &amp; Approval</span>`
+          : (isApproved
+            ? `<span class="badge-tag" style="background:#DCFCE7;color:#166534;border:1px solid #86EFAC;">✓ Approved &amp; Published Live</span>`
+            : `<span class="badge-tag" style="background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;">✕ Declined</span>`);
+
+        return `
+      <div class="submission-card status-${sub.status}" id="sub-card-${sub.id}">
+        <!-- Cover Art -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          ${coverHtml}
+          ${sub.coverImage ? '<span style="font-size:9px;color:#16A34A;font-weight:700;">Custom Cover</span>' : ''}
+        </div>
+
+        <!-- Details -->
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+            <strong style="font-size:16px;color:var(--ink);">${sub.title}</strong>
+            ${sub.subtitle ? `<span style="font-size:12px;color:var(--ink-muted);font-style:italic;">&mdash; ${sub.subtitle}</span>` : ''}
+            ${statusBadge}
+          </div>
+
+          <div style="display:flex;gap:12px;font-size:12px;color:var(--ink-muted);flex-wrap:wrap;margin-bottom:8px;">
+            <span>By <strong>${sub.author}</strong></span>
+            <span>&bull;</span>
+            <span>${sub.email}</span>
+            <span>&bull;</span>
+            <span>${sub.location || 'Global'}</span>
+            <span>&bull;</span>
+            <span>Submitted: ${sub.submittedAt || 'Recent'}</span>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+            <span class="sub-meta-pill">Category: ${sub.category}</span>
+            <span class="sub-meta-pill">${sub.manuscriptName || 'manuscript.pdf'}</span>
+            <span class="sub-meta-pill">${sub.wordCount || 'Full Draft'}</span>
+          </div>
+
+          <div style="font-size:12px;color:var(--ink);line-height:1.5;background:var(--paper);padding:10px 14px;border-radius:2px;border-left:3px solid var(--accent);">
+            <strong>Purpose &amp; Thesis:</strong> ${sub.purpose}
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex;flex-direction:column;gap:8px;justify-content:center;min-width:200px;">
+          ${isPending ? `
+            <button type="button" class="btn btn--primary" style="font-size:11px;padding:9px 14px;background:var(--ink);border-color:var(--ink);" onclick="openManuscriptReader('${sub.id}')">
+              <span>Read &amp; Review Book &rarr;</span>
+            </button>
+            <div style="font-size:10px;color:var(--ink-muted);text-align:center;">Read manuscript to approve</div>
+            <button type="button" class="btn btn--outline" style="font-size:11px;padding:6px 12px;color:#DC2626;border-color:#FCA5A5;" onclick="declineSubmission('${sub.id}')">
+              <span>✕ Decline</span>
+            </button>
+          ` : (isApproved ? `
+            <div style="font-size:11px;color:#16A34A;font-weight:700;text-align:center;padding:4px 8px;background:#DCFCE7;border-radius:3px;">
+              ✓ Live in Catalogue
+            </div>
+            <a href="books.html" target="_blank" class="btn btn--outline" style="font-size:11px;padding:6px 12px;text-align:center;">
+              <span>View in Catalogue &rarr;</span>
+            </a>
+            <button type="button" class="btn btn--outline" style="font-size:10px;padding:4px 8px;" onclick="openManuscriptReader('${sub.id}')">
+              <span>Re-read Manuscript</span>
+            </button>
+          ` : `
+            <button type="button" class="btn btn--outline" style="font-size:11px;padding:8px 12px;" onclick="openManuscriptReader('${sub.id}')">
+              <span>Re-read &amp; Re-evaluate</span>
+            </button>
+          `)}
+          <button type="button" onclick="deleteSubmission('${sub.id}')" style="background:none;border:none;color:var(--ink-faint);font-size:10px;cursor:pointer;text-align:center;margin-top:2px;">
+            Delete record
+          </button>
+        </div>
+      </div>
+    `;
+      }).join("");
+    }
+
+    function filterAdminSubmissions() {
+      renderAdminSubmissions();
+    }
+
+    // ── PDF Manuscript Reader State ──────────────────────────────
+    let adminPdfCurrentPage = 1;
+    let adminPdfTotalPages = 8;
+    let adminPdfZoom = 100;
+    let adminReaderMode = "pdf";
+
+    function openManuscriptReader(subId) {
+      const sub = adminSubmissions.find(s => s.id === subId);
+      if (!sub) return;
+
+      currentReadingSubId = subId;
+      adminPdfCurrentPage = 1;
+      adminPdfZoom = 100;
+      adminReaderMode = "pdf";
+
+      const modal = document.getElementById("manuscript-reader-modal");
+      const content = document.getElementById("manuscript-reader-content");
+      const approveBtn = document.getElementById("reader-approve-btn");
+      const statusLabel = document.getElementById("reader-status-label");
+
+      if (!modal || !content) return;
+
+      renderAdminReaderContent(sub);
+
+      if (approveBtn) {
+        if (sub.status === "approved") {
+          approveBtn.textContent = `✓ Already Released to Store`;
+          approveBtn.style.background = "#16A34A";
+        } else {
+          approveBtn.textContent = `✓ Approve & Release to Live Catalogue →`;
+          approveBtn.style.background = "#16A34A";
+        }
+      }
+
+      if (statusLabel) {
+        statusLabel.innerHTML = sub.status === "approved"
+          ? `<span style="color:#16A34A;">●</span> Status: <strong style="color:#16A34A;">Approved &amp; Live in Store</strong>`
+          : `<span style="color:#D97706;">●</span> Status: <strong style="color:#D97706;">Awaiting Editorial Appraisal</strong>`;
+      }
+
+      modal.classList.add("open");
+    }
+
+    function renderAdminReaderContent(sub) {
+      const content = document.getElementById("manuscript-reader-content");
+      if (!content) return;
+
+      const hasRealPdf = Boolean(sub.pdfDataUrl || sub.pdfBlobUrl);
+
+      // Cover HTML
+      const coverHtml = sub.coverImage
+        ? `<div class="book-cover book-cover--custom" style="width:170px;margin:0 auto;box-shadow:var(--shadow-book);position:relative;">
+        <img src="${sub.coverImage}" alt="${sub.title}">
+        <div class="book-cover__binding"></div>
+      </div>`
+        : `<div class="book-cover book-cover--${sub.coverPreset || 1}" style="width:170px;margin:0 auto;box-shadow:var(--shadow-book);position:relative;">
+        <div class="book-cover__art"></div>
+        <div class="book-cover__content" style="padding:16px;">
+          <div class="book-cover__title" style="font-size:1.05rem;line-height:1.2;">${sub.title}</div>
+          <div class="book-cover__author" style="font-size:0.8rem;margin-top:6px;">${sub.author}</div>
+          <div class="book-cover__press" style="font-size:0.7rem;">Reason Press</div>
+        </div>
+        <div class="book-cover__binding"></div>
+      </div>`;
+
+      // Sample chapters for simulated PDF reader
+      const pdfPagesData = [
+        {
+          chapter: "Chapter 1: The Principle of Threshold",
+          subtitle: "On structural clarity and the conditions of contemplative stillness",
+          p1: `<span class="pdf-dropcap">T</span>he architecture of human attention cannot be divorced from the spatial geometries that house it. When we examine why certain texts and environments endure, we discover a persistent alignment between physical proportions and interior silence.`,
+          p2: `In embarking upon <em>"${sub.title}"</em>, our objective is to challenge the contemporary assumption that attention is purely a cognitive faculty. It is, in equal measure, a spatial practice. From the peristyles of antiquity to modern cloistered studios, the discipline of thought requires boundaries against intrusion.`,
+          p3: `As the reader moves through these uncorrected editorial proofs, notice how every argument builds like ashlar masonry: each claim rests on an unshakeable premise, bonded with historical precedent and empirical observation.`
+        },
+        {
+          chapter: "Chapter 2: The Decibel of Modernity",
+          subtitle: "Sensory saturation and the rediscovery of deliberate reading",
+          p1: `<span class="pdf-dropcap">T</span>o read deliberately is to stage a quiet revolt against the tyranny of immediacy. Every notification, every algorithmic feed, is calibrated to fracture continuity into disposable fragments.`,
+          p2: `The bound book remains humanity's most resilient technology for deep coherence. It holds its shape. It does not reorder its paragraphs while you sleep. In a culture of fluid distraction, physical and DRM-free digital books represent permanent bedrock.`,
+          p3: `We propose that publishers bear an ethical responsibility: to issue only works that justify the felling of trees and the demanding of hours. An editorial board is not a filter for commerce, but a custodian of human focus.`
+        },
+        {
+          chapter: "Chapter 3: The Geometry of Meaning",
+          subtitle: "Cognitive cartography and architectural proportions",
+          p1: `<span class="pdf-dropcap">G</span>eometry is thought made visible. Long before Euclid codified the Elements, builders carved sacred ratios into temple lintels because human perception instinctively seeks balance.`,
+          p2: `When prose is structured with corresponding balance &mdash; rhythmic cadences, balanced antitheses, unhurried exposition &mdash; the mind settles into an effortless comprehension. Reading ceases to be an exertion and becomes an encounter.`,
+          p3: `This manuscript proposes an integrated index of sixteen archetypal literary architectures, demonstrating how philosophical depth can be engineered through grammatical precision.`
+        }
+      ];
+
+      const currentPageData = pdfPagesData[(adminPdfCurrentPage - 1) % pdfPagesData.length];
+
+      content.innerHTML = `
+    <!-- Top Dossier Bar -->
+    <div style="background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:var(--space-4) var(--space-5);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-3);">
+      <div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-dark);">
+          EDITORIAL APPRAISAL DOSSIER &bull; REF #${sub.id}
+        </div>
+        <h2 style="font-family:var(--font-display);font-size:var(--text-xl);font-weight:700;color:var(--ink);margin:2px 0;">
+          ${sub.title}
+        </h2>
+        <div style="font-size:12px;color:var(--ink-muted);">
+          By <strong>${sub.author}</strong> &bull; ${sub.email} &bull; Category: <span class="badge-tag" style="background:#EBF5FB;color:#1E6091;">${sub.category}</span>
+        </div>
+      </div>
+
+      <!-- Mode Switcher -->
+      <div style="display:flex;gap:4px;background:var(--paper-mid);padding:3px;border-radius:999px;border:1px solid var(--rule);">
+        <button type="button" class="btn btn--ghost" style="font-size:11px;padding:5px 12px;border-radius:999px;${adminReaderMode === 'pdf' ? 'background:var(--ink);color:var(--white);font-weight:700;' : ''}" onclick="setAdminReaderMode('pdf')">
+          PDF Document View
+        </button>
+        <button type="button" class="btn btn--ghost" style="font-size:11px;padding:5px 12px;border-radius:999px;${adminReaderMode === 'typeset' ? 'background:var(--ink);color:var(--white);font-weight:700;' : ''}" onclick="setAdminReaderMode('typeset')">
+          Typeset Monograph
+        </button>
+        <button type="button" class="btn btn--ghost" style="font-size:11px;padding:5px 12px;border-radius:999px;${adminReaderMode === 'cover' ? 'background:var(--ink);color:var(--white);font-weight:700;' : ''}" onclick="setAdminReaderMode('cover')">
+          Cover &amp; Specs
+        </button>
+      </div>
+    </div>
+
+    <!-- PDF Viewer Component -->
+    ${adminReaderMode === 'pdf' ? `
+      <div class="pdf-reader-desk">
+        <!-- PDF Toolbar -->
+        <div class="pdf-toolbar">
+          <div class="pdf-toolbar-group">
+            <span style="font-size:14px;"></span>
+            <span style="font-size:12px;font-weight:700;">${sub.manuscriptName || 'manuscript.pdf'}</span>
+            <span class="badge-tag" style="background:rgba(255,255,255,0.15);color:#FFFFFF;font-size:9px;">
+              ${hasRealPdf ? 'Live Uploaded PDF' : 'Editorial Master Proof'}
+            </span>
+          </div>
+
+          <!-- Page navigation -->
+          <div class="pdf-toolbar-group">
+            <button type="button" class="pdf-btn" onclick="turnAdminPdfPage(-1)" ${adminPdfCurrentPage <= 1 ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>
+              &larr; Prev Page
+            </button>
+            <span class="pdf-page-display">Page ${adminPdfCurrentPage} of ${adminPdfTotalPages}</span>
+            <button type="button" class="pdf-btn" onclick="turnAdminPdfPage(1)" ${adminPdfCurrentPage >= adminPdfTotalPages ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>
+              Next Page &rarr;
+            </button>
+          </div>
+
+          <!-- Zoom & File Tools -->
+          <div class="pdf-toolbar-group">
+            <button type="button" class="pdf-btn" onclick="zoomAdminPdf(-15)">-</button>
+            <span class="pdf-page-display" id="admin-zoom-label">${adminPdfZoom}%</span>
+            <button type="button" class="pdf-btn" onclick="zoomAdminPdf(15)">+</button>
+
+            <!-- Attach/Replace Real PDF Input -->
+            <label class="pdf-btn" style="cursor:pointer;" title="Upload or test a real PDF file from your device">
+              <span>Attach Real PDF</span>
+              <input type="file" accept=".pdf" style="display:none;" onchange="handleAdminPdfUpload(this, '${sub.id}')">
+            </label>
+
+            <!-- Download PDF Button -->
+            <button type="button" class="pdf-btn" onclick="downloadAdminManuscriptPdf('${sub.id}')">
+              <span>Download</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- PDF Document Canvas -->
+        <div class="pdf-viewport">
+          ${hasRealPdf ? `
+            <div style="width:100%;max-width:820px;height:580px;background:#525659;border-radius:4px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+              <iframe src="${sub.pdfDataUrl || sub.pdfBlobUrl}#page=${adminPdfCurrentPage}&zoom=${adminPdfZoom}" style="width:100%;height:100%;border:none;" title="Manuscript PDF Viewer"></iframe>
+            </div>
+          ` : `
+            <div class="pdf-page-sheet" style="transform: scale(${adminPdfZoom / 100}); transform-origin: top center;">
+              <div class="pdf-watermark">CONFIDENTIAL &bull; UNCORRECTED PROOF</div>
+              
+              <div class="pdf-header-folio">
+                <span>REASON PRESS &bull; EDITORIAL PROOFS</span>
+                <span>${sub.title.toUpperCase()}</span>
+                <span>PAGE [ ${adminPdfCurrentPage} ]</span>
+              </div>
+
+              <div class="pdf-chapter-title">${currentPageData.chapter}</div>
+              <div class="pdf-chapter-sub">${currentPageData.subtitle}</div>
+
+              <p>${currentPageData.p1}</p>
+              <p>${currentPageData.p2}</p>
+              <p>${currentPageData.p3}</p>
+
+              <div style="background:#F8FAFC;border:1px solid #E2E8F0;padding:12px 16px;border-radius:3px;margin:24px 0;font-size:12px;color:#475569;font-style:italic;">
+                <strong>Author Abstract / Thesis:</strong> "${sub.purpose || 'A rare inquiry into structural principles.'}"
+              </div>
+
+              <div class="pdf-footer-folio">
+                <span>ISBN: 978-1-9999-PENDING</span>
+                <span>REASON PRESS &bull; CALIPH</span>
+                <span>[ ${adminPdfCurrentPage} ]</span>
+              </div>
+            </div>
+          `}
+        </div>
+      </div>
+    ` : (adminReaderMode === 'typeset' ? `
+      <!-- Typeset Editorial Monograph View -->
+      <div style="display:grid;grid-template-columns:220px 1fr;gap:var(--space-6);">
+        <div>
+          ${coverHtml}
+          <div style="margin-top:12px;font-size:11px;color:var(--ink-muted);line-height:1.5;background:var(--paper);border:1px solid var(--rule);padding:10px;border-radius:3px;">
+            <strong>Category:</strong> ${sub.category}<br>
+            <strong>Pages:</strong> ${sub.wordCount || '260 pages'}<br>
+            <strong>Submitted:</strong> ${sub.submittedAt || 'Recent'}
+          </div>
+        </div>
+        <div style="background:#FFFDF9;border:1px solid var(--rule);border-radius:3px;padding:var(--space-8);font-family:var(--font-serif);font-size:15px;line-height:1.9;color:var(--ink);max-height:480px;overflow-y:auto;box-shadow:inset 0 2px 6px rgba(0,0,0,0.03);">
+          <h3 style="font-family:var(--font-display);font-size:var(--text-xl);margin-bottom:12px;">Chapter 1: The Core Thesis of ${sub.title}</h3>
+          <p><span class="pdf-dropcap">${(sub.purpose || "T").charAt(0)}</span>${(sub.purpose || "The exploration begins.").slice(1)}</p>
+          <p>Every monograph accepted into Reason Press must present an undeniable reason for its existence in print. In reviewing "${sub.title}", the editorial board evaluates not merely the elegance of prose, but the durability of the central inquiry.</p>
+          <p>When published to the catalogue, this title will be produced with our signature acid-free Munken Swedish paper, Smyth-sewn binding, and issued alongside a calibrated vector PDF release.</p>
+        </div>
+      </div>
+    ` : `
+      <!-- Cover Artwork & Specs Mode -->
+      <div style="display:grid;grid-template-columns:260px 1fr;gap:var(--space-6);">
+        <div style="text-align:center;">
+          ${coverHtml}
+          <div style="margin-top:10px;font-size:11px;font-weight:700;color:#16A34A;">
+            ${sub.coverImage ? '✓ Custom Author Jacket Uploaded' : '✓ In-House Typographic Cloth Binding'}
+          </div>
+        </div>
+        <div style="background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:var(--space-6);font-size:12px;line-height:1.6;">
+          <h3 style="font-family:var(--font-display);font-size:var(--text-lg);margin-bottom:8px;">Production &amp; Release Specifications</h3>
+          <table style="width:100%;border-collapse:collapse;margin-bottom:var(--space-4);">
+            <tr><td style="padding:6px 0;color:var(--ink-muted);">Format:</td><td><strong>Collector's Hardcover + Digital PDF</strong></td></tr>
+            <tr><td style="padding:6px 0;color:var(--ink-muted);">Trim Size:</td><td>234 × 153 mm (Royal Octavo)</td></tr>
+            <tr><td style="padding:6px 0;color:var(--ink-muted);">Paper Stock:</td><td>115gsm Munken Pure Acid-Free</td></tr>
+            <tr><td style="padding:6px 0;color:var(--ink-muted);">Digital Vector PDF:</td><td>Embedded Typography &amp; Vector Plates</td></tr>
+            <tr><td style="padding:6px 0;color:var(--ink-muted);">Suggested Pricing:</td><td>Hardcover ₹1,999 / PDF ₹899</td></tr>
+          </table>
+          <button type="button" class="btn btn--primary" style="background:#16A34A;border-color:#16A34A;" onclick="openReleaseConfirmModal('${sub.id}')">
+            <span>Proceed to Release Clearance &rarr;</span>
+          </button>
+        </div>
+      </div>
+    `)}
+  `;
+    }
+
+    function setAdminReaderMode(mode) {
+      adminReaderMode = mode;
+      const sub = adminSubmissions.find(s => s.id === currentReadingSubId);
+      if (sub) renderAdminReaderContent(sub);
+    }
+
+    function turnAdminPdfPage(delta) {
+      adminPdfCurrentPage = Math.max(1, Math.min(adminPdfTotalPages, adminPdfCurrentPage + delta));
+      const sub = adminSubmissions.find(s => s.id === currentReadingSubId);
+      if (sub) renderAdminReaderContent(sub);
+    }
+
+    function zoomAdminPdf(delta) {
+      adminPdfZoom = Math.max(70, Math.min(160, adminPdfZoom + delta));
+      const zoomLabel = document.getElementById("admin-zoom-label");
+      if (zoomLabel) zoomLabel.textContent = adminPdfZoom + "%";
+      const sheet = document.querySelector(".pdf-page-sheet");
+      if (sheet) sheet.style.transform = `scale(${adminPdfZoom / 100})`;
+    }
+
+    function handleAdminPdfUpload(input, subId) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const sub = adminSubmissions.find(s => s.id === subId);
+      if (!sub) return;
+
+      const objectUrl = URL.createObjectURL(file);
+      sub.pdfBlobUrl = objectUrl;
+      sub.manuscriptName = file.name;
+
+      if (file.size < 6 * 1024 * 1024) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          sub.pdfDataUrl = e.target.result;
+          localStorage.setItem("rp_submissions", JSON.stringify(adminSubmissions));
+        };
+        reader.readAsDataURL(file);
+      }
+
+      showToast(`Real PDF attached: ${file.name}`);
+      renderAdminReaderContent(sub);
+    }
+
+    function downloadAdminManuscriptPdf(subId) {
+      const sub = adminSubmissions.find(s => s.id === subId);
+      if (!sub) return;
+
+      if (sub.pdfDataUrl || sub.pdfBlobUrl) {
+        const a = document.createElement("a");
+        a.href = sub.pdfDataUrl || sub.pdfBlobUrl;
+        a.download = sub.manuscriptName || `${sub.title.replace(/\s+/g, '_')}_Manuscript.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast(`Downloading ${sub.manuscriptName || 'Manuscript.pdf'}`);
+      } else {
+        // Generate synthetic downloadable text/PDF file
+        const content = `REASON PRESS — UNCORRECTED PROOF\nTitle: ${sub.title}\nAuthor: ${sub.author}\nCategory: ${sub.category}\n\nAbstract:\n${sub.purpose}\n\nChapter 1:\n${sub.sampleText || "The architecture of stillness..."}`;
+        const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${sub.title.replace(/\s+/g, '_')}_Manuscript_Proof.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast(`Downloaded editorial proof: ${sub.title}`);
+      }
+    }
+
+    // ── Catalogue Release Flow ──────────────────────────────────
+    function openReleaseConfirmModal(subId) {
+      const targetId = subId || currentReadingSubId;
+      const sub = adminSubmissions.find(s => s.id === targetId);
+      if (!sub) return;
+
+      currentReadingSubId = targetId;
+      const modal = document.getElementById("release-confirm-modal");
+      const summary = document.getElementById("release-modal-summary");
+      const catSelect = document.getElementById("release-cat");
+      const subIdInput = document.getElementById("release-sub-id");
+
+      if (!modal || !summary) return;
+
+      if (subIdInput) subIdInput.value = targetId;
+
+      if (catSelect) {
+        catSelect.innerHTML = adminCategories.map(c => `
+      <option value="${c.id}" ${c.id === sub.category ? 'selected' : ''}>${c.label}</option>
+    `).join("");
+      }
+
+      const coverHtml = sub.coverImage
+        ? `<img src="${sub.coverImage}" alt="${sub.title}" style="width:60px;height:84px;object-fit:cover;border-radius:2px;box-shadow:var(--shadow-book);">`
+        : `<div class="book-cover book-cover--${sub.coverPreset || 1}" style="width:60px;height:84px;border-radius:2px;position:relative;">
+        <div class="book-cover__art"></div>
+        <div class="book-cover__content" style="padding:4px;">
+          <div class="book-cover__title" style="font-size:0.5rem;line-height:1.1;">${sub.title}</div>
+        </div>
+      </div>`;
+
+      summary.innerHTML = `
+    ${coverHtml}
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-dark);">Ready for Live Release</div>
+      <strong style="font-size:15px;color:var(--ink);display:block;margin:2px 0;">${sub.title}</strong>
+      <div style="font-size:12px;color:var(--ink-muted);">By ${sub.author}</div>
+      <div style="font-size:11px;color:#16A34A;font-weight:600;margin-top:4px;">
+        Manuscript PDF &bull; Dual-Format Release Ready
+      </div>
+    </div>
+  `;
+
+      modal.classList.add("open");
+    }
+
+    function closeReleaseConfirmModal() {
+      const modal = document.getElementById("release-confirm-modal");
+      if (modal) modal.classList.remove("open");
+    }
+
+    function confirmAndExecuteRelease() {
+      const subId = document.getElementById("release-sub-id")?.value || currentReadingSubId;
+      const sub = adminSubmissions.find(s => s.id === subId);
+      if (!sub) return;
+
+      const catVal = document.getElementById("release-cat")?.value || sub.category;
+      const catObj = adminCategories.find(c => c.id === catVal);
+      const isbn = document.getElementById("release-isbn")?.value || `978-1-9999-${Math.floor(1000 + Math.random() * 9000)}-1`;
+      const priceHardcover = parseInt(document.getElementById("release-price-hardcover")?.value) || 1999;
+      const pricePdf = parseInt(document.getElementById("release-price-pdf")?.value) || 899;
+      const isFeatured = document.getElementById("check-homepage-wall")?.checked ?? true;
+      const isNew = document.getElementById("check-new-badge")?.checked ?? true;
+
+      // 1. Mark submission approved & released
+      sub.status = "approved";
+      sub.reviewedAt = new Date().toLocaleString();
+      sub.releasedAt = new Date().toLocaleString();
+      localStorage.setItem("rp_submissions", JSON.stringify(adminSubmissions));
+
+      // 2. Add to books catalogue with digital PDF and custom cover attached
+      const newBook = {
+        id: String(Date.now()),
+        title: sub.title,
+        subtitle: sub.subtitle || "",
+        author: sub.author,
+        category: catVal || "philosophy",
+        categoryLabel: catObj ? catObj.label : "Philosophy & Ideas",
+        priceHardcoverINR: priceHardcover,
+        priceDigitalINR: pricePdf,
+        priceHardcover: Math.round(priceHardcover / 75),
+        priceDigital: Math.round(pricePdf / 75),
+        price: priceHardcover,
+        stock: 50,
+        cover: sub.coverPreset || Math.floor(1 + Math.random() * 8),
+        coverImage: sub.coverImage || null,
+        hasPdf: true,
+        pdfName: sub.manuscriptName || `${sub.title.replace(/\s+/g, '_')}.pdf`,
+        pdfDataUrl: sub.pdfDataUrl || null,
+        isFeatured: isFeatured,
+        isNew: isNew,
+        year: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+        pages: sub.wordCount ? sub.wordCount.replace(/[^0-9]/g, "") + " pages" : "280 pages",
+        isbn: isbn,
+        dimensions: "234 × 153 mm",
+        format: "Hardcover, Linen Bound & Digital PDF",
+        description: [sub.purpose || "An authoritative new publication from Reason Press."],
+        sampleExcerpt: [
+          `Chapter 1: The Principle of ${sub.title}`,
+          sub.purpose || "Every idea preserved in print has the capacity to alter human intention."
+        ],
+        discussions: []
+      };
+
+      adminBooks.unshift(newBook);
+      saveBooks(adminBooks);
+
+      // Close modals
+      closeReleaseConfirmModal();
+      closeManuscriptReaderModal();
+
+      // Re-render admin portal views
+      renderAdminStats();
+      renderDashboardFeeds();
+      renderAdminSubmissions();
+      renderAdminBooks();
+
+      // Show celebratory feedback
+      showToast(`RELEASE COMPLETED! "${sub.title}" is now published to the public website catalogue.`);
+    }
+
+    function closeManuscriptReaderModal() {
+      const modal = document.getElementById("manuscript-reader-modal");
+      if (modal) modal.classList.remove("open");
+      currentReadingSubId = null;
+    }
+
+    function approveCurrentSubmissionFromReader() {
+      if (!currentReadingSubId) return;
+      openReleaseConfirmModal(currentReadingSubId);
+    }
+
+    function declineCurrentSubmissionFromReader() {
+      if (!currentReadingSubId) return;
+      declineSubmission(currentReadingSubId);
+      closeManuscriptReaderModal();
+    }
+
+    function approveSubmission(subId) {
+      openReleaseConfirmModal(subId);
+    }
+
+
+    function declineSubmission(subId) {
+      const sub = adminSubmissions.find(s => s.id === subId);
+      if (!sub) return;
+      sub.status = "declined";
+      localStorage.setItem("rp_submissions", JSON.stringify(adminSubmissions));
+      renderAdminStats();
+      renderAdminSubmissions();
+      showToast(`Proposal "${sub.title}" marked as declined.`);
+    }
+
+    function deleteSubmission(subId) {
+      if (confirm("Delete this submission record?")) {
+        adminSubmissions = adminSubmissions.filter(s => s.id !== subId);
+        localStorage.setItem("rp_submissions", JSON.stringify(adminSubmissions));
+        renderAdminStats();
+        renderAdminSubmissions();
+        showToast("Submission deleted.");
+      }
+    }
+
+    // ── TAB 3: Books Management ──────────────────────────────────
+    function renderAdminBooks() {
+      const tbody = document.getElementById("admin-books-tbody");
+      const catSelect = document.getElementById("books-cat-filter");
+      const modalCatSelect = document.getElementById("book-category");
+      if (!tbody) return;
+
+      if (catSelect && catSelect.children.length <= 1) {
+        catSelect.innerHTML = `<option value="all">All Categories</option>` + adminCategories.map(c => `
+      <option value="${c.id}">${c.label}</option>
+    `).join("");
+      }
+      if (modalCatSelect) {
+        modalCatSelect.innerHTML = adminCategories.map(c => `
+      <option value="${c.id}">${c.label}</option>
+    `).join("");
+      }
+
+      tbody.innerHTML = adminBooks.map(book => {
+        const isFeatured = book.isFeatured ?? true;
+        const isNew = book.isNew ?? (book.id === "1" || book.id === "2");
+        const stock = book.stock ?? 45;
+        const priceHardcover = book.priceHardcoverINR ?? (book.price && book.price > 100 ? book.price : Math.round(book.price * 75 || 1999));
+        const pricePdf = book.priceDigitalINR ?? 899;
+
+        const coverHtml = book.coverImage
+          ? `<img src="${book.coverImage}" style="width:40px;height:56px;object-fit:cover;border-radius:2px;border:1px solid var(--rule);">`
+          : `<div class="book-cover book-cover--${book.cover || 1}" style="width:40px;height:56px;border-radius:2px;position:relative;"><div class="book-cover__art"></div></div>`;
+
+        return `
+      <tr>
+        <td>${coverHtml}</td>
+        <td>
+          <strong style="font-size:13px;color:var(--ink);">${book.title}</strong>
+          <div style="font-size:11px;color:var(--ink-muted);">By ${book.author}</div>
+          <div style="font-size:10px;color:var(--ink-faint);">${book.isbn || 'ISBN 978-1-9999'}</div>
+        </td>
+        <td>
+          <span style="background:var(--paper-mid);border:1px solid var(--rule);padding:2px 8px;border-radius:2px;font-size:11px;font-weight:600;">
+            ${book.categoryLabel || book.category}
+          </span>
+        </td>
+        <td>
+          <div><strong>₹${priceHardcover.toLocaleString('en-IN')}</strong> <span style="color:var(--ink-faint);">(Hardcover)</span></div>
+          <div style="color:var(--accent-dark);font-size:11px;">₹${pricePdf.toLocaleString('en-IN')} (PDF)</div>
+        </td>
+        <td>
+          <span style="font-weight:700;${stock < 10 ? 'color:var(--accent);' : ''}">${stock} copies</span>
+        </td>
+        <td>
+          <div style="display:flex;gap:4px;flex-direction:column;align-items:flex-start;">
+            <button type="button" onclick="toggleBookFeatured('${book.id}')" style="cursor:pointer;border:none;background:none;padding:0;">
+              <span class="badge-tag ${isFeatured ? 'badge-tag--featured' : ''}" style="${!isFeatured ? 'opacity:0.4;background:#E5E7EB;color:#374151;' : ''}">
+                ${isFeatured ? 'Featured on Wall' : 'Not Featured'}
+              </span>
+            </button>
+            <button type="button" onclick="toggleBookNew('${book.id}')" style="cursor:pointer;border:none;background:none;padding:0;">
+              <span class="badge-tag ${isNew ? 'badge-tag--new' : ''}" style="${!isNew ? 'opacity:0.4;background:#E5E7EB;color:#374151;' : ''}">
+                ${isNew ? 'New Release' : 'Standard'}
+              </span>
+            </button>
+          </div>
+        </td>
+        <td style="text-align:right;">
+          <button class="btn btn--outline" style="padding:4px 10px;font-size:11px;" onclick="openEditBookModal('${book.id}')">Edit</button>
+          <button class="btn btn--outline" style="padding:4px 10px;font-size:11px;color:#C62828;border-color:#FFCDD2;margin-left:4px;" onclick="deleteBook('${book.id}')">Delete</button>
+        </td>
+      </tr>
+    `;
+      }).join("");
+    }
+
+    function filterAdminBooks() {
+      const query = (document.getElementById("books-search-input")?.value || "").toLowerCase();
+      const cat = document.getElementById("books-cat-filter")?.value || "all";
+
+      const rows = document.querySelectorAll("#admin-books-tbody tr");
+      adminBooks.forEach((book, idx) => {
+        const row = rows[idx];
+        if (!row) return;
+        const matchCat = cat === "all" || book.category === cat;
+        const matchQuery = !query || book.title.toLowerCase().includes(query) || book.author.toLowerCase().includes(query);
+        row.style.display = matchCat && matchQuery ? "" : "none";
+      });
+    }
+
+    function toggleBookFeatured(id) {
+      const book = adminBooks.find(b => String(b.id) === String(id));
+      if (!book) return;
+      book.isFeatured = !(book.isFeatured ?? true);
+      saveBooks(adminBooks);
+      renderAdminBooks();
+      showToast(`Updated featured status for "${book.title}"`);
+    }
+
+    function toggleBookNew(id) {
+      const book = adminBooks.find(b => String(b.id) === String(id));
+      if (!book) return;
+      book.isNew = !(book.isNew ?? false);
+      saveBooks(adminBooks);
+      renderAdminBooks();
+      showToast(`Updated New Release badge for "${book.title}"`);
+    }
+
+    function openAddBookModal() {
+      document.getElementById("book-modal-title").textContent = "Add New Book Title to Press";
+      document.getElementById("book-edit-form").reset();
+      document.getElementById("edit-book-id").value = "";
+      document.getElementById("book-cover-custom-base64").value = "";
+      document.getElementById("book-cover-preview-wrap").style.display = "none";
+      document.getElementById("book-modal").classList.add("open");
+    }
+
+    function openEditBookModal(id) {
+      const book = adminBooks.find(b => String(b.id) === String(id));
+      if (!book) return;
+
+      document.getElementById("book-modal-title").textContent = `Edit Book: ${book.title}`;
+      document.getElementById("edit-book-id").value = book.id;
+      document.getElementById("book-title").value = book.title || "";
+      document.getElementById("book-subtitle").value = book.subtitle || "";
+      document.getElementById("book-author").value = book.author || "";
+      document.getElementById("book-category").value = book.category || "philosophy";
+      document.getElementById("book-price-hardcover-inr").value = book.priceHardcoverINR || (book.price && book.price > 100 ? book.price : Math.round(book.price * 75 || 1999));
+      document.getElementById("book-price-digital-inr").value = book.priceDigitalINR || 899;
+      document.getElementById("book-stock").value = book.stock ?? 45;
+      document.getElementById("book-cover-preset").value = book.cover || 1;
+      document.getElementById("book-is-featured").checked = book.isFeatured ?? true;
+      document.getElementById("book-is-new").checked = book.isNew ?? false;
+      document.getElementById("book-desc").value = Array.isArray(book.description) ? book.description.join("\n\n") : (book.description || "");
+
+      if (book.coverImage) {
+        document.getElementById("book-cover-custom-base64").value = book.coverImage;
+        document.getElementById("book-cover-preview-img").src = book.coverImage;
+        document.getElementById("book-cover-preview-wrap").style.display = "block";
+      } else {
+        document.getElementById("book-cover-custom-base64").value = "";
+        document.getElementById("book-cover-preview-wrap").style.display = "none";
+      }
+
+      document.getElementById("book-modal").classList.add("open");
+    }
+
+    function closeBookModal() {
+      document.getElementById("book-modal").classList.remove("open");
+    }
+
+    function handleAdminCoverUpload(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          document.getElementById("book-cover-custom-base64").value = e.target.result;
+          document.getElementById("book-cover-preview-img").src = e.target.result;
+          document.getElementById("book-cover-preview-wrap").style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function removeAdminCoverUpload() {
+      document.getElementById("book-cover-file").value = "";
+      document.getElementById("book-cover-custom-base64").value = "";
+      document.getElementById("book-cover-preview-wrap").style.display = "none";
+    }
+
+    async function saveBookForm() {
+      const id = document.getElementById("edit-book-id").value;
+      const title = document.getElementById("book-title").value.trim();
+      const subtitle = document.getElementById("book-subtitle").value.trim();
+      const author = document.getElementById("book-author").value.trim();
+      const cat = document.getElementById("book-category").value;
+      const catObj = adminCategories.find(c => c.id === cat);
+      const priceHc = parseInt(document.getElementById("book-price-hardcover-inr").value) || 1999;
+      const pricePdf = parseInt(document.getElementById("book-price-digital-inr").value) || 899;
+      const stock = parseInt(document.getElementById("book-stock").value) || 50;
+      const coverPreset = parseInt(document.getElementById("book-cover-preset").value) || 1;
+      const isFeatured = document.getElementById("book-is-featured").checked;
+      const isNew = document.getElementById("book-is-new").checked;
+      const desc = document.getElementById("book-desc").value.trim();
+      const customCoverBase64 = document.getElementById("book-cover-custom-base64").value;
+      const fileInput = document.getElementById("book-cover-file");
+
+      let uploadedCoverUrl = customCoverBase64 || null;
+
+      // Real upload to Firebase Storage if file attached
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        showToast("Uploading jacket image to Firebase Storage...");
+        try {
+          uploadedCoverUrl = await FirebaseService.uploadFile(fileInput.files[0], "covers");
+        } catch (err) {
+          console.warn("Storage upload error:", err);
+          showToast("Cover upload notice: " + (err.message || "Using fallback"));
+        }
+      }
+
+      const bookData = {
+        title: title,
+        subtitle: subtitle,
+        author: author,
+        category: cat,
+        categoryLabel: catObj?.label || cat,
+        priceHardcoverINR: priceHc,
+        priceDigitalINR: pricePdf,
+        priceHardcover: Math.round(priceHc / 75),
+        priceDigital: Math.round(pricePdf / 75),
+        price: priceHc,
+        stock: stock,
+        cover: coverPreset,
+        isFeatured: isFeatured,
+        isNew: isNew,
+        coverImage: uploadedCoverUrl,
+        description: desc ? [desc] : ["An authoritative new release from Reason Press."],
+        format: "Hardcover, Linen Bound & Digital PDF",
+        language: "English",
+        available: true
+      };
+
+      if (id) {
+        if (typeof FirebaseService !== "undefined") {
+          await FirebaseService.updateBook(id, bookData);
+        }
+      } else {
+        bookData.isbn = `978-1-9999-${Math.floor(1000 + Math.random() * 9000)}-0`;
+        bookData.year = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        bookData.pages = "280 pages";
+        if (typeof FirebaseService !== "undefined") {
+          await FirebaseService.addBook(bookData);
+        }
+      }
+
+      if (typeof FirebaseService !== "undefined") {
+        adminBooks = await FirebaseService.getBooks();
+      }
+      saveBooks(adminBooks);
+      renderAdminStats();
+      renderAdminBooks();
+      closeBookModal();
+      showToast(`✓ Saved "${title}" to Cloud Firestore!`);
+    }
+
+    async function deleteBook(id) {
+      const book = adminBooks.find(b => String(b.id) === String(id));
+      if (!book) return;
+      if (confirm(`Are you sure you want to remove "${book.title}" from the live catalogue in Cloud Firestore?`)) {
+        if (typeof FirebaseService !== "undefined") {
+          await FirebaseService.deleteBook(id);
+          adminBooks = await FirebaseService.getBooks();
+        } else {
+          adminBooks = adminBooks.filter(b => String(b.id) !== String(id));
+        }
+        saveBooks(adminBooks);
+        renderAdminStats();
+        renderAdminBooks();
+        showToast(`Removed "${book.title}" from Firestore.`);
+      }
+    }
+
+    // ── TAB 4: Categories Management ─────────────────────────────
+    function renderAdminCategories() {
+      const tbody = document.getElementById("admin-categories-tbody");
+      if (!tbody) return;
+
+      tbody.innerHTML = adminCategories.map(cat => {
+        const count = adminBooks.filter(b => b.category === cat.id).length;
+        return `
+      <tr>
+        <td><code style="background:var(--paper-mid);padding:2px 6px;border-radius:2px;">${cat.id}</code></td>
+        <td><strong>${cat.label}</strong></td>
+        <td style="color:var(--ink-muted);">${cat.desc || 'General subject category'}</td>
+        <td><strong>${count} books</strong></td>
+        <td style="text-align:right;">
+          <button class="btn btn--outline" style="padding:4px 10px;font-size:11px;" onclick="openEditCategoryModal('${cat.id}')">Edit</button>
+          <button class="btn btn--outline" style="padding:4px 10px;font-size:11px;color:#C62828;border-color:#FFCDD2;margin-left:4px;" onclick="deleteCategory('${cat.id}')">Delete</button>
+        </td>
+      </tr>
+    `;
+      }).join("");
+    }
+
+    function openAddCategoryModal() {
+      document.getElementById("category-form").reset();
+      document.getElementById("edit-cat-id").value = "";
+      document.getElementById("category-modal").classList.add("open");
+    }
+
+    function openEditCategoryModal(slug) {
+      const cat = adminCategories.find(c => c.id === slug);
+      if (!cat) return;
+      document.getElementById("edit-cat-id").value = cat.id;
+      document.getElementById("cat-name").value = cat.label;
+      document.getElementById("cat-slug").value = cat.id;
+      document.getElementById("cat-desc").value = cat.desc || "";
+      document.getElementById("category-modal").classList.add("open");
+    }
+
+    function closeCategoryModal() {
+      document.getElementById("category-modal").classList.remove("open");
+    }
+
+    async function saveCategoryForm() {
+      const editId = document.getElementById("edit-cat-id").value;
+      const label = document.getElementById("cat-name").value.trim();
+      const slug = document.getElementById("cat-slug").value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
+      const desc = document.getElementById("cat-desc").value.trim();
+
+      if (!label || !slug) {
+        showToast("Please provide both a Category Name and Identifier.");
+        return;
+      }
+
+      if (typeof FirebaseService !== "undefined" && FirebaseService.addCategory) {
+        try {
+          if (editId) {
+            await FirebaseService.updateCategory(editId, { label, desc });
+          } else {
+            await FirebaseService.addCategory({ id: slug, slug, label, desc });
+          }
+          adminCategories = await FirebaseService.getCategories();
+          adminLogs = await FirebaseService.getActivityLogs(150);
+        } catch (e) {
+          console.warn("Firestore category error:", e);
+        }
+      } else {
+        if (editId) {
+          const cat = adminCategories.find(c => c.id === editId);
+          if (cat) { cat.label = label; cat.desc = desc; }
+        } else {
+          adminCategories.push({ id: slug, label: label, desc: desc });
+        }
+        saveCategories(adminCategories);
+      }
+
+      renderAdminStats();
+      renderAdminCategories();
+      renderAdminLogs();
+
+      // Update category selects in book modals
+      const modalCatSelect = document.getElementById("book-category");
+      if (modalCatSelect) {
+        modalCatSelect.innerHTML = adminCategories.map(c => `
+          <option value="${c.id}">${c.label}</option>
+        `).join("");
+      }
+
+      const catFilterSelect = document.getElementById("books-cat-filter");
+      if (catFilterSelect) {
+        catFilterSelect.innerHTML = `<option value="all">All Categories</option>` + adminCategories.map(c => `
+          <option value="${c.id}">${c.label}</option>
+        `).join("");
+      }
+
+      closeCategoryModal();
+      showToast(`✓ Category "${label}" saved to Cloud Firestore!`);
+    }
+
+    async function deleteCategory(slug) {
+      if (confirm(`Delete subject category "${slug}" from Cloud Firestore?`)) {
+        if (typeof FirebaseService !== "undefined" && FirebaseService.deleteCategory) {
+          try {
+            await FirebaseService.deleteCategory(slug);
+            adminCategories = await FirebaseService.getCategories();
+            adminLogs = await FirebaseService.getActivityLogs(150);
+          } catch (e) {
+            console.warn(e);
+          }
+        } else {
+          adminCategories = adminCategories.filter(c => c.id !== slug);
+          saveCategories(adminCategories);
+        }
+        renderAdminStats();
+        renderAdminCategories();
+        renderAdminLogs();
+        showToast(`Deleted category "${slug}"`);
+      }
+    }
+
+    // ── TAB 5: Orders Management ─────────────────────────────────
+    function renderAdminOrders() {
+      const tbody = document.getElementById("admin-orders-tbody");
+      if (!tbody) return;
+
+      tbody.innerHTML = adminOrders.map(order => {
+        const status = order.status || "Confirmed";
+        return `
+      <tr>
+        <td>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:13px;color:var(--ink);">#${order.id}</div>
+          <div style="font-size:10px;color:var(--ink-faint);">${order.date || order.dateFormatted || 'Recent'}</div>
+        </td>
+        <td>
+          <strong>${order.customerName}</strong>
+          <div style="font-size:11px;color:var(--ink-muted);">${order.customerEmail}</div>
+          <div style="font-size:11px;color:var(--ink-muted);">${order.customerPhone}</div>
+        </td>
+        <td>
+          <div style="font-size:11px;max-width:220px;line-height:1.4;">${order.customerAddress}</div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink);">PIN: ${order.customerPin}</div>
+        </td>
+        <td>
+          ${(order.items || []).map(i => `
+            <div style="font-size:11px;">
+              <strong>${i.title}</strong> &times; ${i.qty}
+              <span style="font-size:10px;color:var(--accent-dark);">(${i.format})</span>
+            </div>
+          `).join("")}
+        </td>
+        <td>
+          <div style="font-size:13px;font-weight:700;color:var(--accent-dark);">₹${(order.total || 0).toLocaleString('en-IN')}</div>
+          <div style="font-size:10px;color:var(--ink-muted);">${order.paymentMethod || 'Online'}</div>
+          ${order.utrRef ? `<div style="font-size:9px;color:var(--ink-faint);">${order.utrRef}</div>` : ''}
+        </td>
+        <td>
+          <select class="status-select ${status}" onchange="updateOrderStatus('${order.id}', this.value, this)">
+            <option value="Confirmed" ${status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+            <option value="Processing" ${status === 'Processing' ? 'selected' : ''}>Processing</option>
+            <option value="Dispatched" ${status === 'Dispatched' ? 'selected' : ''}>Dispatched</option>
+            <option value="Delivered" ${status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+            <option value="Cancelled" ${status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+          </select>
+        </td>
+      </tr>
+    `;
+      }).join("");
+    }
+
+    async function updateOrderStatus(orderId, newStatus, selectEl) {
+      const order = adminOrders.find(o => String(o.id) === String(orderId));
+      if (!order) return;
+
+      order.status = newStatus;
+      if (typeof FirebaseService !== "undefined") {
+        await FirebaseService.updateOrderStatus(orderId, newStatus);
+      }
+      if (selectEl) selectEl.className = `status-select ${newStatus}`;
+      showToast(`✓ Order #${orderId} updated to ${newStatus} in Firestore.`);
+    }
+
+    // ── TAB 6: Press & Site Settings ─────────────────────────────
+    function loadAdminSettings() {
+      const s = getSiteSettings();
+      document.getElementById("set-press-name").value = s.pressName || "Reason Press";
+      document.getElementById("set-motto").value = s.motto || "BOOKS WITH PURPOSE";
+      document.getElementById("set-manifesto-heading").value = s.manifestoHeading || "";
+      document.getElementById("set-manifesto-text").value = s.manifestoText || "";
+      document.getElementById("set-editorial-email").value = s.contactEmail || "";
+      document.getElementById("set-orders-email").value = s.ordersEmail || "";
+      document.getElementById("set-phone").value = s.contactPhone || "";
+      document.getElementById("set-turnaround").value = s.reviewTurnaround || "";
+      document.getElementById("set-address").value = s.address || "";
+    }
+
+    async function saveAdminSettings() {
+      const settings = {
+        pressName: document.getElementById("set-press-name").value.trim(),
+        motto: document.getElementById("set-motto").value.trim(),
+        manifestoHeading: document.getElementById("set-manifesto-heading").value.trim(),
+        manifestoText: document.getElementById("set-manifesto-text").value.trim(),
+        contactEmail: document.getElementById("set-editorial-email").value.trim(),
+        ordersEmail: document.getElementById("set-orders-email").value.trim(),
+        contactPhone: document.getElementById("set-phone").value.trim(),
+        reviewTurnaround: document.getElementById("set-turnaround").value.trim(),
+        address: document.getElementById("set-address").value.trim()
+      };
+
+      if (typeof FirebaseService !== "undefined") {
+        await FirebaseService.updateSiteSettings(settings);
+      }
+      saveSiteSettings(settings);
+      showToast("Site settings updated successfully.");
+    }
+
+    // ── TAB 7: User Accounts & Roles Management ──────────────────
+    function renderAdminUsers() {
+        const tbody = document.getElementById("admin-users-tbody");
+        if (!tbody) return;
+
+        const currentU = (typeof FirebaseService !== "undefined") ? FirebaseService.currentUser : null;
+        const currentP = (typeof FirebaseService !== "undefined") ? FirebaseService.userProfile : null;
+
+        // Update Current Signed-in Account Quick Card
+        if (currentU) {
+          const isCurrentAdmin = (currentP && currentP.role === "admin") || currentU.email === "editor@reasonpress.com";
+          const nameEl = document.getElementById("signedin-name");
+          const emailEl = document.getElementById("signedin-email");
+          const uidEl = document.getElementById("signedin-uid");
+          const badgeEl = document.getElementById("signedin-role-badge");
+          const avatarEl = document.getElementById("signedin-avatar");
+          const btnToggle = document.getElementById("btn-toggle-current-admin");
+
+          if (nameEl) nameEl.textContent = (currentP?.name || currentU.displayName || currentU.email.split("@")[0]);
+          if (emailEl) emailEl.textContent = currentU.email;
+          if (uidEl) uidEl.textContent = `UID: ${currentU.uid}`;
+          if (avatarEl) avatarEl.textContent = (currentU.displayName || currentU.email).charAt(0).toUpperCase();
+
+          if (badgeEl) {
+            badgeEl.className = isCurrentAdmin ? "role-badge role-badge--admin" : "role-badge role-badge--user";
+            badgeEl.textContent = isCurrentAdmin ? "ADMINISTRATOR" : "REGULAR READER";
+          }
+
+          if (btnToggle) {
+            if (isCurrentAdmin) {
+              btnToggle.className = "btn btn--outline";
+              btnToggle.style.color = "#DC2626";
+              btnToggle.style.borderColor = "#FCA5A5";
+              btnToggle.innerHTML = "<span>Revoke Admin from My Account</span>";
+            } else {
+              btnToggle.className = "btn btn--primary";
+              btnToggle.style.background = "#16A34A";
+              btnToggle.style.borderColor = "#16A34A";
+              btnToggle.innerHTML = "<span>Make This Signed-in Account Admin</span>";
+            }
+          }
+        }
+
+        // Populate Users Table
+        if (adminUsers.length === 0) {
+          tbody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align:center;padding:var(--space-8);color:var(--ink-muted);">
+          No user accounts found in Cloud Firestore yet. New registrations will automatically appear here.
+        </td>
+      </tr>
+    `;
+          const summary = document.getElementById("users-count-summary");
+          if (summary) summary.textContent = "0 registered accounts";
+          return;
+        }
+
+        tbody.innerHTML = adminUsers.map(u => {
+          const isAdmin = u.role === "admin";
+          const name = u.name || u.displayName || u.email?.split("@")[0] || "Reader";
+          const email = u.email || "No email";
+          const uid = u.uid || u.id || "N/A";
+          const initial = (name || email).charAt(0).toUpperCase();
+
+          let createdStr = "Recent";
+          if (u.createdAt) {
+            try {
+              const d = u.createdAt.toMillis ? new Date(u.createdAt.toMillis()) : new Date(u.createdAt);
+              createdStr = d.toLocaleDateString("en-GB", { month: "short", day: "numeric", year: "numeric" });
+            } catch (e) { }
+          }
+
+          let lastLoginStr = "Active";
+          if (u.lastLoginAt) {
+            try {
+              const d = u.lastLoginAt.toMillis ? new Date(u.lastLoginAt.toMillis()) : new Date(u.lastLoginAt);
+              lastLoginStr = d.toLocaleDateString("en-GB", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+            } catch (e) { }
+          }
+
+          return `
+      <tr id="user-row-${uid}">
+        <td>
+          <div class="user-avatar-circle" style="${isAdmin ? 'background:var(--ink);color:var(--white);border-color:var(--ink);' : ''}">${initial}</div>
+        </td>
+        <td>
+          <strong style="font-size:13px;color:var(--ink);">${name}</strong>
+          <div style="font-size:11px;color:var(--ink-muted);">${email}</div>
+          ${u.emailVerified ? '<span style="font-size:10px;color:#16A34A;">✓ Email Verified</span>' : '<span style="font-size:10px;color:var(--ink-faint);">Unverified</span>'}
+        </td>
+        <td>
+          <code style="background:var(--paper-mid);padding:2px 6px;border-radius:2px;font-size:10px;color:var(--ink-muted);">${uid.slice(0, 12)}...</code>
+        </td>
+        <td style="font-size:11px;color:var(--ink-muted);">${createdStr}</td>
+        <td style="font-size:11px;color:var(--ink-muted);">${lastLoginStr}</td>
+        <td>
+          <span class="role-badge ${isAdmin ? 'role-badge--admin' : 'role-badge--user'}">
+            ${isAdmin ? 'ADMIN' : 'READER'}
+          </span>
+        </td>
+        <td style="text-align:right;white-space:nowrap;">
+          ${isAdmin ? `
+            <button class="btn btn--outline" style="padding:4px 8px;font-size:10px;color:#DC2626;border-color:#FCA5A5;" onclick="handleToggleUserRole('${uid}', 'admin')">
+              Revoke Admin
+            </button>
+          ` : `
+            <button class="btn btn--outline" style="padding:4px 8px;font-size:10px;color:#16A34A;border-color:#86EFAC;" onclick="handleToggleUserRole('${uid}', 'user')">
+              Make Admin
+            </button>
+          `}
+          <button class="btn btn--outline" style="padding:4px 8px;font-size:10px;margin-left:4px;" onclick="handleViewUserLogs('${email}')" title="Filter activity logs by this user">
+            Logs
+          </button>
+          <button class="btn btn--outline" style="padding:4px 8px;font-size:10px;margin-left:4px;" onclick="handleSendUserPasswordReset('${email}')" title="Send password reset email">
+            Reset
+          </button>
+        </td>
+      </tr>
+    `;
+        }).join("");
+
+        const summary = document.getElementById("users-count-summary");
+        if (summary) summary.textContent = `${adminUsers.length} total account${adminUsers.length === 1 ? '' : 's'}`;
+      }
+
+      function filterAdminUsers() {
+        const query = (document.getElementById("users-search-input")?.value || "").toLowerCase().trim();
+        const role = document.getElementById("users-role-filter")?.value || "all";
+
+        const rows = document.querySelectorAll("#admin-users-tbody tr");
+        let matchedCount = 0;
+
+        adminUsers.forEach((u, idx) => {
+          const row = rows[idx];
+          if (!row) return;
+
+          const uRole = u.role || "user";
+          const matchRole = role === "all" || uRole === role;
+          const matchQuery = !query ||
+            (u.name && u.name.toLowerCase().includes(query)) ||
+            (u.email && u.email.toLowerCase().includes(query)) ||
+            ((u.uid || u.id) && (u.uid || u.id).toLowerCase().includes(query));
+
+          const show = matchRole && matchQuery;
+          row.style.display = show ? "" : "none";
+          if (show) matchedCount++;
+        });
+
+        const summary = document.getElementById("users-count-summary");
+        if (summary) summary.textContent = `Showing ${matchedCount} of ${adminUsers.length} accounts`;
+      }
+
+      async function handleToggleUserRole(uid, currentRole) {
+        const isCurrentlyAdmin = currentRole === "admin";
+        const newRole = isCurrentlyAdmin ? "user" : "admin";
+        const confirmMsg = isCurrentlyAdmin
+          ? `Revoke Administrator privileges for UID ${uid}? They will become a standard reader.`
+          : `Promote UID ${uid} to Administrator? They will have full access to the editorial console, catalogue, orders, and user logs.`;
+
+        if (!confirm(confirmMsg)) return;
+
+        if (typeof FirebaseService !== "undefined") {
+          try {
+            await FirebaseService.setUserRole(uid, newRole);
+            adminUsers = await FirebaseService.getAllUsers();
+            adminLogs = await FirebaseService.getActivityLogs(150);
+            renderAdminStats();
+            renderAdminUsers();
+            renderAdminLogs();
+            showToast(`✓ Updated role to ${newRole.toUpperCase()} for UID: ${uid}`);
+          } catch (err) {
+            console.error(err);
+            showToast("Error updating role: " + err.message);
+          }
+        }
+      }
+
+      async function handleToggleCurrentAccountAdmin() {
+        if (typeof FirebaseService === "undefined" || !FirebaseService.currentUser) return;
+        const u = FirebaseService.currentUser;
+        const p = FirebaseService.userProfile;
+        const isCurrentlyAdmin = p?.role === "admin";
+        const newRole = isCurrentlyAdmin ? "user" : "admin";
+
+        try {
+          await FirebaseService.setUserRole(u.uid, newRole);
+          adminUsers = await FirebaseService.getAllUsers();
+          adminLogs = await FirebaseService.getActivityLogs(150);
+          renderAdminStats();
+          renderAdminUsers();
+          renderAdminLogs();
+          showToast(`✓ Your signed-in account is now: ${newRole.toUpperCase()}`);
+        } catch (err) {
+          showToast("Notice: " + err.message);
+        }
+      }
+
+      async function handlePromoteUserForm() {
+        const input = document.getElementById("user-promote-input");
+        const val = input ? input.value.trim() : "";
+        if (!val) return;
+
+        if (typeof FirebaseService !== "undefined") {
+          try {
+            showToast("Assigning administrator privileges in Cloud Firestore...");
+            const res = await FirebaseService.promoteUserByEmail(val);
+            if (input) input.value = "";
+            adminUsers = await FirebaseService.getAllUsers();
+            adminLogs = await FirebaseService.getActivityLogs(150);
+            renderAdminStats();
+            renderAdminUsers();
+            renderAdminLogs();
+            showToast(res.message);
+          } catch (err) {
+            showToast("Error promoting user: " + err.message);
+          }
+        }
+      }
+
+      async function refreshAdminUsers() {
+        showToast("Refreshing user accounts from Cloud Firestore...");
+        if (typeof FirebaseService !== "undefined") {
+          adminUsers = await FirebaseService.getAllUsers();
+        }
+        renderAdminStats();
+        renderAdminUsers();
+        showToast("✓ User list synchronized.");
+      }
+
+      async function handleSendUserPasswordReset(email) {
+        if (!email || email === "No email") return;
+        if (confirm(`Send a password reset email link to ${email}?`)) {
+          try {
+            if (typeof FirebaseService !== "undefined") {
+              await FirebaseService.sendPasswordReset(email);
+              adminLogs = await FirebaseService.getActivityLogs(150);
+              renderAdminLogs();
+              renderAdminStats();
+            }
+            showToast(`✓ Password reset email sent to ${email}`);
+          } catch (err) {
+            showToast("Reset error: " + err.message);
+          }
+        }
+      }
+
+      function handleViewUserLogs(email) {
+        if (!email) return;
+        switchAdminTab("logs");
+        const searchInput = document.getElementById("logs-search-input");
+        if (searchInput) {
+          searchInput.value = email;
+          filterAdminLogs();
+        }
+      }
+
+      // ── TAB 8: Live User Activity & Audit Logs ───────────────────
+      function renderAdminLogs() {
+        const tbody = document.getElementById("admin-logs-tbody");
+        if (!tbody) return;
+
+        if (adminLogs.length === 0) {
+          tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align:center;padding:var(--space-8);color:var(--ink-muted);">
+          No user activity logs recorded yet. Actions like sign-ins, orders, book releases, and role changes will be recorded here live in Cloud Firestore.
+        </td>
+      </tr>
+    `;
+          const summary = document.getElementById("logs-count-summary");
+          if (summary) summary.textContent = "0 logs recorded";
+          return;
+        }
+
+        tbody.innerHTML = adminLogs.map(log => {
+          const type = log.type || "general";
+          const timeStr = log.dateFormatted || (log.timestamp ? new Date(log.timestamp.toMillis ? log.timestamp.toMillis() : log.timestamp).toLocaleString("en-GB", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "Recent");
+          const userEmail = log.userEmail || "guest";
+          const userName = log.userName || userEmail.split("@")[0];
+          const details = log.details || "";
+          const action = log.action || "Activity";
+          const ua = log.userAgent ? (log.userAgent.includes("Windows") ? "Windows / Browser" : (log.userAgent.includes("Mac") ? "Mac / Browser" : "Web Client")) : "Browser Client";
+
+          let badgeClass = "log-badge--general";
+          let badgeLabel = type.toUpperCase();
+          if (type === "auth") { badgeClass = "log-badge--auth"; badgeLabel = "AUTH"; }
+          else if (type === "role_change") { badgeClass = "log-badge--role_change"; badgeLabel = "ROLE"; }
+          else if (type === "order") { badgeClass = "log-badge--order"; badgeLabel = "ORDER"; }
+          else if (type === "book") { badgeClass = "log-badge--book"; badgeLabel = "CATALOGUE"; }
+          else if (type === "submission") { badgeClass = "log-badge--submission"; badgeLabel = "MANUSCRIPT"; }
+          else if (type === "profile") { badgeClass = "log-badge--profile"; badgeLabel = "PROFILE"; }
+
+          return `
+      <tr>
+        <td style="font-size:11px;color:var(--ink-muted);white-space:nowrap;">
+          <strong>${timeStr}</strong>
+        </td>
+        <td>
+          <span class="log-badge ${badgeClass}">${badgeLabel}</span>
+        </td>
+        <td>
+          <strong style="font-size:12px;color:var(--ink);">${userName}</strong>
+          <div style="font-size:10px;color:var(--ink-muted);">${userEmail}</div>
+        </td>
+        <td>
+          <strong style="font-size:12px;color:var(--ink);">${action}</strong>
+          <div style="font-size:11px;color:var(--ink-muted);line-height:1.4;margin-top:2px;">${details}</div>
+        </td>
+        <td style="font-size:10px;color:var(--ink-faint);white-space:nowrap;">
+          ${ua}
+        </td>
+      </tr>
+    `;
+        }).join("");
+
+        const summary = document.getElementById("logs-count-summary");
+        if (summary) summary.textContent = `${adminLogs.length} activity log${adminLogs.length === 1 ? '' : 's'} recorded`;
+      }
+
+      function filterAdminLogs() {
+        const query = (document.getElementById("logs-search-input")?.value || "").toLowerCase().trim();
+        const typeFilter = document.getElementById("logs-type-filter")?.value || "all";
+
+        const rows = document.querySelectorAll("#admin-logs-tbody tr");
+        let matchedCount = 0;
+
+        adminLogs.forEach((log, idx) => {
+          const row = rows[idx];
+          if (!row) return;
+
+          const logType = log.type || "general";
+          const matchType = typeFilter === "all" || logType === typeFilter;
+          const matchQuery = !query ||
+            (log.action && log.action.toLowerCase().includes(query)) ||
+            (log.details && log.details.toLowerCase().includes(query)) ||
+            (log.userEmail && log.userEmail.toLowerCase().includes(query)) ||
+            (log.userName && log.userName.toLowerCase().includes(query));
+
+          const show = matchType && matchQuery;
+          row.style.display = show ? "" : "none";
+          if (show) matchedCount++;
+        });
+
+        const summary = document.getElementById("logs-count-summary");
+        if (summary) summary.textContent = `Showing ${matchedCount} of ${adminLogs.length} logs`;
+      }
+
+      async function refreshAdminLogs() {
+        showToast("Refreshing live logs from Cloud Firestore...");
+        if (typeof FirebaseService !== "undefined") {
+          adminLogs = await FirebaseService.getActivityLogs(150);
+        }
+        renderAdminStats();
+        renderAdminLogs();
+        showToast("✓ Activity feed refreshed.");
+      }
+
+      function exportAdminLogs() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(adminLogs, null, 2));
+        const downloadAnchor = document.createElement("a");
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `reason_press_activity_logs_${new Date().toISOString().slice(0, 10)}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        showToast("✓ Activity logs exported as JSON file.");
+      }
+
+      async function clearAdminLogs() {
+        if (confirm("Are you sure you want to clear the activity log feed? This cannot be undone.")) {
+          if (typeof FirebaseService !== "undefined") {
+            await FirebaseService.clearActivityLogs();
+            adminLogs = [];
+          }
+          renderAdminStats();
+          renderAdminLogs();
+          showToast("Activity logs cleared.");
+        }
+      }
+
+      // Explicitly expose all handlers on window for HTML onclick compatibility
+      window.handleAdminLogout = handleAdminLogout;
+      window.switchAdminTab = switchAdminTab;
+      window.openAddBookModal = openAddBookModal;
+      window.openEditBookModal = openEditBookModal;
+      window.closeBookModal = closeBookModal;
+      window.saveBookForm = saveBookForm;
+      window.deleteBook = deleteBook;
+      window.toggleBookFeatured = toggleBookFeatured;
+      window.toggleBookNew = toggleBookNew;
+      window.openAddCategoryModal = openAddCategoryModal;
+      window.openEditCategoryModal = openEditCategoryModal;
+      window.closeCategoryModal = closeCategoryModal;
+      window.saveCategoryForm = saveCategoryForm;
+      window.deleteCategory = deleteCategory;
+      window.filterAdminBooks = filterAdminBooks;
+      window.filterAdminSubmissions = filterAdminSubmissions;
+      window.openManuscriptReader = openManuscriptReader;
+      window.closeManuscriptReaderModal = closeManuscriptReaderModal;
+      window.setAdminReaderMode = setAdminReaderMode;
+      window.turnAdminPdfPage = turnAdminPdfPage;
+      window.zoomAdminPdf = zoomAdminPdf;
+      window.downloadAdminManuscriptPdf = downloadAdminManuscriptPdf;
+      window.declineSubmission = declineSubmission;
+      window.deleteSubmission = deleteSubmission;
+      window.openReleaseConfirmModal = openReleaseConfirmModal;
+      window.closeReleaseConfirmModal = closeReleaseConfirmModal;
+      window.confirmAndExecuteRelease = confirmAndExecuteRelease;
+      window.filterAdminOrders = filterAdminOrders;
+      window.filterAdminUsers = filterAdminUsers;
+      window.handleToggleUserRole = handleToggleUserRole;
+      window.handleViewUserLogs = handleViewUserLogs;
+      window.handleSendUserPasswordReset = handleSendUserPasswordReset;
+      window.handlePromoteUserByEmailForm = handlePromoteUserByEmailForm;
+      window.handleToggleCurrentAccountAdmin = handleToggleCurrentAccountAdmin;
+      window.refreshAdminUsers = refreshAdminUsers;
+      window.filterAdminLogs = filterAdminLogs;
+      window.refreshAdminLogs = refreshAdminLogs;
+      window.exportAdminLogs = exportAdminLogs;
+      window.clearAdminLogs = clearAdminLogs;
+      window.handleAuthorizeCurrentAdmin = handleAuthorizeCurrentAdmin;
+      window.saveAdminSettings = saveAdminSettings;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        initAdminPortal();
+      });
+  </script>
+</body>
+
+</html>

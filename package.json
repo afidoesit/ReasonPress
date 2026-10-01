@@ -1,0 +1,17 @@
+{
+  "name": "reason-press",
+  "version": "1.0.0",
+  "description": "Reason Press - Books with Purpose",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "books",
+    "bookstore",
+    "publishing"
+  ],
+  "author": "",
+  "license": "ISC"
+}

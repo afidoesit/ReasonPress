@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Reason Press</title>
+<meta name="description" content="Reason Press is an independent publishing house founded on the belief that books should provoke thought, expand understanding, and endure beyond the moment.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo" aria-label="Reason Press Home">
+      <img src="assets/favicon.png" alt="Reason Press Logo" class="nav__logo-img">
+      <div class="nav__logo-text">
+        <span class="nav__logo-name">Reason</span>
+        <span class="nav__logo-press">PRESS</span>
+      </div>
+    </a>
+    <div class="nav__links">
+      <a href="index.html" class="nav__link">Home</a>
+      <a href="books.html" class="nav__link">Books</a>
+      <a href="library.html" class="nav__link">My Library</a>
+      <a href="publish.html" class="nav__link">Publish</a>
+      <a href="community.html" class="nav__link">Community</a>
+      <a href="about.html" class="nav__link nav__link--active">About</a>
+      <a href="contact.html" class="nav__link">Contact</a>
+    </div>
+    <div class="nav__actions">
+      <!-- Universal Account / Sign-In Button -->
+      <div class="nav__account-wrapper" id="nav-account-wrap">
+        <button type="button" class="nav__account-btn" id="nav-account-btn" aria-label="User Account" aria-haspopup="true" aria-expanded="false" onclick="handleNavAccountClick()">
+          <span class="nav__account-avatar" id="nav-account-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <span class="nav__account-name" id="nav-account-name">Sign In</span>
+          <span class="nav__account-caret" aria-hidden="true">&caron;</span>
+        </button>
+        <div class="nav__account-dropdown" id="nav-account-dropdown" role="menu" style="display:none;"></div>
+      </div>
+      <a href="cart.html" class="nav__cart" aria-label="Reading Bag">
+        <span>Bag</span>
+        <span class="cart-count" style="display:none;">0</span>
+      </a>
+      <button class="nav__menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="nav-drawer">
+  <div id="mobile-account-slot" style="padding:var(--space-3) 0 var(--space-4);border-bottom:1px solid var(--rule-light);margin-bottom:var(--space-3);"></div>
+  <nav class="nav-drawer__links">
+    <a href="index.html" class="nav-drawer__link">Home</a>
+    <a href="books.html" class="nav-drawer__link">Books</a>
+    <a href="library.html" class="nav-drawer__link">My Library</a>
+    <a href="publish.html" class="nav-drawer__link">Publish</a>
+    <a href="community.html" class="nav-drawer__link">Community</a>
+    <a href="about.html" class="nav-drawer__link">About</a>
+    <a href="contact.html" class="nav-drawer__link">Contact</a>
+    <a href="cart.html" class="nav-drawer__link">Bag</a>
+  </nav>
+  <div style="font-size:var(--text-xs);color:var(--ink-faint);letter-spacing:0.12em;text-transform:uppercase;">
+    Reason Press . Caliph
+  </div>
+</div>
+
+<header class="page-header">
+  <div class="container">
+    <div class="page-header__label">Our Philosophy</div>
+    <h1 class="page-header__title"><em>A small press</em><br>with a strong idea.</h1>
+    <p class="page-header__desc">Reason Press was founded in Caliph in 2019. We publish books that matter — and nothing else.</p>
+  </div>
+</header>
+
+<main>
+  <!-- Manifesto -->
+  <section class="about-manifesto">
+    <div class="container">
+      <div class="about-manifesto__inner">
+        <div class="about-manifesto__aside">
+          <div class="about-manifesto__aside-label">Founded</div>
+          <div class="about-manifesto__aside-year">2019</div>
+          <div style="margin-top:var(--space-8);font-family:var(--font-serif);font-size:var(--text-lg);font-style:italic;color:var(--ink-muted);line-height:1.7;">
+            &ldquo;We are not in the business of books. We are in the business of ideas that happen to take the form of books.&rdquo;
+          </div>
+          <div style="margin-top:var(--space-4);font-size:var(--text-xs);letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:700;">— Editorial Board, 2019</div>
+        </div>
+        <div class="about-manifesto__body">
+          <p>Publishing is a strange business. Everyone knows it is difficult. What fewer people discuss is why it should exist at all — what it is for, beyond the commerce of distraction. Reason Press was started to answer that question with an act rather than a statement.</p>
+          <p>We publish books that make demands of the reader. Books that require something of the person who opens them — time, attention, willingness to be changed. This is not a punishing definition; it is simply an honest one. A book worth reading always wants something from you. It will not leave you exactly as it found you.</p>
+          <p>Our catalogue is intentionally compact. In an age when publishing more has become the default survival strategy of corporate media, we have chosen the opposite path: fewer titles, chosen with relentless scrutiny, typeset by hand, and printed on archival, acid-free Swedish papers.</p>
+          <p>We are a focused team of editors, typographers, and readers based in Caliph. We are not interested in algorithmic trend cycles or instant virality. We are interested in the long conversation — the one that happens between a profound book and an attentive mind.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values -->
+  <section class="about-values">
+    <div class="container">
+      <div class="section-label reveal">
+        <span class="section-label__line"></span>
+        <span class="section-label__text">Our Standards</span>
+      </div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(var(--text-3xl),4vw,var(--text-4xl));font-weight:600;margin-bottom:0;" class="reveal">The principles that guide every release</h2>
+      <div class="about-values__grid">
+        <div class="about-value reveal">
+          <div class="about-value__num">I. PURPOSE OVER MARKET</div>
+          <div class="about-value__title">Ideas that Endure</div>
+          <p class="about-value__desc">We never ask whether a book is easily marketable. We ask whether it needs to exist. Genuine intellectual merit creates its own audience over time.</p>
+        </div>
+        <div class="about-value reveal reveal--delay-1">
+          <div class="about-value__num">II. CRAFT AS ESSENCE</div>
+          <div class="about-value__title">Form as Content</div>
+          <p class="about-value__desc">The typography, binding, cloth spine, and paper feel of a book are not decorative luxuries. They are intrinsic to how ideas are received and remembered.</p>
+        </div>
+        <div class="about-value reveal reveal--delay-2">
+          <div class="about-value__num">III. EDITORIAL RIGOUR</div>
+          <div class="about-value__title">Uncompromising Care</div>
+          <p class="about-value__desc">Each manuscript undergoes months of line-by-line editorial collaboration. We publish fewer than eight books each year to honour that dedication.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="manifesto-strip">
+    <div class="container">
+      <div class="manifesto-strip__inner">
+        <div>
+          <div class="manifesto-strip__label">Manuscripts &amp; Submissions</div>
+          <div class="manifesto-strip__subtitle">We read every proposal sent to our desk.</div>
+        </div>
+        <div class="manifesto-strip__text">
+          <p>If you are writing something essential — a work of philosophy, literary fiction, or cultural reflection — we invite you to explore our publishing portal or share your proposal with our editors.</p>
+          <div style="display:flex;gap:var(--space-4);margin-top:var(--space-6);flex-wrap:wrap;">
+            <a href="publish.html" class="btn btn--primary"><span>Publish With Us</span></a>
+            <a href="community.html" class="btn btn--outline" style="border-color:rgba(254,251,244,0.4);color:var(--white);">Join the Reader Salon</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <div class="footer__logo-wrap">
+          <img src="assets/favicon.png" alt="Reason Press" class="footer__logo-img">
+          <div class="footer__logo-text">
+            <span class="footer__logo-name">Reason</span>
+            <span class="footer__logo-press">PRESS</span>
+          </div>
+        </div>
+        <p class="footer__brand-desc">An independent publishing house built around the idea that books should matter.</p>
+      </div>
+      <div>
+        <div class="footer__col-title">Catalogue</div>
+        <ul class="footer__links">
+          <li><a href="books.html" class="footer__link">All Books</a></li>
+          <li><a href="books.html?cat=philosophy" class="footer__link">Philosophy</a></li>
+          <li><a href="books.html?cat=fiction" class="footer__link">Fiction</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Company</div>
+        <ul class="footer__links">
+          <li><a href="about.html" class="footer__link">About</a></li>
+          <li><a href="publish.html" class="footer__link">Publish With Us</a></li>
+          <li><a href="community.html" class="footer__link">Reader Salon</a></li>
+          <li><a href="contact.html" class="footer__link">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Policies</div>
+        <ul class="footer__links">
+          <li><a href="about.html" class="footer__link">Shipping &amp; PDF Delivery</a></li>
+          <li><a href="about.html" class="footer__link">Returns</a></li>
+          <li><a href="about.html" class="footer__link">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span class="footer__copy">&copy; 2026 Reason Press Ltd. All rights reserved. Reason Press . Caliph</span>
+      <div class="footer__social">
+        <a href="#" class="footer__social-link">Instagram</a>
+        <a href="#" class="footer__social-link">Twitter</a>
+        <a href="#" class="footer__social-link">Substack</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" role="status" aria-live="polite"></div>
+<!-- Firebase SDK & Production Services -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-service.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

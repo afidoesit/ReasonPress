@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Publish With Us — Reason Press</title>
+<meta name="description" content="Publish your book with Reason Press. An independent publishing house for authors of purpose, intellectual depth, and enduring ideas.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo" aria-label="Reason Press Home">
+      <img src="assets/favicon.png" alt="Reason Press Logo" class="nav__logo-img">
+      <div class="nav__logo-text">
+        <span class="nav__logo-name">Reason</span>
+        <span class="nav__logo-press">PRESS</span>
+      </div>
+    </a>
+    <div class="nav__links">
+      <a href="index.html" class="nav__link">Home</a>
+      <a href="books.html" class="nav__link">Books</a>
+      <a href="library.html" class="nav__link">My Library</a>
+      <a href="publish.html" class="nav__link nav__link--active">Publish</a>
+      <a href="community.html" class="nav__link">Community</a>
+      <a href="about.html" class="nav__link">About</a>
+      <a href="contact.html" class="nav__link">Contact</a>
+    </div>
+    <div class="nav__actions">
+      <!-- Universal Account / Sign-In Button -->
+      <div class="nav__account-wrapper" id="nav-account-wrap">
+        <button type="button" class="nav__account-btn" id="nav-account-btn" aria-label="User Account" aria-haspopup="true" aria-expanded="false" onclick="handleNavAccountClick()">
+          <span class="nav__account-avatar" id="nav-account-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <span class="nav__account-name" id="nav-account-name">Sign In</span>
+          <span class="nav__account-caret" aria-hidden="true">&caron;</span>
+        </button>
+        <div class="nav__account-dropdown" id="nav-account-dropdown" role="menu" style="display:none;"></div>
+      </div>
+      <a href="cart.html" class="nav__cart" aria-label="Reading Bag">
+        <span>Bag</span>
+        <span class="cart-count" style="display:none;">0</span>
+      </a>
+      <button class="nav__menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="nav-drawer">
+  <div id="mobile-account-slot" style="padding:var(--space-3) 0 var(--space-4);border-bottom:1px solid var(--rule-light);margin-bottom:var(--space-3);"></div>
+  <nav class="nav-drawer__links">
+    <a href="index.html" class="nav-drawer__link">Home</a>
+    <a href="books.html" class="nav-drawer__link">Books</a>
+    <a href="library.html" class="nav-drawer__link">My Library</a>
+    <a href="publish.html" class="nav-drawer__link nav-drawer__link--active">Publish</a>
+    <a href="community.html" class="nav-drawer__link">Community</a>
+    <a href="about.html" class="nav-drawer__link">About</a>
+    <a href="contact.html" class="nav-drawer__link">Contact</a>
+    <a href="cart.html" class="nav-drawer__link">Bag</a>
+  </nav>
+  <div style="font-size:var(--text-xs);color:var(--ink-faint);letter-spacing:0.12em;text-transform:uppercase;">
+    Reason Press . Caliph
+  </div>
+</div>
+
+<!-- PUBLISH HERO -->
+<header class="page-header publish-hero">
+  <div class="container container--narrow" style="text-align:center;">
+    <div class="page-header__label">Author Submissions &amp; Manuscript Review</div>
+    <h1 class="page-header__title">Publish with <em>Reason Press.</em></h1>
+    <p class="page-header__desc" style="margin: 0 auto var(--space-8); max-width: 58ch;">
+      We partner with thoughtful writers, essayists, scholars, and novelists. Rather than typing your text here, simply upload your completed manuscript file (<strong style="color:var(--ink);">PDF</strong> or <strong style="color:var(--ink);">DOCX</strong>) along with your book cover page design for our editorial board to evaluate.
+    </p>
+    <div style="display:flex; justify-content:center; gap:var(--space-6); flex-wrap:wrap; font-size:var(--text-sm); color:var(--ink-muted);">
+      <span style="display:inline-flex; align-items:center; gap:6px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Direct PDF &amp; DOCX Submissions
+      </span>
+      <span style="display:inline-flex; align-items:center; gap:6px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Cover Artwork or In-House Design
+      </span>
+      <span style="display:inline-flex; align-items:center; gap:6px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Editorial Response within 14 Days
+      </span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Manuscript & Cover Upload Submission Form -->
+  <section class="section section--sm" style="background:var(--paper-mid);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);">
+    <div class="container container--narrow">
+      <div class="publish-form-card" style="background:var(--paper);padding:var(--space-10);border:1px solid var(--rule);border-radius:3px;box-shadow:0 8px 30px rgba(25, 42, 62, 0.04);">
+        <div class="section-label" style="margin-bottom:var(--space-3);">
+          <span class="section-label__line"></span>
+          <span class="section-label__text">Author Proposal &amp; Files</span>
+        </div>
+        <h2 style="font-family:var(--font-display);font-size:clamp(var(--text-2xl),3vw,var(--text-3xl));font-weight:600;margin-bottom:var(--space-2);color:var(--ink);">
+          Submit Your Manuscript &amp; Cover Art
+        </h2>
+        <p style="font-family:var(--font-serif);font-size:var(--text-base);color:var(--ink-muted);line-height:1.6;margin-bottom:var(--space-8);">
+          Fill in your book details and attach your files below. We review all unsolicited non-fiction, philosophy, essay collections, cultural critiques, and literary fiction.
+        </p>
+
+        <form id="publish-submission-form" class="contact-form" novalidate>
+          
+          <!-- Section 1: Author Details -->
+          <div style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-dark);margin-bottom:var(--space-3);padding-bottom:4px;border-bottom:1px solid var(--rule-light);">
+            01 &bull; Author Information
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="author-name">Author / Pen Name <span style="color:var(--accent);">*</span></label>
+              <input class="form-input" type="text" id="author-name" name="author_name" placeholder="e.g. Elena Rostova" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="author-email">Email Address <span style="color:var(--accent);">*</span></label>
+              <input class="form-input" type="email" id="author-email" name="author_email" placeholder="author@domain.com" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="author-phone">Phone / WhatsApp (Optional)</label>
+              <input class="form-input" type="tel" id="author-phone" name="author_phone" placeholder="+1 (555) 000-0000">
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="author-location">Country / City</label>
+              <input class="form-input" type="text" id="author-location" name="author_location" placeholder="e.g. Oxford, United Kingdom">
+            </div>
+          </div>
+
+          <!-- Section 2: Book Details -->
+          <div style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-dark);margin-top:var(--space-6);margin-bottom:var(--space-3);padding-bottom:4px;border-bottom:1px solid var(--rule-light);">
+            02 &bull; Book Overview
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="manuscript-title">Book Title <span style="color:var(--accent);">*</span></label>
+              <input class="form-input" type="text" id="manuscript-title" name="title" placeholder="e.g. The Architecture of Thought" required>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="manuscript-subtitle">Subtitle / Tagline (Optional)</label>
+              <input class="form-input" type="text" id="manuscript-subtitle" name="subtitle" placeholder="e.g. Structure, Stillness, and the Spatial Mind">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="manuscript-category">Primary Subject Category <span style="color:var(--accent);">*</span></label>
+              <select class="form-select" id="manuscript-category" name="category" required>
+                <option value="">Select Category</option>
+                <option value="philosophy">Philosophy &amp; Intellectual Inquiry</option>
+                <option value="fiction">Literary Fiction &amp; Novellas</option>
+                <option value="essays">Essays &amp; Cultural Criticism</option>
+                <option value="history">History, Geography &amp; Memory</option>
+                <option value="science">Science &amp; Societal Studies</option>
+                <option value="poetry">Poetry &amp; Classical Translation</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="manuscript-words">Estimated Word Count / Pages <span style="color:var(--accent);">*</span></label>
+              <input class="form-input" type="text" id="manuscript-words" name="word_count" placeholder="e.g. 58,000 words (~240 pages)" required>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="manuscript-purpose">Core Purpose &amp; Abstract (2&ndash;3 Sentences) <span style="color:var(--accent);">*</span></label>
+            <textarea class="form-textarea" id="manuscript-purpose" name="purpose" rows="3" placeholder="Briefly describe what unique perspective or central thesis your book brings to readers..." required></textarea>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="manuscript-sample-text" style="display:flex;justify-content:space-between;align-items:baseline;">
+              <span>Sample Excerpt or Opening Passage (Optional)</span>
+              <span style="font-size:11px;color:var(--ink-faint);font-weight:400;">Helps editor read your work in review desk</span>
+            </label>
+            <textarea class="form-textarea" id="manuscript-sample-text" name="sample_text" rows="3" placeholder="Paste opening chapter or key passage for immediate editorial board reading..."></textarea>
+          </div>
+
+          <!-- Section 3: File Uploads (PDF/DOCX Manuscript & Cover Art) -->
+          <div style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-dark);margin-top:var(--space-6);margin-bottom:var(--space-3);padding-bottom:4px;border-bottom:1px solid var(--rule-light);">
+            03 &bull; Upload Manuscript &amp; Cover Page
+          </div>
+
+          <!-- Manuscript Upload Dropzone -->
+          <div class="form-field" style="margin-bottom:var(--space-6);">
+            <label class="form-label" style="display:flex; justify-content:space-between; align-items:baseline;">
+              <span>Manuscript Document (.PDF or .DOCX) <span style="color:var(--accent);">*</span></span>
+              <span style="font-size:11px; color:var(--ink-faint); font-weight:400;">PDF, DOCX, DOC, EPUB &bull; Up to 50MB</span>
+            </label>
+            <div class="upload-dropzone" id="manuscript-dropzone">
+              <input type="file" id="manuscript-file-input" name="manuscript_file" accept=".pdf,.docx,.doc,.epub" required>
+              <div class="upload-dropzone__icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="12" y1="18" x2="12" y2="12"></line>
+                  <line x1="9" y1="15" x2="12" y2="12"></line>
+                  <line x1="15" y1="15" x2="12" y2="12"></line>
+                </svg>
+              </div>
+              <div class="upload-dropzone__title">Click to browse or drag &amp; drop manuscript file</div>
+              <div class="upload-dropzone__hint">Send your complete draft or sample chapters as PDF or Word DOCX</div>
+            </div>
+            <div id="manuscript-file-badge" class="upload-file-badge" style="display:none;">
+              <div class="upload-file-badge__name">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <span id="manuscript-filename">manuscript.pdf</span>
+                <span id="manuscript-filesize" style="color:var(--ink-faint); font-size:11px; margin-left:4px;">(2.4 MB)</span>
+              </div>
+              <button type="button" class="upload-file-badge__remove" id="manuscript-file-remove" aria-label="Remove manuscript">&times; Remove</button>
+            </div>
+          </div>
+
+          <!-- Cover Page Upload Dropzone -->
+          <div class="form-field" style="margin-bottom:var(--space-6);">
+            <label class="form-label" style="display:flex; justify-content:space-between; align-items:baseline;">
+              <span>Book Cover Page / Jacket Artwork</span>
+              <span style="font-size:11px; color:var(--ink-faint); font-weight:400;">PNG, JPG, JPEG, PDF</span>
+            </label>
+            <div class="upload-dropzone" id="cover-dropzone">
+              <input type="file" id="cover-file-input" name="cover_file" accept=".png,.jpg,.jpeg,.webp,.pdf">
+              <div class="upload-dropzone__icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+              </div>
+              <div class="upload-dropzone__title">Upload cover image or design layout</div>
+              <div class="upload-dropzone__hint">PNG, JPG, or PDF cover artwork</div>
+            </div>
+            
+            <div id="cover-preview-card" class="cover-preview-card">
+              <img id="cover-preview-img" src="" alt="Cover Preview">
+            </div>
+
+            <div id="cover-file-badge" class="upload-file-badge" style="display:none;">
+              <div class="upload-file-badge__name">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+                <span id="cover-filename">cover.jpg</span>
+              </div>
+              <button type="button" class="upload-file-badge__remove" id="cover-file-remove" aria-label="Remove cover">&times; Remove</button>
+            </div>
+
+            <!-- In-house cover design request checkbox -->
+            <label style="display:flex; align-items:flex-start; gap:10px; margin-top:var(--space-3); cursor:pointer; font-size:var(--text-xs); color:var(--ink-muted); line-height:1.5;">
+              <input type="checkbox" id="request-cover-design" name="request_cover_design" style="margin-top:2px; accent-color:var(--accent);">
+              <span>I do not have a finished cover yet &mdash; I would like Reason Press's in-house typographers and book designers to design the bespoke book cover and jacket art.</span>
+            </label>
+          </div>
+
+          <!-- Terms & Submit -->
+          <div style="margin-top:var(--space-6); padding-top:var(--space-6); border-top:1px solid var(--rule); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:var(--space-4);">
+            <div style="font-size:var(--text-xs); color:var(--ink-muted); max-width:44ch;">
+              By submitting, you confirm that you own the rights to this manuscript. Reason Press respects intellectual property and signs non-disclosure agreements upon request.
+            </div>
+            <button type="submit" class="btn btn--primary" id="publish-submit-btn" style="padding:16px 36px; white-space:nowrap;">
+              <span>Submit Manuscript &amp; Cover &rarr;</span>
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <div class="footer__logo-wrap">
+          <img src="assets/favicon.png" alt="Reason Press" class="footer__logo-img">
+          <div class="footer__logo-text">
+            <span class="footer__logo-name">Reason</span>
+            <span class="footer__logo-press">PRESS</span>
+          </div>
+        </div>
+        <p class="footer__brand-desc">An independent publishing house built around the idea that books should matter. Thoughtfully written, purposefully made.</p>
+      </div>
+      <div>
+        <div class="footer__col-title">Catalogue</div>
+        <ul class="footer__links">
+          <li><a href="books.html" class="footer__link">All Books</a></li>
+          <li><a href="books.html?cat=philosophy" class="footer__link">Philosophy</a></li>
+          <li><a href="books.html?cat=fiction" class="footer__link">Fiction</a></li>
+          <li><a href="books.html?cat=essays" class="footer__link">Essays</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Authors</div>
+        <ul class="footer__links">
+          <li><a href="publish.html" class="footer__link">Publish With Us</a></li>
+          <li><a href="publish.html#submission" class="footer__link">Submit Manuscript</a></li>
+          <li><a href="about.html" class="footer__link">Editorial Standards</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Community</div>
+        <ul class="footer__links">
+          <li><a href="community.html" class="footer__link">The Reader Salon</a></li>
+          <li><a href="community.html" class="footer__link">Reading Circles</a></li>
+          <li><a href="contact.html" class="footer__link">Bookstore Partners</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span class="footer__copy">&copy; 2026 Reason Press Ltd. All rights reserved. Reason Press . Caliph</span>
+      <div class="footer__social">
+        <a href="#" class="footer__social-link">Instagram</a>
+        <a href="#" class="footer__social-link">Twitter</a>
+        <a href="#" class="footer__social-link">Substack</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" role="status" aria-live="polite"></div>
+<!-- Firebase SDK & Production Services -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-service.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
