@@ -2,262 +2,7 @@
 "use strict";
 
 // ── Book Database (Default Fallback) ─────────────────────────
-const DEFAULT_BOOKS = [
-  {
-    id: "1",
-    title: "The Architecture of Thought",
-    subtitle: "A philosophical investigation into the structures of human reasoning",
-    author: "Julian Vance",
-    priceHardcover: 28.00,
-    priceDigital: 12.00,
-    price: 28.00,
-    cover: 1,
-    category: "philosophy",
-    categoryLabel: "Philosophy & Ideas",
-    year: "March 2026",
-    pages: "312 pages",
-    isbn: "978-1-9999-0001-3",
-    dimensions: "234 × 153 mm",
-    format: "Hardcover, Linen Bound & Digital PDF",
-    description: [
-      "In The Architecture of Thought, Julian Vance offers a rare and rigorous account of how the mind builds the structures through which it understands the world. Beginning with Kant's schemata and ending with computational models of the twenty-first century, Vance traces the long conversation between philosophers and scientists about what it means to think.",
-      "This is not a book about simple ideas. It is a book about the ideas that make simple ideas possible — the invisible scaffolding of reason. Vance writes with the clarity of someone who has spent decades in the company of difficult questions and has finally found words adequate to them.",
-      "Available both in our signature archival hardcover printed on Munken acid-free paper, and in our typographically calibrated DRM-free Digital PDF Edition with interactive footnotes."
-    ],
-    sampleExcerpt: [
-      "Chapter 1: The Scaffolding of Perception",
-      "We do not encounter the world unmediated. Every sensation, every glimpse of dawn or fracture of memory, arrives pre-shaped by an apparatus we rarely pause to inspect.",
-      "Consider the simple act of recognizing a doorway. Long before geometry was codified in Alexandria, the creature navigating the forest had already internalized an implicit physics of threshold and traversal. We are builders of models before we are dwellers in rooms.",
-      "When we speak of logic, we are not speaking of an external ruler placed against existence. We are examining the structural joints of human consciousness itself."
-    ],
-    discussions: [
-      {
-        id: "d1",
-        author: "Helena Rostova",
-        avatar: "HR",
-        time: "2 days ago",
-        passage: "“We are builders of models before we are dwellers in rooms.”",
-        body: "Vance's opening assertion in Chapter 1 hits right at the core of phenomenology. Has anyone compared this with Merleau-Ponty's spatial perception theories?",
-        likes: 14
-      },
-      {
-        id: "d2",
-        author: "Dr. Arthur Pendelton",
-        avatar: "AP",
-        time: "4 days ago",
-        passage: "“The invisible scaffolding of reason...”",
-        body: "The historical analysis of Kantian schemata in part two alone justifies the physical edition. Superb marginal notes and typography.",
-        likes: 9
-      }
-    ]
-  },
-  {
-    id: "2",
-    title: "Quiet Hours",
-    subtitle: "Essays on silence, attention, and the modern condition",
-    author: "Anya Sharma",
-    priceHardcover: 24.00,
-    priceDigital: 10.00,
-    price: 24.00,
-    cover: 2,
-    category: "essays",
-    categoryLabel: "Essays & Reflection",
-    year: "January 2026",
-    pages: "224 pages",
-    isbn: "978-1-9999-0002-0",
-    dimensions: "216 × 140 mm",
-    format: "Hardcover, Cloth Spine & Digital PDF",
-    description: [
-      "Quiet Hours is a collection of twelve meditative essays examining what happens to our interior lives when silence is extinguished from daily life.",
-      "Sharma draws effortlessly on literature, neurobiology, and personal solitude to mount a lyrical defence of quietness as an ethical necessity rather than an aesthetic luxury.",
-      "A book to keep on the nightstand and revisit during restless seasons."
-    ],
-    sampleExcerpt: [
-      "Prologue: The Decibel of Modernity",
-      "Silence is not empty; it is merely uncrowded. In our current century, silence has acquired the scarcity value of ambergris or clean groundwater.",
-      "When we turn down the volume of the world, we do not discover nothingness. We discover the steady, rhythmic pulse of our own consciousness asking to be heard."
-    ],
-    discussions: [
-      {
-        id: "d3",
-        author: "Julian M.",
-        avatar: "JM",
-        time: "1 week ago",
-        passage: "“Silence is not empty; it is merely uncrowded.”",
-        body: "I read this during a train commute and put my phone away for the remainder of the week. Sharma articulates the sensory exhaustion of modern life with surgical beauty.",
-        likes: 22
-      }
-    ]
-  },
-  {
-    id: "3",
-    title: "Terra Firma",
-    subtitle: "A geological and social chronicle of earth and community",
-    author: "Marcus Croft",
-    priceHardcover: 32.00,
-    priceDigital: 14.00,
-    price: 32.00,
-    cover: 3,
-    category: "history",
-    categoryLabel: "History & Geography",
-    year: "November 2025",
-    pages: "448 pages",
-    isbn: "978-1-9999-0003-7",
-    dimensions: "240 × 160 mm",
-    format: "Hardcover, Illustrated & Digital PDF",
-    description: [
-      "In Terra Firma, Marcus Croft blends deep-time geological field studies with historical narratives of human settlement. From the chalk plateaus of southern England to the basalt cliffs of the Hebrides, the earth tells a tale of endurance.",
-      "Richly illustrated with hand-drawn cartography and geological cross-sections, this volume explores how bedrock determines culture, architecture, and civic memory.",
-      "Essential reading for anyone drawn to the intersection of landscape, science, and history."
-    ],
-    sampleExcerpt: [
-      "Introduction: The Deep Memory of Stone",
-      "Beneath the streets of London and Paris lie layers of ancient sea creatures whose compressed shells form the very stone of our cathedrals.",
-      "Every city is a petrified reef. To understand human history without geology is to admire the tapestry while ignoring the loom."
-    ],
-    discussions: []
-  },
-  {
-    id: "4",
-    title: "The Weight of Light",
-    subtitle: "A novel of memory, exile, and post-war resurgence",
-    author: "Eleanor Reed",
-    priceHardcover: 26.00,
-    priceDigital: 11.00,
-    price: 26.00,
-    cover: 4,
-    category: "fiction",
-    categoryLabel: "Literary Fiction",
-    year: "February 2026",
-    pages: "288 pages",
-    isbn: "978-1-9999-0004-4",
-    dimensions: "210 × 138 mm",
-    format: "Hardcover, Ribbon Bookmark & Digital PDF",
-    description: [
-      "Set across Trieste, Vienna, and Copenhagen between 1948 and 1962, The Weight of Light follows an archivist who discovers an uncatalogued diary written in an untranslatable dialect.",
-      "Eleanor Reed's prose possesses a crystalline restraint reminiscent of Sebald and Ishiguro, balancing intimate heartbreak against large geopolitical transformations.",
-      "Winner of the 2026 Continental Review Prize for Fiction."
-    ],
-    sampleExcerpt: [
-      "Part One: The Archive at Miramare",
-      "The salt air had eaten away the brass corners of the vitrines long before I arrived in October.",
-      "Nothing in the Adriatic moves quickly, not even grief. When you walk along the sea wall, the light carries an unbearable physical heft, as if luminous dust were settling upon your shoulders."
-    ],
-    discussions: []
-  },
-  {
-    id: "5",
-    title: "Meridian",
-    subtitle: "Mapping navigation, borders, and the illusion of orientation",
-    author: "Elias Thorne",
-    priceHardcover: 29.00,
-    priceDigital: 13.00,
-    price: 29.00,
-    cover: 5,
-    category: "essays",
-    categoryLabel: "Essays & Science",
-    year: "October 2025",
-    pages: "264 pages",
-    isbn: "978-1-9999-0005-1",
-    dimensions: "220 × 145 mm",
-    format: "Hardcover with Foil Stamp & Digital PDF",
-    description: [
-      "Elias Thorne explores the mathematical invention of lines upon the globe and how arbitrary coordinates reshaped empires, trade, and human psychology.",
-      "From Greenwich to zero-meridian rivalries in seventeenth-century France, Meridian tells the fascinating story of humanity's obsession with locating itself.",
-      "An eloquent meditation on wanderlust, astronomy, and the borders we draw upon nature."
-    ],
-    sampleExcerpt: [
-      "The Line on the Floor",
-      "In the courtyard of Greenwich, tourists step across a brass line set in paving stones, placing one foot in the eastern hemisphere and one in the western.",
-      "The line does not exist in nature. The Earth is a spinning sphere of molten rock and salty seas; it knows no prime meridian. The line exists only in agreement, which makes it far more durable than granite."
-    ],
-    discussions: []
-  },
-  {
-    id: "6",
-    title: "On Solitude",
-    subtitle: "Notes on creative independence and stillness",
-    author: "Sarah Jensen",
-    priceHardcover: 22.00,
-    priceDigital: 9.00,
-    price: 22.00,
-    cover: 6,
-    category: "philosophy",
-    categoryLabel: "Philosophy",
-    year: "April 2026",
-    pages: "192 pages",
-    isbn: "978-1-9999-0006-8",
-    dimensions: "198 × 129 mm",
-    format: "Paperback, French Flaps & Digital PDF",
-    description: [
-      "What is the difference between loneliness and chosen solitude? Jensen examines how solitude has served as the nursery of original thought throughout intellectual history.",
-      "Brief, crystalline chapters guide the reader through Montaigne's tower, Dickinson's room, and the quiet spaces we desperately need to reclaim today.",
-      "A pocket-sized manifesto for thinking clearly on one's own terms."
-    ],
-    sampleExcerpt: [
-      "I. The Room with One Window",
-      "To be alone without feeling deserted is an art form. It requires trusting that the contents of your own head will not consume you in the silence.",
-      "Those who never learn to be alone remain at the mercy of every room they enter."
-    ],
-    discussions: []
-  },
-  {
-    id: "7",
-    title: "The Blue Hour",
-    subtitle: "Stories from the edge of wakefulness and sea",
-    author: "Clara Morales",
-    priceHardcover: 27.00,
-    priceDigital: 11.50,
-    price: 27.00,
-    cover: 7,
-    category: "fiction",
-    categoryLabel: "Fiction",
-    year: "May 2026",
-    pages: "256 pages",
-    isbn: "978-1-9999-0007-5",
-    dimensions: "216 × 140 mm",
-    format: "Hardcover, Embossed Cloth & Digital PDF",
-    description: [
-      "The Blue Hour collects eight interrelated novellas that take place during the thirty minutes after dusk along Mediterranean and Atlantic coasts.",
-      "Morales writes with sensory lyricism about encounters between strangers, unfinished conversations, and the delicate shifts of human intimacy.",
-      "A stunning debut from an exceptional new European voice."
-    ],
-    sampleExcerpt: [
-      "Twilight at Cap de Creus",
-      "The lighthouse had not yet turned on its second revolution when she noticed the notebook on the wooden bench.",
-      "In that twilight, all colors dissolve into slate and cobalt. The sea was neither gray nor blue, but something older than either color."
-    ],
-    discussions: []
-  },
-  {
-    id: "8",
-    title: "The Ethics of Attention",
-    subtitle: "Reclaiming the mind in an economy of distraction",
-    author: "D.K. Mehta",
-    priceHardcover: 31.00,
-    priceDigital: 13.50,
-    price: 31.00,
-    cover: 8,
-    category: "philosophy",
-    categoryLabel: "Philosophy & Society",
-    year: "February 2026",
-    pages: "340 pages",
-    isbn: "978-1-9999-0008-2",
-    dimensions: "234 × 153 mm",
-    format: "Hardcover, Acid-Free Paper & Digital PDF",
-    description: [
-      "Attention is not just a psychological resource; it is the fundamental currency of love, civic responsibility, and moral consciousness.",
-      "Mehta argues with formidable clarity that when our attention is privatized and commodified by algorithmic platforms, we lose not just concentration, but our capacity for moral judgment.",
-      "A vital book for educators, thinkers, and citizens navigating modern technological life."
-    ],
-    sampleExcerpt: [
-      "Chapter 1: The Sovereignty of What We Notice",
-      "What you pay attention to becomes your life. This is not a self-help aphorism; it is an ontological fact.",
-      "If you allow strangers to dictate what enters your field of consciousness, you have ceded sovereignty over your own existence."
-    ],
-    discussions: []
-  }
-];
+const DEFAULT_BOOKS = [];
 
 // ── Categories & Site Settings Default Data ─────────────────
 const DEFAULT_CATEGORIES = [
@@ -284,13 +29,30 @@ const DEFAULT_SITE_SETTINGS = {
 // Clean any leftover demo caches from older sessions
 (function purgeDemoCache() {
   try {
-    const CLEAN_KEY = "rp_clean_store_v4";
-    if (localStorage.getItem(CLEAN_KEY) !== "true") {
-      const current = localStorage.getItem("rp_custom_books");
-      if (current && (current.includes("data:image/") || current.includes("b jhbjbb") || current.includes("gh") || current.includes("ss") || current.length > 50000)) {
-        localStorage.removeItem("rp_custom_books");
+    const demoTitles = [
+      "The Architecture of Thought",
+      "Quiet Hours",
+      "Terra Firma",
+      "The Weight of Light",
+      "Meridian",
+      "On Solitude",
+      "A Pattern of Shadows",
+      "Signals in the Noise"
+    ];
+    const demoIds = ["1", "2", "3", "4", "5", "6", "7", "8"];
+    const current = localStorage.getItem("rp_custom_books");
+    if (current) {
+      try {
+        const list = JSON.parse(current);
+        if (Array.isArray(list)) {
+          const filtered = list.filter(b => b && b.title && !demoTitles.includes(b.title.trim()) && !demoIds.includes(String(b.id)));
+          localStorage.setItem("rp_custom_books", JSON.stringify(filtered));
+        }
+      } catch(e) {
+        localStorage.setItem("rp_custom_books", "[]");
       }
-      localStorage.setItem(CLEAN_KEY, "true");
+    } else {
+      localStorage.setItem("rp_custom_books", "[]");
     }
   } catch(e) {}
 })();
@@ -298,23 +60,13 @@ const DEFAULT_SITE_SETTINGS = {
 // ── Global Store Accessors ──────────────────────────────────
 function getBooks() {
   const saved = localStorage.getItem("rp_custom_books");
-  if (saved) {
+  if (saved !== null) {
     try {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) return parsed;
     } catch(e) {}
   }
-  // Initialize default books with INR prices & stocks
-  const seeded = DEFAULT_BOOKS.map((b, idx) => ({
-    ...b,
-    stock: b.stock ?? (idx === 0 ? 45 : idx === 1 ? 60 : 35),
-    isFeatured: b.isFeatured ?? (idx < 6),
-    isNew: b.isNew ?? (idx === 0 || idx === 1),
-    priceHardcoverINR: b.priceHardcoverINR ?? (b.price && b.price > 100 ? b.price : Math.round((b.priceHardcover || b.price) * 75 || 1999)),
-    priceDigitalINR: b.priceDigitalINR ?? Math.round((b.priceDigital || 12) * 75 || 899)
-  }));
-  localStorage.setItem("rp_custom_books", JSON.stringify(seeded));
-  return seeded;
+  return [];
 }
 
 function broadcastSync(type) {
@@ -338,7 +90,7 @@ async function syncBooksFromFirestore() {
   if (typeof FirebaseService === "undefined" || !FirebaseService.getBooks) return;
   try {
     const firestoreBooks = await FirebaseService.getBooks();
-    if (Array.isArray(firestoreBooks) && firestoreBooks.length > 0) {
+    if (Array.isArray(firestoreBooks)) {
       const mapped = firestoreBooks.map((b, idx) => ({
         id: String(b.id),
         title: b.title,
@@ -768,9 +520,17 @@ function initBookDetailPage() {
   if (!isBookDetail) return;
 
   const params = new URLSearchParams(window.location.search);
-  const bookId = params.get("id") || "1";
+  const bookId = params.get("id");
   const allBooks = getBooks();
-  const book = allBooks.find(b => String(b.id) === String(bookId)) || allBooks[0];
+  const book = allBooks.find(b => String(b.id) === String(bookId)) || (allBooks.length > 0 ? allBooks[0] : null);
+
+  if (!book) {
+    const titleEl = document.querySelector(".book-detail__title");
+    if (titleEl) titleEl.textContent = "Book Not Found";
+    const subEl = document.querySelector(".book-detail__subtitle");
+    if (subEl) subEl.textContent = "No books are available under this identifier. Browse our active catalogue.";
+    return;
+  }
 
   document.title = `${book.title} — Reason Press`;
 
@@ -994,6 +754,7 @@ function renderBookDiscussions(book) {
           ...newNote
         }).catch(() => {});
       }
+      broadcastSync("reviews_updated");
       renderBookDiscussions(book);
       showToast("Reader reflection shared to the Salon");
       form.reset();
@@ -2185,45 +1946,61 @@ function initPublishForm() {
     e.preventDefault();
 
     const currentUser = typeof getCurrentUser === "function" ? getCurrentUser() : null;
-    if (!currentUser) {
-      showToast("Please sign in to submit your manuscript for peer review.");
-      openAccountModal('signin');
-      return;
-    }
-    const authorName = (document.getElementById("author-name")?.value || currentUser.name || "Author").trim();
-    const authorEmail = (document.getElementById("author-email")?.value || currentUser.email).trim();
+    const authorName = (document.getElementById("author-name")?.value || currentUser?.name || "").trim();
+    const authorEmail = (document.getElementById("author-email")?.value || currentUser?.email || "").trim();
     const authorPhone = (document.getElementById("author-phone")?.value || "").trim();
     const authorLocation = (document.getElementById("author-location")?.value || "").trim();
-    const bookTitle = (document.getElementById("manuscript-title")?.value || "Untitled Book").trim();
+    const bookTitle = (document.getElementById("manuscript-title")?.value || "").trim();
     const bookSubtitle = (document.getElementById("manuscript-subtitle")?.value || "").trim();
     const category = (document.getElementById("manuscript-category")?.value || "philosophy");
     const wordCount = (document.getElementById("manuscript-words")?.value || "50,000 words").trim();
-    const purpose = (document.getElementById("manuscript-purpose")?.value || "Submitted manuscript.").trim();
+    const purpose = (document.getElementById("manuscript-purpose")?.value || "").trim();
     const sampleText = (document.getElementById("manuscript-sample-text")?.value || "").trim();
 
-    const submitBtn = document.getElementById("publish-submit-btn");
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<span>Uploading Files to Storage...</span>`;
+    if (!authorName) {
+      showToast("Please enter your Author / Pen Name.");
+      document.getElementById("author-name")?.focus();
+      return;
+    }
+    if (!authorEmail) {
+      showToast("Please enter your contact email address.");
+      document.getElementById("author-email")?.focus();
+      return;
+    }
+    if (!bookTitle) {
+      showToast("Please enter your Book Title.");
+      document.getElementById("manuscript-title")?.focus();
+      return;
     }
 
-    let manuscriptFileUrl = null;
-    let msFile = msInput?.files[0]?.name || "manuscript.pdf";
-    if (msInput?.files && msInput.files[0]) {
+    const submitBtn = document.getElementById("publish-submit-btn");
+    const originalBtnHtml = submitBtn ? submitBtn.innerHTML : "";
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span>Uploading Proposal &amp; Files...</span>`;
+    }
+
+    let manuscriptFileUrl = msInput?._uploadedPdfDataUrl || null;
+    let msFile = msInput?.files[0]?.name || (sampleText ? "Direct_Text_Submission.txt" : "manuscript.pdf");
+    if (!manuscriptFileUrl && msInput?.files && msInput.files[0]) {
       try {
-        manuscriptFileUrl = await FirebaseService.uploadFile(msInput.files[0], "manuscripts");
+        if (typeof FirebaseService !== "undefined" && FirebaseService.uploadFile) {
+          manuscriptFileUrl = await FirebaseService.uploadFile(msInput.files[0], "manuscripts");
+        }
       } catch (err) {
         console.warn("Storage upload error for manuscript:", err);
       }
     }
 
-    let coverFileUrl = null;
+    let coverFileUrl = coverInput?._uploadedBase64 || null;
     const coverChoice = reqCoverCheck?.checked 
       ? "Bespoke Cover Design by Reason Press Art Dept" 
-      : (coverInput?.files[0]?.name || "Author Submitted Cover Art");
-    if (!reqCoverCheck?.checked && coverInput?.files && coverInput.files[0]) {
+      : (coverInput?.files[0]?.name || (coverFileUrl ? "Uploaded Custom Jacket Artwork" : "In-House Standard Monograph Cloth"));
+    if (!reqCoverCheck?.checked && !coverFileUrl && coverInput?.files && coverInput.files[0]) {
       try {
-        coverFileUrl = await FirebaseService.uploadFile(coverInput.files[0], "covers");
+        if (typeof FirebaseService !== "undefined" && FirebaseService.uploadFile) {
+          coverFileUrl = await FirebaseService.uploadFile(coverInput.files[0], "covers");
+        }
       } catch (err) {
         console.warn("Storage upload error for cover:", err);
       }
@@ -2237,28 +2014,40 @@ function initPublishForm() {
       title: bookTitle,
       subtitle: bookSubtitle,
       category: category,
-      wordCount: wordCount,
-      purpose: purpose,
+      wordCount: wordCount || "Unspecified",
+      purpose: purpose || (sampleText ? sampleText.slice(0, 200) : "Author manuscript proposal for editorial evaluation."),
       sampleText: sampleText || null,
       manuscriptName: msFile,
       manuscriptUrl: manuscriptFileUrl,
+      pdfDataUrl: manuscriptFileUrl,
       coverTreatment: coverChoice,
       coverImage: coverFileUrl,
       coverPreset: Math.floor(1 + Math.random() * 8),
       status: "pending",
-      submittedAt: "Just now",
-      submittedBy: currentUser.email,
-      userId: currentUser.uid || null
+      submittedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      submittedBy: currentUser?.email || authorEmail,
+      userId: currentUser?.uid || null
     };
 
     let createdDoc = null;
-    if (typeof FirebaseService !== "undefined") {
+    if (typeof FirebaseService !== "undefined" && FirebaseService.submitManuscript) {
       try {
         createdDoc = await FirebaseService.submitManuscript(newSubmission);
       } catch (err) {
-        console.error("Firestore submission error:", err);
+        console.error("Manuscript submission error:", err);
       }
+    } else {
+      try {
+        const localSubs = JSON.parse(localStorage.getItem("rp_submissions") || "[]");
+        const docId = "sub_" + Date.now();
+        createdDoc = { id: docId, ...newSubmission };
+        localSubs.unshift(createdDoc);
+        localStorage.setItem("rp_submissions", JSON.stringify(localSubs));
+      } catch(e) {}
     }
+
+    // Broadcast to Admin Panel and other tabs immediately
+    broadcastSync("submissions_updated");
 
     const submissionId = createdDoc?.id || ("SUB-" + Math.floor(10000 + Math.random() * 90000));
       form.innerHTML = `
@@ -2717,6 +2506,17 @@ function renderHomeBookWall() {
   if (!wall) return;
 
   const books = getBooks();
+  if (!books || books.length === 0) {
+    wall.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 48px 24px; color: var(--ink-muted); background: var(--bg-surface); border: 1px dashed var(--border-light); border-radius: var(--radius-md);">
+        <div style="font-family: var(--font-display); font-size: var(--text-xl); color: var(--ink); margin-bottom: 8px;">No Titles in Active Catalogue</div>
+        <p style="font-size: var(--text-sm); max-width: 480px; margin: 0 auto 16px;">New publications added via the Admin Console will appear here immediately across all devices.</p>
+        <a href="admin.html" class="btn btn--outline btn--sm" style="display: inline-flex;"><span>Open Admin Console</span></a>
+      </div>
+    `;
+    return;
+  }
+
   const featured = books.filter(b => b.isFeatured !== false);
   const displayBooks = featured.length >= 4 ? featured.slice(0, 6) : books.slice(0, 6);
 
@@ -2777,7 +2577,6 @@ function renderCatalogueGrid() {
       <button class="books-tab ${activeCat === c.id ? 'active' : ''}" role="tab" aria-selected="${activeCat === c.id}" data-cat="${c.id}">${c.label}</button>
     `).join("");
 
-    // Wire tab clicks
     tabsWrap.querySelectorAll(".books-tab").forEach(tab => {
       tab.addEventListener("click", () => {
         tabsWrap.querySelectorAll(".books-tab").forEach(t => {
@@ -2792,6 +2591,17 @@ function renderCatalogueGrid() {
   }
 
   const books = getBooks();
+  if (!books || books.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 64px 24px; color: var(--ink-muted); background: var(--bg-surface); border: 1px dashed var(--border-light); border-radius: var(--radius-md);">
+        <div style="font-family: var(--font-display); font-size: var(--text-2xl); color: var(--ink); margin-bottom: 10px;">Catalogue Being Curated</div>
+        <p style="font-size: var(--text-sm); max-width: 480px; margin: 0 auto 20px;">No books have been published yet. Once a title is created in the Admin Panel, it will instantly display here.</p>
+        <a href="admin.html" class="btn btn--primary btn--sm" style="display: inline-flex;"><span>Publish a Book in Admin</span></a>
+      </div>
+    `;
+    return;
+  }
+
   const sortSelect = document.getElementById("sort-select");
   const sortVal = sortSelect ? sortSelect.value : "Curated Order";
 
@@ -3903,7 +3713,15 @@ function stopHeroBookLoop() {
 
 function renderHero3DShowcase() {
   const allBooks = getBooks();
-  if (!allBooks || allBooks.length === 0) return;
+  if (!allBooks || allBooks.length === 0) {
+    const titleEl = document.getElementById("hero-3d-title");
+    const authorEl = document.getElementById("hero-3d-author");
+    const badgeText = document.getElementById("hero-3d-badge-text");
+    if (titleEl) titleEl.textContent = "Reason Press Catalogue";
+    if (authorEl) authorEl.textContent = "Curated Editions";
+    if (badgeText) badgeText.textContent = "ARCHIVAL PRESS";
+    return;
+  }
 
   // Filter newly published releases first, followed by curated classics
   const newBooks = allBooks.filter(b => b.isNew);
@@ -4585,6 +4403,7 @@ function initContactForm() {
       } catch(e) {}
     }
 
+    broadcastSync("messages_updated");
     showToast("✓ Message delivered to Reason Press editorial desk.");
     form.reset();
     if (submitBtn) {

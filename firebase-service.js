@@ -460,59 +460,35 @@ const FirebaseService = {
 
   // ── 2. REAL BOOKS DATABASE (FIRESTORE + SHARED SERVER BACKEND) ─
   async getBooks() {
-    let combined = [];
-
     // 1. Fetch from shared server API first (permanent cross-account store)
     const serverBooks = await this.fetchFromServer("books");
-    if (Array.isArray(serverBooks) && serverBooks.length > 0) {
-      combined = [...serverBooks];
+    if (Array.isArray(serverBooks)) {
+      try { localStorage.setItem("rp_custom_books", JSON.stringify(serverBooks)); } catch(e){}
+      return serverBooks;
     }
 
-    // 2. Fetch from Cloud Firestore if available, and merge new/updated books
+    // 2. Fetch from Cloud Firestore if available
     if (rpDb) {
       try {
         const snap = await rpDb.collection("books").get();
         if (!snap.empty) {
-          snap.forEach(doc => {
-            const data = { id: doc.id, ...doc.data() };
-            const idx = combined.findIndex(b => String(b.id) === String(doc.id));
-            if (idx >= 0) {
-              combined[idx] = { ...combined[idx], ...data };
-            } else {
-              combined.push(data);
-            }
-          });
+          const list = [];
+          snap.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
+          try { localStorage.setItem("rp_custom_books", JSON.stringify(list)); } catch(e){}
+          return list;
         }
       } catch (err) {
-        console.warn("Firestore getBooks notice (using shared server/local store):", err.message || err);
+        console.warn("Firestore getBooks notice:", err.message || err);
       }
     }
 
-    // 3. Fallback: if both server API and Firestore had no items, only then fall back to local cache
-    if (combined.length === 0) {
-      try {
-        const local = JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
-        if (Array.isArray(local) && local.length > 0) {
-          combined = [...local];
-        }
-      } catch(e) {}
-    }
+    // 3. Fallback to local cache only if server and Firestore are both offline
+    try {
+      const local = JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
+      if (Array.isArray(local)) return local;
+    } catch(e) {}
 
-    // 4. Fallback to default catalog if empty
-    if (combined.length === 0 && typeof DEFAULT_BOOKS !== "undefined" && Array.isArray(DEFAULT_BOOKS)) {
-      combined = [...DEFAULT_BOOKS];
-    }
-
-    // Filter out any stale dummy/test items
-    combined = combined.filter(b => b && b.title && b.title !== "b jhbjbb" && b.title !== "gh" && b.title !== "ss" && !String(b.id).startsWith("test_junk"));
-
-    // Sort: featured first
-    combined.sort((a, b) => (b.featured || b.isFeatured ? 1 : 0) - (a.featured || a.isFeatured ? 1 : 0));
-
-    // Update local cache with complete authoritative set
-    try { localStorage.setItem("rp_custom_books", JSON.stringify(combined)); } catch(e){}
-
-    return combined;
+    return [];
   },
 
   async getBookById(id) {
@@ -1601,10 +1577,13 @@ const FirebaseService = {
       }
     }
 
+    const finalMsg = { id: docId, ...docData };
+    await this.postToServer("messages", finalMsg);
+
     // Save to local backup
     try {
       const msgs = JSON.parse(localStorage.getItem("rp_messages") || "[]");
-      msgs.unshift({ id: docId, ...docData });
+      msgs.unshift(finalMsg);
       localStorage.setItem("rp_messages", JSON.stringify(msgs));
     } catch(e) {}
 
@@ -1615,10 +1594,16 @@ const FirebaseService = {
       targetEmail: docData.email
     }).catch(() => {});
 
-    return { id: docId, ...docData };
+    return finalMsg;
   },
 
   async getAllMessages() {
+    const serverMsgs = await this.fetchFromServer("messages");
+    if (Array.isArray(serverMsgs)) {
+      try { localStorage.setItem("rp_messages", JSON.stringify(serverMsgs)); } catch(e){}
+      return serverMsgs;
+    }
+
     let messages = [];
     if (rpDb) {
       try {
@@ -1626,9 +1611,7 @@ const FirebaseService = {
         snap.forEach(doc => {
           messages.push({ id: doc.id, ...doc.data() });
         });
-      } catch (err) {
-        console.warn("Could not fetch messages from Firestore:", err);
-      }
+      } catch (err) {}
     }
 
     let localMsgs = [];
@@ -1664,6 +1647,7 @@ const FirebaseService = {
         console.warn("Update message status error:", err);
       }
     }
+    await this.putToServer("messages", id, { status: status });
     try {
       const msgs = JSON.parse(localStorage.getItem("rp_messages") || "[]");
       const m = msgs.find(x => String(x.id) === String(id));
@@ -1683,6 +1667,7 @@ const FirebaseService = {
         console.warn("Delete message error:", err);
       }
     }
+    await this.deleteFromServer("messages", id);
     try {
       const msgs = JSON.parse(localStorage.getItem("rp_messages") || "[]");
       const filtered = msgs.filter(x => String(x.id) !== String(id));
@@ -1716,9 +1701,12 @@ const FirebaseService = {
       }
     }
 
+    const finalRev = { id: docId, ...docData };
+    await this.postToServer("reviews", finalRev);
+
     try {
       const revs = JSON.parse(localStorage.getItem("rp_reviews") || "[]");
-      revs.unshift({ id: docId, ...docData });
+      revs.unshift(finalRev);
       localStorage.setItem("rp_reviews", JSON.stringify(revs));
     } catch(e) {}
 
@@ -1728,10 +1716,16 @@ const FirebaseService = {
       details: `Review on "${docData.bookTitle}" by ${docData.author}: "${docData.body.slice(0, 60)}..."`
     }).catch(() => {});
 
-    return { id: docId, ...docData };
+    return finalRev;
   },
 
   async getAllReviews() {
+    const serverRevs = await this.fetchFromServer("reviews");
+    if (Array.isArray(serverRevs)) {
+      try { localStorage.setItem("rp_reviews", JSON.stringify(serverRevs)); } catch(e){}
+      return serverRevs;
+    }
+
     let reviews = [];
     if (rpDb) {
       try {
@@ -1739,9 +1733,7 @@ const FirebaseService = {
         snap.forEach(doc => {
           reviews.push({ id: doc.id, ...doc.data() });
         });
-      } catch (err) {
-        console.warn("Could not fetch reviews from Firestore:", err);
-      }
+      } catch (err) {}
     }
 
     let localRevs = [];
@@ -1770,10 +1762,9 @@ const FirebaseService = {
     if (rpDb) {
       try {
         await rpDb.collection("reviews").doc(String(id)).delete();
-      } catch (err) {
-        console.warn("Delete review error:", err);
-      }
+      } catch (err) {}
     }
+    await this.deleteFromServer("reviews", id);
     try {
       const revs = JSON.parse(localStorage.getItem("rp_reviews") || "[]");
       const filtered = revs.filter(x => String(x.id) !== String(id));
