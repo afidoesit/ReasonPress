@@ -3311,8 +3311,9 @@ input, textarea, select {
 
 .reveal {
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity var(--t-slow) var(--ease-out), transform var(--t-slow) var(--ease-out);
+  transform: translateY(10px);
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
 }
 
 .reveal.visible {
@@ -3334,10 +3335,10 @@ input, textarea, select {
   visibility: visible !important;
 }
 
-.reveal--delay-1 { transition-delay: 0.1s; }
-.reveal--delay-2 { transition-delay: 0.2s; }
-.reveal--delay-3 { transition-delay: 0.3s; }
-.reveal--delay-4 { transition-delay: 0.4s; }
+.reveal--delay-1 { transition-delay: 0.04s; }
+.reveal--delay-2 { transition-delay: 0.08s; }
+.reveal--delay-3 { transition-delay: 0.12s; }
+.reveal--delay-4 { transition-delay: 0.16s; }
 
 /* ── Comprehensive Responsive Design System (Mobile, Tablet, Laptop, Desktop) ── */
 

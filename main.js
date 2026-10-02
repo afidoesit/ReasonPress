@@ -4358,6 +4358,34 @@ function downloadBookPdf(bookId, bookTitle) {
 }
 
 // ── Contact Inquiries Form Handler ──────────────────────────
+
+// ── Instant Hover & Touch Navigation Prefetching ───────────
+function initInstantNavigation() {
+  const prefetched = new Set();
+  const prefetch = (url) => {
+    if (!url || prefetched.has(url) || url.startsWith('#') || url.startsWith('http') || url.includes(':')) return;
+    prefetched.add(url);
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = url;
+    document.head.appendChild(link);
+  };
+
+  document.addEventListener('mouseover', (e) => {
+    const a = e.target.closest('a');
+    if (a && a.getAttribute('href') && !a.getAttribute('href').startsWith('http') && !a.getAttribute('href').startsWith('#')) {
+      prefetch(a.getAttribute('href'));
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchstart', (e) => {
+    const a = e.target.closest('a');
+    if (a && a.getAttribute('href') && !a.getAttribute('href').startsWith('http') && !a.getAttribute('href').startsWith('#')) {
+      prefetch(a.getAttribute('href'));
+    }
+  }, { passive: true });
+}
+
 function initContactForm() {
   const form = document.getElementById("contact-form");
   if (!form) return;
@@ -4419,6 +4447,7 @@ function initContactForm() {
 // ── Global Initializer ──────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initNav();
+  initInstantNavigation();
   initAccountSystem();
   syncBooksFromFirestore();
   initHero3DInteraction();

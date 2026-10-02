@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
 
 const PORT = process.env.PORT || 3000;
 const ROOT_DIR = __dirname;
@@ -582,14 +583,50 @@ const server = http.createServer(async (req, res) => {
       const ext = path.extname(filePath).toLowerCase();
       const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
-      res.writeHead(200, {
+      const etag = `W/"${stats.size}-${Math.floor(stats.mtimeMs)}"`;
+
+      // 304 Not Modified validation for sub-millisecond response
+      if (req.headers['if-none-match'] === etag) {
+        res.writeHead(304, {
+          'ETag': etag,
+          'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=86400, stale-while-revalidate=3600',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end();
+        return;
+      }
+
+      const headers = {
         'Content-Type': contentType,
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-        'Access-Control-Allow-Origin': '*'
-      });
-      res.end(data);
+        'ETag': etag,
+        'Access-Control-Allow-Origin': '*',
+        'Vary': 'Accept-Encoding'
+      };
+
+      if (ext === '.html') {
+        headers['Cache-Control'] = 'no-cache';
+      } else {
+        headers['Cache-Control'] = 'public, max-age=86400, stale-while-revalidate=3600';
+      }
+
+      const acceptEncoding = req.headers['accept-encoding'] || '';
+      const isCompressible = /^(text\/|application\/javascript|application\/json|image\/svg\+xml)/.test(contentType);
+
+      if (isCompressible && acceptEncoding.includes('gzip')) {
+        headers['Content-Encoding'] = 'gzip';
+        zlib.gzip(data, (gzErr, compressed) => {
+          if (gzErr) {
+            res.writeHead(200, headers);
+            res.end(data);
+          } else {
+            res.writeHead(200, headers);
+            res.end(compressed);
+          }
+        });
+      } else {
+        res.writeHead(200, headers);
+        res.end(data);
+      }
     });
   });
 });
