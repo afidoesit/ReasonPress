@@ -320,24 +320,24 @@ async function syncBooksFromFirestore() {
         subtitle: b.subtitle || (typeof b.description === "string" ? b.description.slice(0, 100) : (Array.isArray(b.description) ? b.description[0]?.slice(0, 100) : "")) || "",
         author: b.author,
         price: b.price || b.priceHardcoverINR || 1999,
-        priceHardcover: b.price || 28,
-        priceDigital: b.pdfPrice || b.priceDigital || 12,
+        priceHardcover: b.priceHardcover || b.price || 28,
+        priceDigital: b.priceDigital || b.pdfPrice || 12,
         priceHardcoverINR: b.priceHardcoverINR || (b.price && b.price > 100 ? b.price : Math.round((b.price || 28) * 75)),
         priceDigitalINR: b.priceDigitalINR || (b.pdfPrice && b.pdfPrice > 100 ? b.pdfPrice : Math.round((b.pdfPrice || 12) * 75)),
-        cover: b.coverPreset || b.cover || ((idx % 6) + 1),
+        cover: b.cover || b.coverPreset || ((idx % 6) + 1),
         coverImage: b.coverImage || null,
         category: b.category || "philosophy",
-        categoryLabel: b.categoryLabel || "Philosophy & Ideas",
-        year: b.publicationDate || b.year || "2026",
-        pages: b.pageCount ? `${b.pageCount} pages` : (b.pages || "320 pages"),
-        isbn: b.ISBN || b.isbn || `978-1-999901-0${idx + 1}-0`,
+        categoryLabel: b.categoryLabel || b.category || "Philosophy & Ideas",
+        year: b.year || b.publicationDate || "2026",
+        pages: b.pages || (b.pageCount ? `${b.pageCount} pages` : "280 pages"),
+        isbn: b.isbn || b.ISBN || `978-1-999901-0${idx + 1}-0`,
         format: b.format || "Hardcover & Digital PDF",
-        description: Array.isArray(b.description) ? b.description : [b.description || ""],
-        sampleExcerpt: Array.isArray(b.excerpt) ? b.excerpt : (typeof b.excerpt === "string" ? [b.excerpt] : b.sampleExcerpt || []),
+        description: Array.isArray(b.description) ? b.description : [b.description || "An authoritative title from Reason Press."],
+        sampleExcerpt: Array.isArray(b.excerpt) ? b.excerpt : (typeof b.excerpt === "string" ? [b.excerpt] : (b.sampleExcerpt || [])),
         chapters: b.chapters || [],
         stock: b.stock ?? 30,
-        isFeatured: b.featured ?? true,
-        isNew: idx < 2
+        isFeatured: (b.isFeatured !== undefined) ? b.isFeatured : ((b.featured !== undefined) ? b.featured : true),
+        isNew: (b.isNew !== undefined) ? b.isNew : (idx < 2)
       }));
       localStorage.setItem("rp_custom_books", JSON.stringify(mapped));
       if (typeof renderHomeBookWall === "function") renderHomeBookWall();
@@ -345,7 +345,7 @@ async function syncBooksFromFirestore() {
       if (typeof initHero3DInteraction === "function") initHero3DInteraction();
     }
   } catch(err) {
-    console.warn("Could not sync books from Firestore:", err);
+    console.warn("Could not sync books from Firestore / server:", err);
   }
 }
 

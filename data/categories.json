@@ -1,0 +1,38 @@
+[
+  {
+    "id": "all",
+    "slug": "all",
+    "label": "All Works",
+    "desc": "Complete active catalogue"
+  },
+  {
+    "id": "philosophy",
+    "slug": "philosophy",
+    "label": "Philosophy & Ideas",
+    "desc": "Epistemology, ethics, mind & language"
+  },
+  {
+    "id": "essays",
+    "slug": "essays",
+    "label": "Essays & Reflection",
+    "desc": "Long-form reflections, solitude & cultural critique"
+  },
+  {
+    "id": "history",
+    "slug": "history",
+    "label": "History & Geography",
+    "desc": "Deep time, landscape & societal transformations"
+  },
+  {
+    "id": "fiction",
+    "slug": "fiction",
+    "label": "Literary Fiction",
+    "desc": "Novellas and literary narratives with enduring style"
+  },
+  {
+    "id": "monographs",
+    "slug": "monographs",
+    "label": "Monographs",
+    "desc": "Single-topic academic and intellectual inquiries"
+  }
+]

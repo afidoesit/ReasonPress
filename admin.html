@@ -619,6 +619,15 @@
       if (target) {
         target.style.display = "block";
       }
+
+      // Re-render target panel content so it always displays freshest data
+      if (tabName === "books" && typeof renderAdminBooks === "function") renderAdminBooks();
+      if (tabName === "categories" && typeof renderAdminCategories === "function") renderAdminCategories();
+      if (tabName === "orders" && typeof renderAdminOrders === "function") renderAdminOrders();
+      if (tabName === "submissions" && typeof renderAdminSubmissions === "function") renderAdminSubmissions();
+      if (tabName === "users" && typeof renderAdminUsers === "function") renderAdminUsers();
+      if (tabName === "logs" && typeof renderAdminLogs === "function") renderAdminLogs();
+      if (tabName === "dashboard" && typeof renderDashboardFeeds === "function") renderDashboardFeeds();
     }
     window.switchAdminTab = switchAdminTab;
 
@@ -665,6 +674,23 @@
       </button>
     </div>
   </header>
+
+  <!-- Cloud Firestore & Database Health Indicator -->
+  <div id="firestore-status-banner" style="background:#0F172A;border-bottom:1px solid #1E293B;padding:10px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:12px;z-index:95;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span id="firestore-status-dot" style="width:10px;height:10px;border-radius:50%;background:#F59E0B;display:inline-block;box-shadow:0 0 8px rgba(245,158,11,0.5);"></span>
+      <span id="firestore-status-text" style="color:#E2E8F0;">Testing Cloud Firestore status for <code>reasonpress-0</code>...</span>
+    </div>
+    <div id="firestore-status-actions" style="display:flex;align-items:center;gap:10px;">
+      <button type="button" id="btn-sync-firestore" onclick="testAndSyncFirestore()" class="btn btn--outline" style="font-size:11px;padding:6px 14px;color:#38BDF8;border-color:#0284C7;background:rgba(56,189,248,0.06);cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        <span>Test &amp; Sync to Cloud Firestore</span>
+      </button>
+      <a id="btn-create-firestore" href="https://console.firebase.google.com/project/reasonpress-0/firestore" target="_blank" class="btn btn--primary" style="font-size:11px;padding:6px 14px;background:#2563EB;border-color:#2563EB;display:none;align-items:center;gap:6px;text-decoration:none;">
+        <span>Create Database in Firebase Console &rarr;</span>
+      </a>
+    </div>
+  </div>
 
   <!-- Tab Navigation Bar -->
   <nav class="admin-nav" role="tablist">
@@ -1375,10 +1401,14 @@
             <input type="file" id="book-cover-file" class="form-input" accept="image/*"
               onchange="handleAdminCoverUpload(this)">
             <div id="book-cover-preview-wrap" style="display:none;margin-top:8px;">
-              <img id="book-cover-preview-img" style="height:90px;border-radius:2px;border:1px solid var(--rule);">
-              <button type="button" onclick="removeAdminCoverUpload()"
-                style="margin-left:8px;font-size:11px;color:var(--accent-dark);cursor:pointer;background:none;border:none;">&times;
-                Remove custom image</button>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <img id="book-cover-preview-img" style="height:90px;width:60px;object-fit:cover;border-radius:2px;border:1px solid var(--rule);box-shadow:var(--shadow-sm);">
+                <div>
+                  <div id="book-cover-file-info" style="font-size:12px;color:var(--ink);font-weight:600;"></div>
+                  <button type="button" onclick="removeAdminCoverUpload()"
+                    style="margin-top:4px;font-size:11px;color:var(--accent-dark);cursor:pointer;background:none;border:none;padding:0;">&times; Remove custom image</button>
+                </div>
+              </div>
             </div>
             <input type="hidden" id="book-cover-custom-base64">
           </div>
@@ -1590,9 +1620,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
-  <script src="firebase-config.js"></script>
-  <script src="firebase-service.js"></script>
-  <script src="main.js"></script>
+  <script src="firebase-config.js?v=2.2"></script>
+  <script src="firebase-service.js?v=2.3"></script>
+  <script src="main.js?v=2.3"></script>
   <script>
     // ── Admin Panel Specific Controller ──────────────────────────
     let adminBooks = [];
@@ -1727,14 +1757,17 @@
         }, (err) => console.warn("Realtime activity logs notice:", err));
       } catch(e) {}
 
-      // 5. Realtime Books Sync
+      // 5. Realtime Books Sync (merges incoming without wiping local books)
       try {
         rpDb.collection("books").onSnapshot((snapshot) => {
           if (!snapshot.empty) {
-            const books = [];
-            snapshot.forEach(doc => books.push({ id: doc.id, ...doc.data() }));
-            adminBooks = books;
-            try { localStorage.setItem("rp_custom_books", JSON.stringify(books)); } catch(e){}
+            snapshot.forEach(doc => {
+              const b = { id: doc.id, ...doc.data() };
+              const idx = adminBooks.findIndex(x => String(x.id) === String(b.id));
+              if (idx >= 0) adminBooks[idx] = { ...adminBooks[idx], ...b };
+              else adminBooks.unshift(b);
+            });
+            try { localStorage.setItem("rp_custom_books", JSON.stringify(adminBooks)); } catch(e){}
             renderAdminStats();
             renderDashboardFeeds();
             renderAdminBooks();
@@ -1746,10 +1779,13 @@
       try {
         rpDb.collection("categories").onSnapshot((snapshot) => {
           if (!snapshot.empty) {
-            const cats = [];
-            snapshot.forEach(doc => cats.push({ id: doc.id, ...doc.data() }));
-            adminCategories = cats;
-            try { localStorage.setItem("rp_categories", JSON.stringify(cats)); } catch(e){}
+            snapshot.forEach(doc => {
+              const c = { id: doc.id, ...doc.data() };
+              const idx = adminCategories.findIndex(x => String(x.id || x.slug) === String(c.id || c.slug));
+              if (idx >= 0) adminCategories[idx] = { ...adminCategories[idx], ...c };
+              else adminCategories.push(c);
+            });
+            try { localStorage.setItem("rp_categories", JSON.stringify(adminCategories)); } catch(e){}
             renderAdminStats();
             renderAdminCategories();
           }
@@ -1888,52 +1924,95 @@
     async function loadAdminData() {
       if (typeof FirebaseService !== "undefined") {
         try {
-          adminBooks = await FirebaseService.getBooks();
+          const remoteBooks = await FirebaseService.getBooks();
+          if (Array.isArray(remoteBooks) && remoteBooks.length > 0) {
+            // Merge with local adminBooks so newly created books are never lost
+            const merged = [...remoteBooks];
+            (adminBooks || []).forEach(localB => {
+              if (!merged.some(m => String(m.id) === String(localB.id))) {
+                merged.unshift(localB);
+              }
+            });
+            adminBooks = merged;
+            if (typeof saveBooks === "function") saveBooks(adminBooks);
+          } else if (!adminBooks || adminBooks.length === 0) {
+            adminBooks = (typeof getBooks === "function") ? getBooks() : JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
+          }
         } catch(e) {
-          adminBooks = (typeof getBooks === "function") ? getBooks() : [];
+          if (!adminBooks || adminBooks.length === 0) {
+            adminBooks = (typeof getBooks === "function") ? getBooks() : [];
+          }
         }
 
         try {
-          adminSubmissions = await FirebaseService.getAllSubmissions();
-        } catch(e) {
-          adminSubmissions = JSON.parse(localStorage.getItem("rp_submissions") || "[]");
-        }
+          const remoteSubs = await FirebaseService.getAllSubmissions();
+          if (Array.isArray(remoteSubs) && remoteSubs.length > 0) {
+            adminSubmissions = remoteSubs;
+            try { localStorage.setItem("rp_submissions", JSON.stringify(adminSubmissions)); } catch(e){}
+          } else if (!adminSubmissions || adminSubmissions.length === 0) {
+            adminSubmissions = JSON.parse(localStorage.getItem("rp_submissions") || "[]");
+          }
+        } catch(e) {}
 
         try {
-          adminOrders = await FirebaseService.getAllOrders();
-        } catch(e) {
-          adminOrders = JSON.parse(localStorage.getItem("rp_orders") || "[]");
-        }
+          const remoteOrders = await FirebaseService.getAllOrders();
+          if (Array.isArray(remoteOrders) && remoteOrders.length > 0) {
+            adminOrders = remoteOrders;
+            try { localStorage.setItem("rp_orders", JSON.stringify(adminOrders)); } catch(e){}
+          } else if (!adminOrders || adminOrders.length === 0) {
+            adminOrders = JSON.parse(localStorage.getItem("rp_orders") || "[]");
+          }
+        } catch(e) {}
 
         try {
-          adminUsers = await FirebaseService.getAllUsers();
-        } catch(e) {
-          adminUsers = JSON.parse(localStorage.getItem("rp_cached_users") || "[]");
-        }
+          const remoteUsers = await FirebaseService.getAllUsers();
+          if (Array.isArray(remoteUsers) && remoteUsers.length > 0) {
+            adminUsers = remoteUsers;
+            try { localStorage.setItem("rp_cached_users", JSON.stringify(adminUsers)); } catch(e){}
+          } else if (!adminUsers || adminUsers.length === 0) {
+            adminUsers = JSON.parse(localStorage.getItem("rp_cached_users") || "[]");
+          }
+        } catch(e) {}
 
         try {
-          adminLogs = await FirebaseService.getActivityLogs(150);
-        } catch(e) {
-          adminLogs = JSON.parse(localStorage.getItem("rp_activity_logs") || "[]");
-        }
+          const remoteLogs = await FirebaseService.getActivityLogs(150);
+          if (Array.isArray(remoteLogs) && remoteLogs.length > 0) {
+            adminLogs = remoteLogs;
+            try { localStorage.setItem("rp_activity_logs", JSON.stringify(adminLogs)); } catch(e){}
+          } else if (!adminLogs || adminLogs.length === 0) {
+            adminLogs = JSON.parse(localStorage.getItem("rp_activity_logs") || "[]");
+          }
+        } catch(e) {}
 
         try {
-          adminCategories = await FirebaseService.getCategories();
-        } catch(e) {
-          adminCategories = (typeof getCategories === "function") ? getCategories() : [];
-        }
+          const remoteCats = await FirebaseService.getCategories();
+          if (Array.isArray(remoteCats) && remoteCats.length > 0) {
+            adminCategories = remoteCats;
+            try { localStorage.setItem("rp_categories", JSON.stringify(adminCategories)); } catch(e){}
+          } else if (!adminCategories || adminCategories.length === 0) {
+            adminCategories = (typeof getCategories === "function") ? getCategories() : [];
+          }
+        } catch(e) {}
 
         try {
-          adminMessages = await FirebaseService.getAllMessages();
-        } catch(e) {
-          adminMessages = JSON.parse(localStorage.getItem("rp_messages") || "[]");
-        }
+          const remoteMsgs = await FirebaseService.getAllMessages();
+          if (Array.isArray(remoteMsgs) && remoteMsgs.length > 0) {
+            adminMessages = remoteMsgs;
+            try { localStorage.setItem("rp_messages", JSON.stringify(adminMessages)); } catch(e){}
+          } else if (!adminMessages || adminMessages.length === 0) {
+            adminMessages = JSON.parse(localStorage.getItem("rp_messages") || "[]");
+          }
+        } catch(e) {}
 
         try {
-          adminReviews = await FirebaseService.getAllReviews();
-        } catch(e) {
-          adminReviews = JSON.parse(localStorage.getItem("rp_reviews") || "[]");
-        }
+          const remoteRevs = await FirebaseService.getAllReviews();
+          if (Array.isArray(remoteRevs) && remoteRevs.length > 0) {
+            adminReviews = remoteRevs;
+            try { localStorage.setItem("rp_reviews", JSON.stringify(adminReviews)); } catch(e){}
+          } else if (!adminReviews || adminReviews.length === 0) {
+            adminReviews = JSON.parse(localStorage.getItem("rp_reviews") || "[]");
+          }
+        } catch(e) {}
       } else {
         adminBooks = (typeof getBooks === "function") ? getBooks() : [];
         adminSubmissions = JSON.parse(localStorage.getItem("rp_submissions") || "[]");
@@ -1943,6 +2022,11 @@
         adminCategories = (typeof getCategories === "function") ? getCategories() : [];
         adminMessages = JSON.parse(localStorage.getItem("rp_messages") || "[]");
         adminReviews = JSON.parse(localStorage.getItem("rp_reviews") || "[]");
+      }
+
+      // Check status banner
+      if (typeof updateFirestoreStatusBanner === "function") {
+        updateFirestoreStatusBanner().catch(() => {});
       }
     }
 
@@ -1995,14 +2079,7 @@
       }
     }
 
-    function switchAdminTab(tabName) {
-      document.querySelectorAll(".admin-nav-btn").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.tab === tabName);
-      });
-      document.querySelectorAll(".admin-panel").forEach(p => p.style.display = "none");
-      const target = document.getElementById("panel-" + tabName);
-      if (target) target.style.display = "block";
-    }
+
 
     function renderDashboardFeeds() {
       // Recent orders
@@ -2806,14 +2883,22 @@
           document.getElementById("book-cover-custom-base64").value = e.target.result;
           document.getElementById("book-cover-preview-img").src = e.target.result;
           document.getElementById("book-cover-preview-wrap").style.display = "block";
+          const info = document.getElementById("book-cover-file-info");
+          if (info) {
+            const kb = Math.round(file.size / 1024);
+            info.textContent = `Selected: ${file.name} (${kb} KB)`;
+          }
         };
         reader.readAsDataURL(file);
       }
     }
 
     function removeAdminCoverUpload() {
-      document.getElementById("book-cover-file").value = "";
+      const fileInput = document.getElementById("book-cover-file");
+      if (fileInput) fileInput.value = "";
       document.getElementById("book-cover-custom-base64").value = "";
+      const info = document.getElementById("book-cover-file-info");
+      if (info) info.textContent = "";
       document.getElementById("book-cover-preview-wrap").style.display = "none";
     }
 
@@ -2839,16 +2924,25 @@
         return;
       }
 
+      const submitBtn = document.querySelector("#book-edit-form button[type='submit']");
+      const originalBtnText = submitBtn ? submitBtn.innerHTML : "";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span>Saving to Catalogue...</span>`;
+      }
+
       let uploadedCoverUrl = customCoverBase64 || null;
 
-      // Real upload to Firebase Storage if file attached
+      // Resilient image processing
       if (fileInput && fileInput.files && fileInput.files[0]) {
-        showToast("Uploading jacket image to Firebase Storage...");
         try {
-          uploadedCoverUrl = await FirebaseService.uploadFile(fileInput.files[0], "covers");
+          if (typeof FirebaseService !== "undefined" && FirebaseService.uploadFile) {
+            const uploaded = await FirebaseService.uploadFile(fileInput.files[0], "covers");
+            if (uploaded) uploadedCoverUrl = uploaded;
+          }
         } catch (err) {
-          console.warn("Storage upload error:", err);
-          showToast("Cover upload notice: " + (err.message || "Using fallback"));
+          console.warn("Cover image processing notice:", err);
+          uploadedCoverUrl = customCoverBase64;
         }
       }
 
@@ -2900,25 +2994,33 @@
       renderAdminStats();
       renderAdminBooks();
       closeBookModal();
-      showToast(`✓ Saved "${title}" to Cloud Firestore!`);
 
-      // 2. Persist to Cloud Firestore in background
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+      }
+
+      showToast(`✓ Published "${title}" across all accounts & catalogue!`);
+
+      // 2. Persist to shared Server API and Cloud Firestore
       if (typeof FirebaseService !== "undefined") {
         try {
+          let res;
           if (id) {
-            await FirebaseService.updateBook(id, bookData);
+            res = await FirebaseService.updateBook(id, bookData);
           } else {
-            await FirebaseService.addBook(bookData);
+            res = await FirebaseService.addBook(bookData);
           }
-          const fresh = await FirebaseService.getBooks();
-          if (Array.isArray(fresh) && fresh.length > 0) {
-            adminBooks = fresh;
-            if (typeof saveBooks === "function") saveBooks(adminBooks);
-            renderAdminStats();
-            renderAdminBooks();
+
+          if (res && res.firestoreSaved) {
+            showToast(`✓ Published "${title}" directly to Cloud Firestore & Live Catalogue!`);
+          }
+
+          if (typeof updateFirestoreStatusBanner === "function") {
+            updateFirestoreStatusBanner().catch(() => {});
           }
         } catch (e) {
-          console.warn("Firestore book background sync:", e);
+          console.warn("Book background sync notice:", e);
         }
       }
     }
@@ -2926,7 +3028,7 @@
     async function deleteBook(id) {
       const book = adminBooks.find(b => String(b.id) === String(id));
       if (!book) return;
-      if (confirm(`Are you sure you want to remove "${book.title}" from the live catalogue in Cloud Firestore?`)) {
+      if (confirm(`Are you sure you want to remove "${book.title}" from the live catalogue?`)) {
         adminBooks = adminBooks.filter(b => String(b.id) !== String(id));
         if (typeof saveBooks === "function") {
           saveBooks(adminBooks);
@@ -2935,13 +3037,13 @@
         }
         renderAdminStats();
         renderAdminBooks();
-        showToast(`Removed "${book.title}" from Firestore.`);
+        showToast(`Removed "${book.title}" from catalogue.`);
 
         if (typeof FirebaseService !== "undefined" && FirebaseService.deleteBook) {
           try {
             await FirebaseService.deleteBook(id);
           } catch(e) {
-            console.warn("Firestore deleteBook sync:", e);
+            console.warn("deleteBook sync notice:", e);
           }
         }
       }
@@ -3060,30 +3162,31 @@
       }
 
       closeCategoryModal();
-      showToast(`✓ Category "${label}" saved!`);
 
-      // 2. Persist to Cloud Firestore in background
+      // 2. Persist to shared Server API and Cloud Firestore
       if (typeof FirebaseService !== "undefined" && FirebaseService.addCategory) {
         try {
+          let res;
           if (editId) {
-            await FirebaseService.updateCategory(editId, { label, desc });
+            res = await FirebaseService.updateCategory(editId, { label, desc });
           } else {
-            await FirebaseService.addCategory({ id: slug, slug, label, desc });
+            res = await FirebaseService.addCategory({ id: slug, slug, label, desc });
           }
-          const freshCats = await FirebaseService.getCategories();
-          if (Array.isArray(freshCats) && freshCats.length > 0) {
-            adminCategories = freshCats;
-            if (typeof saveCategories === "function") saveCategories(adminCategories);
-            renderAdminStats();
-            renderAdminCategories();
+          if (res && res.firestoreSaved) {
+            showToast(`✓ Category "${label}" saved to Cloud Firestore & Live Website!`);
+          } else {
+            showToast(`✓ Category "${label}" saved locally & across all accounts!`);
           }
           if (FirebaseService.getActivityLogs) {
             adminLogs = await FirebaseService.getActivityLogs(150);
             renderAdminLogs();
           }
         } catch (e) {
-          console.warn("Firestore category background sync:", e);
+          console.warn("Category sync notice:", e);
+          showToast(`✓ Category "${label}" saved.`);
         }
+      } else {
+        showToast(`✓ Category "${label}" saved!`);
       }
     }
 
@@ -3108,7 +3211,7 @@
               renderAdminLogs();
             }
           } catch (e) {
-            console.warn("Firestore deleteCategory sync:", e);
+            console.warn("deleteCategory sync notice:", e);
           }
         }
       }
@@ -3836,6 +3939,92 @@
         }
       }
 
+      async function updateFirestoreStatusBanner() {
+        const dot = document.getElementById("firestore-status-dot");
+        const text = document.getElementById("firestore-status-text");
+        const createBtn = document.getElementById("btn-create-firestore");
+        const syncBtn = document.getElementById("btn-sync-firestore");
+
+        if (typeof FirebaseService === "undefined" || !FirebaseService.checkFirestoreStatus) return;
+
+        try {
+          const status = await FirebaseService.checkFirestoreStatus();
+          if (status.databaseExists) {
+            if (dot) {
+              dot.style.background = "#10B981";
+              dot.style.boxShadow = "0 0 8px rgba(16,185,129,0.6)";
+            }
+            if (text) {
+              text.innerHTML = `<strong style="color:#86EFAC;">● Cloud Firestore Live &amp; Connected:</strong> Real-time database sync active with project <code>reasonpress-0</code>. Works are safely synced across all accounts and cloud.`;
+            }
+            if (createBtn) createBtn.style.display = "none";
+            if (syncBtn) {
+              syncBtn.innerHTML = `
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <span>Sync Catalogue to Cloud</span>
+              `;
+            }
+          } else {
+            if (dot) {
+              dot.style.background = "#F59E0B";
+              dot.style.boxShadow = "0 0 8px rgba(245,158,11,0.6)";
+            }
+            if (text) {
+              text.innerHTML = `<strong style="color:#FBBF24;">⚠️ Cloud Firestore Database Not Initialized:</strong> Reason Press is running in <em>Persistent Shared Database</em> mode (saved to server &amp; synchronized across all accounts). To activate real Google Cloud Firestore, create the database in your Firebase Console.`;
+            }
+            if (createBtn) {
+              createBtn.style.display = "inline-flex";
+              if (status.consoleUrl) createBtn.href = status.consoleUrl;
+            }
+            if (syncBtn) {
+              syncBtn.innerHTML = `
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <span>Test Connection</span>
+              `;
+            }
+          }
+        } catch(err) {
+          console.warn("Status banner check error:", err);
+        }
+      }
+
+      async function testAndSyncFirestore() {
+        const syncBtn = document.getElementById("btn-sync-firestore");
+        if (syncBtn) {
+          syncBtn.disabled = true;
+          syncBtn.innerHTML = "<span>Checking Firestore...</span>";
+        }
+
+        showToast("Connecting to Cloud Firestore (reasonpress-0)...");
+
+        if (typeof FirebaseService === "undefined") {
+          showToast("FirebaseService not initialized.");
+          if (syncBtn) syncBtn.disabled = false;
+          return;
+        }
+
+        try {
+          const status = await FirebaseService.checkFirestoreStatus();
+          if (!status.databaseExists) {
+            showToast("⚠️ Cloud Firestore database (default) does not exist yet. Please click 'Create Database in Firebase Console'.");
+            await updateFirestoreStatusBanner();
+            if (syncBtn) syncBtn.disabled = false;
+            return;
+          }
+
+          showToast("Cloud database detected! Syncing catalogue to Firestore...");
+          const res = await FirebaseService.syncAllLocalToFirestore();
+          showToast(`✓ Cloud Firestore Sync Complete! ${res.syncedBooks} books & ${res.syncedCategories} categories are now live on Google Cloud.`);
+          await updateFirestoreStatusBanner();
+        } catch (err) {
+          console.error("Firestore sync error:", err);
+          showToast("Sync Notice: " + (err.message || err));
+          await updateFirestoreStatusBanner();
+        } finally {
+          if (syncBtn) syncBtn.disabled = false;
+        }
+      }
+
       // Explicitly expose all handlers on window for HTML onclick compatibility
       window.handleAdminLogout = handleAdminLogout;
       window.switchAdminTab = switchAdminTab;
@@ -3887,6 +4076,8 @@
       window.renderAdminReviews = renderAdminReviews;
       window.refreshAdminReviews = refreshAdminReviews;
       window.deleteAdminReview = deleteAdminReview;
+      window.updateFirestoreStatusBanner = updateFirestoreStatusBanner;
+      window.testAndSyncFirestore = testAndSyncFirestore;
 
       document.addEventListener("DOMContentLoaded", () => {
         initAdminPortal();

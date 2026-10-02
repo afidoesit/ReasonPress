@@ -365,66 +365,216 @@ const FirebaseService = {
     this.userProfile = null;
   },
 
-  // ── 2. REAL BOOKS DATABASE (FIRESTORE) ─────────────────────────
-  async getBooks() {
-    if (!rpDb) return [];
+  // ── SERVER & CROSS-ACCOUNT SYNC HELPERS ──────────────────────
+  _getServerBaseUrl() {
+    if (typeof window !== "undefined" && window.location && window.location.protocol === "file:") {
+      return "http://localhost:3000";
+    }
+    return "";
+  },
+
+  async fetchFromServer(collection) {
     try {
-      const snap = await rpDb.collection("books").get();
-      if (snap.empty) {
-        return await this.seedInitialBooks();
-      }
-      const books = [];
-      snap.forEach(doc => {
-        books.push({ id: doc.id, ...doc.data() });
+      const res = await fetch(`${this._getServerBaseUrl()}/api/${collection}`);
+      if (res.ok) return await res.json();
+    } catch(e) {}
+    return null;
+  },
+
+  async postToServer(collection, data) {
+    try {
+      const res = await fetch(`${this._getServerBaseUrl()}/api/${collection}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
       });
-      return books.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+      if (res.ok) return await res.json();
+    } catch(e) {}
+    return null;
+  },
+
+  async putToServer(collection, id, data) {
+    try {
+      const res = await fetch(`${this._getServerBaseUrl()}/api/${collection}/${encodeURIComponent(id)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) return await res.json();
+    } catch(e) {}
+    return null;
+  },
+
+  async deleteFromServer(collection, id) {
+    try {
+      const res = await fetch(`${this._getServerBaseUrl()}/api/${collection}/${encodeURIComponent(id)}`, {
+        method: "DELETE"
+      });
+      if (res.ok) return await res.json();
+    } catch(e) {}
+    return null;
+  },
+
+  async checkFirestoreStatus() {
+    try {
+      const res = await fetch(`${this._getServerBaseUrl()}/api/firestore-status`);
+      if (res.ok) return await res.json();
+    } catch(e) {}
+
+    if (!rpDb) {
+      return {
+        databaseExists: false,
+        status: "uninitialized",
+        projectId: "reasonpress-0",
+        consoleUrl: "https://console.firebase.google.com/project/reasonpress-0/firestore",
+        message: "Firebase SDK not loaded."
+      };
+    }
+
+    try {
+      const probe = rpDb.collection("books").limit(1).get();
+      const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("Timeout")), 2500));
+      await Promise.race([probe, timeout]);
+      return {
+        databaseExists: true,
+        status: "active",
+        projectId: "reasonpress-0",
+        consoleUrl: "https://console.firebase.google.com/project/reasonpress-0/firestore",
+        message: "Cloud Firestore is connected and live."
+      };
     } catch (err) {
-      console.error("Error fetching books from Firestore:", err);
-      return [];
+      const msg = err.message || String(err);
+      const notFound = msg.includes("does not exist") || msg.includes("NOT_FOUND") || err.code === "not-found";
+      return {
+        databaseExists: !notFound,
+        status: notFound ? "not_created" : "error",
+        error: msg,
+        projectId: "reasonpress-0",
+        consoleUrl: "https://console.firebase.google.com/project/reasonpress-0/firestore",
+        message: notFound
+          ? "Cloud Firestore database (default) has not been created yet in Firebase Console."
+          : `Firestore notice: ${msg}`
+      };
     }
   },
 
-  async getBookById(id) {
-    if (!rpDb || !id) return null;
-    try {
-      const doc = await rpDb.collection("books").doc(String(id)).get();
-      if (doc.exists) {
-        return { id: doc.id, ...doc.data() };
-      }
-      return null;
-    } catch (err) {
-      console.error("Error fetching book doc:", err);
-      return null;
+  // ── 2. REAL BOOKS DATABASE (FIRESTORE + SHARED SERVER BACKEND) ─
+  async getBooks() {
+    let combined = [];
+
+    // 1. Fetch from shared server API first (permanent cross-account store)
+    const serverBooks = await this.fetchFromServer("books");
+    if (Array.isArray(serverBooks) && serverBooks.length > 0) {
+      combined = [...serverBooks];
     }
+
+    // 2. Fetch from Cloud Firestore if available, and merge new/updated books
+    if (rpDb) {
+      try {
+        const snap = await rpDb.collection("books").get();
+        if (!snap.empty) {
+          snap.forEach(doc => {
+            const data = { id: doc.id, ...doc.data() };
+            const idx = combined.findIndex(b => String(b.id) === String(doc.id));
+            if (idx >= 0) {
+              combined[idx] = { ...combined[idx], ...data };
+            } else {
+              combined.push(data);
+            }
+          });
+        }
+      } catch (err) {
+        console.warn("Firestore getBooks notice (using shared server/local store):", err.message || err);
+      }
+    }
+
+    // 3. Merge with localStorage cache if it has any additional unsynced books
+    try {
+      const local = JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
+      if (Array.isArray(local)) {
+        local.forEach(b => {
+          if (!combined.some(x => String(x.id) === String(b.id))) {
+            combined.push(b);
+          }
+        });
+      }
+    } catch(e) {}
+
+    // 4. Fallback to default catalog if empty
+    if (combined.length === 0 && typeof DEFAULT_BOOKS !== "undefined" && Array.isArray(DEFAULT_BOOKS)) {
+      combined = [...DEFAULT_BOOKS];
+    }
+
+    // Sort: featured first
+    combined.sort((a, b) => (b.featured || b.isFeatured ? 1 : 0) - (a.featured || a.isFeatured ? 1 : 0));
+
+    // Update local cache with complete merged set
+    try { localStorage.setItem("rp_custom_books", JSON.stringify(combined)); } catch(e){}
+
+    return combined;
+  },
+
+  async getBookById(id) {
+    if (!id) return null;
+    if (rpDb) {
+      try {
+        const doc = await rpDb.collection("books").doc(String(id)).get();
+        if (doc.exists) return { id: doc.id, ...doc.data() };
+      } catch (err) {}
+    }
+
+    try {
+      const serverItem = await this.fetchFromServer(`books/${encodeURIComponent(id)}`);
+      if (serverItem && !serverItem.error) return serverItem;
+    } catch(e) {}
+
+    try {
+      const local = JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
+      const found = local.find(b => String(b.id) === String(id));
+      if (found) return found;
+    } catch(e) {}
+
+    return null;
   },
 
   async addBook(bookData) {
     const docData = { ...bookData };
-    docData.createdAt = (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date();
-    docData.updatedAt = (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date();
-
+    const now = new Date().toISOString();
     let docId = bookData.id || ("book_" + Date.now());
+    docData.id = docId;
+    if (!docData.createdAt) docData.createdAt = now;
+    docData.updatedAt = now;
+
+    let firestoreSaved = false;
+    let firestoreError = null;
+
+    // 1. Attempt Cloud Firestore persistence
     if (rpDb) {
       try {
-        if (bookData.id) {
-          await rpDb.collection("books").doc(String(bookData.id)).set(docData, { merge: true });
-        } else {
-          const docRef = await rpDb.collection("books").add(docData);
-          docId = docRef.id;
-          docData.id = docId;
-        }
+        const fsDoc = {
+          ...docData,
+          createdAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : now,
+          updatedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : now
+        };
+        await rpDb.collection("books").doc(String(docId)).set(fsDoc, { merge: true });
+        firestoreSaved = true;
       } catch (err) {
-        console.warn("Could not add book to Firestore directly:", err);
+        firestoreError = err.message || String(err);
+        console.warn("Could not save book to Firestore directly:", firestoreError);
       }
     }
 
+    // 2. Save to shared Server API (persists on disk in data/books.json so all accounts see it!)
+    await this.postToServer("books", docData);
+
+    // 3. Save to localStorage cache
     try {
       let books = JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
       const idx = books.findIndex(b => String(b.id) === String(docId));
       if (idx >= 0) {
-        books[idx] = { id: docId, ...docData };
+        books[idx] = docData;
       } else {
-        books.unshift({ id: docId, ...docData });
+        books.unshift(docData);
       }
       localStorage.setItem("rp_custom_books", JSON.stringify(books));
     } catch(e) {}
@@ -435,21 +585,34 @@ const FirebaseService = {
       details: `New title added to catalogue: "${docData.title}" by ${docData.author}`
     }).catch(() => {});
 
-    return { id: docId, ...docData };
+    return { id: docId, ...docData, firestoreSaved, firestoreError };
   },
 
   async updateBook(id, bookData) {
     const docData = { ...bookData };
-    docData.updatedAt = (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date();
+    const now = new Date().toISOString();
+    docData.updatedAt = now;
+    let firestoreSaved = false;
+    let firestoreError = null;
 
     if (rpDb) {
       try {
-        await rpDb.collection("books").doc(String(id)).set(docData, { merge: true });
+        const fsDoc = {
+          ...docData,
+          updatedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : now
+        };
+        await rpDb.collection("books").doc(String(id)).set(fsDoc, { merge: true });
+        firestoreSaved = true;
       } catch (err) {
-        console.warn("Could not update book in Firestore directly:", err);
+        firestoreError = err.message || String(err);
+        console.warn("Could not update book in Firestore directly:", firestoreError);
       }
     }
 
+    // Save to shared server API
+    await this.putToServer("books", id, docData);
+
+    // Save to local cache
     try {
       let books = JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
       const idx = books.findIndex(b => String(b.id) === String(id));
@@ -464,6 +627,8 @@ const FirebaseService = {
       action: "Book Updated",
       details: `Catalogue entry updated: "${docData.title || id}"`
     }).catch(() => {});
+
+    return { id, ...docData, firestoreSaved, firestoreError };
   },
 
   async deleteBook(id) {
@@ -475,6 +640,10 @@ const FirebaseService = {
       }
     }
 
+    // Delete from shared server API
+    await this.deleteFromServer("books", id);
+
+    // Remove from local cache
     try {
       let books = JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
       books = books.filter(b => String(b.id) !== String(id));
@@ -586,46 +755,87 @@ const FirebaseService = {
     return seeded;
   },
 
-  // ── 2.5. REAL CATEGORIES DATABASE (FIRESTORE) ────────────────
+  // ── 2.5. REAL CATEGORIES DATABASE (FIRESTORE + SERVER BACKEND) ──
   async getCategories() {
-    if (!rpDb) {
-      try { return JSON.parse(localStorage.getItem("rp_categories") || "[]"); } catch (e) { return []; }
+    let combined = [];
+
+    // 1. Fetch from shared server API first
+    const serverCats = await this.fetchFromServer("categories");
+    if (Array.isArray(serverCats) && serverCats.length > 0) {
+      combined = [...serverCats];
     }
-    try {
-      const snap = await rpDb.collection("categories").get();
-      if (snap.empty) {
-        return await this.seedInitialCategories();
+
+    // 2. Fetch from Cloud Firestore and merge
+    if (rpDb) {
+      try {
+        const snap = await rpDb.collection("categories").get();
+        if (!snap.empty) {
+          snap.forEach(doc => {
+            const data = { id: doc.id, ...doc.data() };
+            const idx = combined.findIndex(c => String(c.id || c.slug) === String(doc.id || data.slug));
+            if (idx >= 0) {
+              combined[idx] = { ...combined[idx], ...data };
+            } else {
+              combined.push(data);
+            }
+          });
+        }
+      } catch (err) {
+        console.warn("Firestore getCategories notice (using server/local store):", err.message || err);
       }
-      const cats = [];
-      snap.forEach(doc => {
-        cats.push({ id: doc.id, ...doc.data() });
-      });
-      try { localStorage.setItem("rp_categories", JSON.stringify(cats)); } catch (e) {}
-      return cats;
-    } catch (err) {
-      console.warn("Error fetching categories from Firestore:", err);
-      try { return JSON.parse(localStorage.getItem("rp_categories") || "[]"); } catch (e) { return []; }
     }
+
+    // 3. Merge with localStorage cache
+    try {
+      const local = JSON.parse(localStorage.getItem("rp_categories") || "[]");
+      if (Array.isArray(local)) {
+        local.forEach(c => {
+          if (!combined.some(x => String(x.id || x.slug) === String(c.id || c.slug))) {
+            combined.push(c);
+          }
+        });
+      }
+    } catch (e) {}
+
+    if (combined.length === 0 && typeof DEFAULT_CATEGORIES !== "undefined") {
+      combined = [...DEFAULT_CATEGORIES];
+    }
+
+    try { localStorage.setItem("rp_categories", JSON.stringify(combined)); } catch (e) {}
+    return combined;
   },
 
   async addCategory(categoryData) {
     const slug = (categoryData.id || categoryData.slug || categoryData.label.toLowerCase().replace(/[^a-z0-9_-]/g, "")).trim();
+    const now = new Date().toISOString();
     const docData = {
       id: slug,
       slug: slug,
       label: categoryData.label.trim(),
       desc: (categoryData.desc || "").trim(),
-      createdAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date(),
-      updatedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
+      createdAt: now,
+      updatedAt: now
     };
+
+    let firestoreSaved = false;
+    let firestoreError = null;
 
     if (rpDb) {
       try {
-        await rpDb.collection("categories").doc(slug).set(docData, { merge: true });
+        const fsDoc = {
+          ...docData,
+          createdAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : now,
+          updatedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : now
+        };
+        await rpDb.collection("categories").doc(slug).set(fsDoc, { merge: true });
+        firestoreSaved = true;
       } catch (err) {
-        console.warn("Could not save category to Firestore directly:", err);
+        firestoreError = err.message || String(err);
+        console.warn("Could not save category to Firestore directly:", firestoreError);
       }
     }
+
+    await this.postToServer("categories", docData);
 
     try {
       let cats = JSON.parse(localStorage.getItem("rp_categories") || "[]");
@@ -644,23 +854,35 @@ const FirebaseService = {
       details: `New subject category added: "${docData.label}" (${slug})`
     }).catch(() => {});
 
-    return docData;
+    return { id: slug, ...docData, firestoreSaved, firestoreError };
   },
 
   async updateCategory(slug, categoryData) {
+    const now = new Date().toISOString();
     const docData = {
       label: categoryData.label.trim(),
       desc: (categoryData.desc || "").trim(),
-      updatedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
+      updatedAt: now
     };
+
+    let firestoreSaved = false;
+    let firestoreError = null;
 
     if (rpDb) {
       try {
-        await rpDb.collection("categories").doc(slug).set(docData, { merge: true });
+        const fsDoc = {
+          ...docData,
+          updatedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : now
+        };
+        await rpDb.collection("categories").doc(slug).set(fsDoc, { merge: true });
+        firestoreSaved = true;
       } catch (err) {
-        console.warn("Could not update category in Firestore directly:", err);
+        firestoreError = err.message || String(err);
+        console.warn("Could not update category in Firestore directly:", firestoreError);
       }
     }
+
+    await this.putToServer("categories", slug, docData);
 
     try {
       let cats = JSON.parse(localStorage.getItem("rp_categories") || "[]");
@@ -676,6 +898,8 @@ const FirebaseService = {
       action: "Category Updated",
       details: `Updated subject category "${docData.label}" (${slug})`
     }).catch(() => {});
+
+    return { id: slug, ...docData, firestoreSaved, firestoreError };
   },
 
   async deleteCategory(slug) {
@@ -686,6 +910,8 @@ const FirebaseService = {
         console.warn("Could not delete category from Firestore directly:", err);
       }
     }
+
+    await this.deleteFromServer("categories", slug);
 
     try {
       let cats = JSON.parse(localStorage.getItem("rp_categories") || "[]");
@@ -716,23 +942,65 @@ const FirebaseService = {
     return defaults;
   },
 
-  // ── 3. REAL IMAGE & PDF STORAGE (FIREBASE STORAGE) ─────────────
+  // ── 3. RESILIENT IMAGE & PDF STORAGE (SERVER + FIREBASE STORAGE) ─
   async uploadFile(file, folder = "uploads") {
-    if (!rpStorage) throw new Error("Firebase Storage not initialized.");
-    
-    // File validation
-    const maxSizeBytes = 25 * 1024 * 1024; // 25MB max
-    if (file.size > maxSizeBytes) {
-      throw new Error(`File is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed size is 25MB.`);
+    if (!file) return null;
+
+    // Convert to Base64 Data URL first so we ALWAYS have an immediate, 100% working fallback
+    const fileDataUrl = await new Promise((resolve) => {
+      if (typeof file === "string") return resolve(file);
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+
+    // 1. Try local server disk upload (instant, permanent in assets/uploads/)
+    if (fileDataUrl) {
+      try {
+        const uploadEndpoint = `${this._getServerBaseUrl()}/api/upload`;
+        const res = await fetch(uploadEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: file.name || "cover.jpg",
+            dataUrl: fileDataUrl
+          })
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.url) {
+            const finalUrl = (typeof window !== "undefined" && window.location.protocol === "file:")
+              ? `http://localhost:3000${json.url}`
+              : json.url;
+            return finalUrl;
+          }
+        }
+      } catch(e) {}
     }
 
-    const cleanName = (file.name || "upload").replace(/[^a-zA-Z0-9._-]/g, "_");
-    const uniqueId = Date.now() + "_" + Math.floor(Math.random() * 1000);
-    const storageRef = rpStorage.ref().child(`${folder}/${uniqueId}_${cleanName}`);
+    // 2. Try Firebase Storage with a 2.5s timeout (prevents hanging indefinitely!)
+    if (rpStorage && typeof file !== "string") {
+      try {
+        const cleanName = (file.name || "upload").replace(/[^a-zA-Z0-9._-]/g, "_");
+        const uniqueId = Date.now() + "_" + Math.floor(Math.random() * 1000);
+        const storageRef = rpStorage.ref().child(`${folder}/${uniqueId}_${cleanName}`);
 
-    const snapshot = await storageRef.put(file);
-    const downloadUrl = await snapshot.ref.getDownloadURL();
-    return downloadUrl;
+        const uploadTask = storageRef.put(file);
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("Storage timeout")), 2500)
+        );
+
+        const snapshot = await Promise.race([uploadTask, timeoutPromise]);
+        const downloadUrl = await snapshot.ref.getDownloadURL();
+        if (downloadUrl) return downloadUrl;
+      } catch (err) {
+        console.warn("Firebase Storage unavailable or timed out, using local image:", err.message || err);
+      }
+    }
+
+    // 3. Fallback to Base64 Data URL directly
+    return fileDataUrl;
   },
 
   // ── 4. REAL SHOPPING CART (FIRESTORE + LOCAL MERGE) ───────────
@@ -769,21 +1037,47 @@ const FirebaseService = {
     }
   },
 
-  // ── 5. REAL ORDERS & CHECKOUT (FIRESTORE) ──────────────────────
+  // ── 5. REAL ORDERS & CHECKOUT (FIRESTORE + SERVER BACKEND) ──
   async createOrder(orderData) {
-    if (!rpDb) throw new Error("Firestore not initialized.");
-    orderData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+    const now = new Date().toISOString();
+    let docId = "order_" + Date.now();
     orderData.status = orderData.status || "Confirmed";
-    const docRef = await rpDb.collection("orders").add(orderData);
-    const orderId = docRef.id;
+    orderData.createdAt = now;
+
+    let firestoreSaved = false;
+    if (rpDb) {
+      try {
+        const fsDoc = {
+          ...orderData,
+          createdAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : now
+        };
+        const docRef = await rpDb.collection("orders").add(fsDoc);
+        docId = docRef.id;
+        firestoreSaved = true;
+      } catch (err) {
+        console.warn("Could not save order to Firestore directly:", err);
+      }
+    }
+
+    const finalOrder = { id: docId, ...orderData, firestoreSaved };
+
+    // Save to shared server API
+    await this.postToServer("orders", finalOrder);
+
+    // Save to local backup
+    try {
+      const orders = JSON.parse(localStorage.getItem("rp_orders") || "[]");
+      orders.unshift(finalOrder);
+      localStorage.setItem("rp_orders", JSON.stringify(orders));
+    } catch(e) {}
 
     // Grant books to user library
     if (orderData.userId && Array.isArray(orderData.items)) {
-      await this.grantBooksToUserLibrary(orderData.userId, orderData.items, orderId);
+      await this.grantBooksToUserLibrary(orderData.userId, orderData.items, docId).catch(() => {});
     }
 
     // Clear user cart in Firestore
-    if (orderData.userId) {
+    if (rpDb && orderData.userId) {
       await rpDb.collection("cart").doc(orderData.userId).delete().catch(() => {});
     }
 
@@ -791,60 +1085,96 @@ const FirebaseService = {
     await this.logActivity({
       type: "order",
       action: "Order Placed",
-      details: `Order #${orderId} created for ₹${orderData.total || 0} (${(orderData.items || []).length} title(s)) by ${orderData.customerName || orderData.customerEmail}`,
+      details: `Order #${docId} created for ₹${orderData.total || 0} (${(orderData.items || []).length} title(s)) by ${orderData.customerName || orderData.customerEmail}`,
       targetUserId: orderData.userId || null,
       targetEmail: orderData.customerEmail || null
-    });
+    }).catch(() => {});
 
-    return { id: orderId, ...orderData };
+    return finalOrder;
   },
 
   async getUserOrders(uid) {
-    if (!rpDb || !uid) return [];
-    try {
-      const snap = await rpDb.collection("orders").where("userId", "==", uid).get();
-      const orders = [];
-      snap.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
-      return orders.sort((a, b) => {
-        const timeA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : 0;
-        const timeB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0;
-        return timeB - timeA;
-      });
-    } catch (err) {
-      console.error("Error fetching user orders:", err);
-      return [];
+    if (!uid) return [];
+    if (rpDb) {
+      try {
+        const snap = await rpDb.collection("orders").where("userId", "==", uid).get();
+        if (!snap.empty) {
+          const orders = [];
+          snap.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
+          return orders.sort((a, b) => {
+            const timeA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : 0;
+            const timeB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0;
+            return timeB - timeA;
+          });
+        }
+      } catch (err) {}
     }
+
+    const allOrders = await this.getAllOrders();
+    return allOrders.filter(o => o.userId === uid);
   },
 
   async getAllOrders() {
-    if (!rpDb) return [];
+    if (rpDb) {
+      try {
+        const snap = await rpDb.collection("orders").get();
+        if (!snap.empty) {
+          const orders = [];
+          snap.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
+          orders.sort((a, b) => {
+            const timeA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : 0;
+            const timeB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0;
+            return timeB - timeA;
+          });
+          try { localStorage.setItem("rp_orders", JSON.stringify(orders)); } catch(e){}
+          this.postToServer("orders", orders).catch(() => {});
+          return orders;
+        }
+      } catch (err) {
+        console.warn("Firestore getAllOrders notice (using server/local store):", err.message || err);
+      }
+    }
+
+    const serverOrders = await this.fetchFromServer("orders");
+    if (Array.isArray(serverOrders) && serverOrders.length > 0) {
+      try { localStorage.setItem("rp_orders", JSON.stringify(serverOrders)); } catch(e){}
+      return serverOrders;
+    }
+
     try {
-      const snap = await rpDb.collection("orders").get();
-      const orders = [];
-      snap.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
-      return orders.sort((a, b) => {
-        const timeA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : 0;
-        const timeB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0;
-        return timeB - timeA;
-      });
-    } catch (err) {
-      console.error("Error fetching all orders:", err);
+      return JSON.parse(localStorage.getItem("rp_orders") || "[]");
+    } catch (e) {
       return [];
     }
   },
 
   async updateOrderStatus(orderId, status) {
-    if (!rpDb || !orderId) return;
-    await rpDb.collection("orders").doc(orderId).update({
-      status,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    if (!orderId) return;
+    if (rpDb) {
+      try {
+        await rpDb.collection("orders").doc(orderId).update({
+          status,
+          updatedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
+        });
+      } catch(e) {}
+    }
+
+    await this.putToServer("orders", orderId, { status, updatedAt: new Date().toISOString() });
+
+    try {
+      const orders = JSON.parse(localStorage.getItem("rp_orders") || "[]");
+      const idx = orders.findIndex(o => String(o.id) === String(orderId));
+      if (idx >= 0) {
+        orders[idx].status = status;
+        localStorage.setItem("rp_orders", JSON.stringify(orders));
+      }
+    } catch(e) {}
 
     await this.logActivity({
       type: "order",
       action: "Order Status Updated",
       details: `Order #${orderId} marked as '${status}'`
-    });
+    }).catch(() => {});
   },
 
   // ── 6. REAL USER LIBRARY (PURCHASED BOOKS) ─────────────────────
@@ -874,37 +1204,75 @@ const FirebaseService = {
         format: item.format || "Digital PDF Edition",
         orderId: orderId || "RP-" + Math.floor(10000 + Math.random() * 90000),
         purchasedAt: new Date().toLocaleDateString("en-GB", { month: "short", day: "numeric", year: "numeric" }),
-        grantedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+        grantedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
+      }, { merge: true }).catch(() => {});
     }
   },
 
   // ── 7. REAL AUTHOR MANUSCRIPTS / SUBMISSIONS ───────────────────
   async submitManuscript(submissionData) {
-    if (!rpDb) throw new Error("Firestore not initialized.");
-    submissionData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-    submissionData.status = "pending";
-    const docRef = await rpDb.collection("submissions").add(submissionData);
+    const now = new Date().toISOString();
+    let docId = "sub_" + Date.now();
+    submissionData.status = submissionData.status || "pending";
+    submissionData.createdAt = now;
+
+    if (rpDb) {
+      try {
+        const fsDoc = {
+          ...submissionData,
+          createdAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : now
+        };
+        const docRef = await rpDb.collection("submissions").add(fsDoc);
+        docId = docRef.id;
+      } catch (err) {
+        console.warn("Could not save submission to Firestore directly:", err);
+      }
+    }
+
+    const finalSub = { id: docId, ...submissionData };
+    await this.postToServer("submissions", finalSub);
+
+    try {
+      const subs = JSON.parse(localStorage.getItem("rp_submissions") || "[]");
+      subs.unshift(finalSub);
+      localStorage.setItem("rp_submissions", JSON.stringify(subs));
+    } catch(e) {}
 
     await this.logActivity({
       type: "submission",
       action: "Manuscript Submitted",
       details: `Author ${submissionData.author} submitted manuscript proposal: "${submissionData.title}" (${submissionData.category})`,
       targetEmail: submissionData.email || null
-    });
+    }).catch(() => {});
 
-    return { id: docRef.id, ...submissionData };
+    return finalSub;
   },
 
   async getAllSubmissions() {
-    if (!rpDb) return [];
+    if (rpDb) {
+      try {
+        const snap = await rpDb.collection("submissions").get();
+        if (!snap.empty) {
+          const subs = [];
+          snap.forEach(doc => subs.push({ id: doc.id, ...doc.data() }));
+          try { localStorage.setItem("rp_submissions", JSON.stringify(subs)); } catch(e){}
+          this.postToServer("submissions", subs).catch(() => {});
+          return subs;
+        }
+      } catch (err) {
+        console.warn("Firestore getAllSubmissions notice (using server/local store):", err.message || err);
+      }
+    }
+
+    const serverSubs = await this.fetchFromServer("submissions");
+    if (Array.isArray(serverSubs) && serverSubs.length > 0) {
+      try { localStorage.setItem("rp_submissions", JSON.stringify(serverSubs)); } catch(e){}
+      return serverSubs;
+    }
+
     try {
-      const snap = await rpDb.collection("submissions").get();
-      const subs = [];
-      snap.forEach(doc => subs.push({ id: doc.id, ...doc.data() }));
-      return subs;
+      return JSON.parse(localStorage.getItem("rp_submissions") || "[]");
     } catch (err) {
-      console.error("Error loading submissions:", err);
       return [];
     }
   },
@@ -1426,6 +1794,55 @@ const FirebaseService = {
         console.warn("Error clearing Firestore logs:", err);
       }
     }
+  },
+
+  async syncAllLocalToFirestore() {
+    if (!rpDb) {
+      throw new Error("Firebase SDK is not available.");
+    }
+    const status = await this.checkFirestoreStatus();
+    if (!status.databaseExists) {
+      throw new Error("Cloud Firestore database (default) has not been initialized yet in Firebase Console for project 'reasonpress-0'. Please visit " + (status.consoleUrl || "https://console.firebase.google.com/project/reasonpress-0/firestore") + " and click 'Create database'.");
+    }
+
+    const books = await this.getBooks();
+    const categories = await this.getCategories();
+    let syncedBooks = 0;
+    let syncedCategories = 0;
+
+    for (const b of books) {
+      try {
+        const id = String(b.id);
+        await rpDb.collection("books").doc(id).set({
+          ...b,
+          updatedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
+        }, { merge: true });
+        syncedBooks++;
+      } catch (err) {
+        console.warn("Could not sync book to Firestore:", b.title, err);
+      }
+    }
+
+    for (const c of categories) {
+      try {
+        const id = String(c.id || c.slug);
+        await rpDb.collection("categories").doc(id).set({
+          ...c,
+          updatedAt: (typeof firebase !== "undefined" && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
+        }, { merge: true });
+        syncedCategories++;
+      } catch (err) {
+        console.warn("Could not sync category to Firestore:", c.label, err);
+      }
+    }
+
+    return {
+      success: true,
+      syncedBooks,
+      syncedCategories,
+      totalBooks: books.length,
+      totalCategories: categories.length
+    };
   }
 };
 
