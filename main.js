@@ -281,6 +281,20 @@ const DEFAULT_SITE_SETTINGS = {
   address: "Reason Press . Caliph / India Distribution Hub"
 };
 
+// Clean any leftover demo caches from older sessions
+(function purgeDemoCache() {
+  try {
+    const CLEAN_KEY = "rp_clean_store_v4";
+    if (localStorage.getItem(CLEAN_KEY) !== "true") {
+      const current = localStorage.getItem("rp_custom_books");
+      if (current && (current.includes("data:image/") || current.includes("b jhbjbb") || current.includes("gh") || current.includes("ss") || current.length > 50000)) {
+        localStorage.removeItem("rp_custom_books");
+      }
+      localStorage.setItem(CLEAN_KEY, "true");
+    }
+  } catch(e) {}
+})();
+
 // ── Global Store Accessors ──────────────────────────────────
 function getBooks() {
   const saved = localStorage.getItem("rp_custom_books");
@@ -303,10 +317,21 @@ function getBooks() {
   return seeded;
 }
 
+function broadcastSync(type) {
+  if (typeof BroadcastChannel !== "undefined") {
+    try {
+      const syncChannel = new BroadcastChannel("reason_press_sync");
+      syncChannel.postMessage({ type: type, timestamp: Date.now() });
+      syncChannel.close();
+    } catch(e) {}
+  }
+}
+
 function saveBooks(books) {
   localStorage.setItem("rp_custom_books", JSON.stringify(books));
   if (typeof renderHomeBookWall === "function") renderHomeBookWall();
   if (typeof renderCatalogueGrid === "function") renderCatalogueGrid();
+  broadcastSync("catalogue_updated");
 }
 
 async function syncBooksFromFirestore() {
@@ -349,6 +374,59 @@ async function syncBooksFromFirestore() {
   }
 }
 
+async function syncCategoriesFromFirestore() {
+  if (typeof FirebaseService === "undefined" || !FirebaseService.getCategories) return;
+  try {
+    const cats = await FirebaseService.getCategories();
+    if (Array.isArray(cats) && cats.length > 0) {
+      localStorage.setItem("rp_categories", JSON.stringify(cats));
+      if (typeof renderCatalogueGrid === "function") renderCatalogueGrid();
+    }
+  } catch(e) {}
+}
+
+// ── Real-Time Global Synchronization Across Tabs & Worldwide Devices ──
+if (typeof BroadcastChannel !== "undefined") {
+  try {
+    const syncChannel = new BroadcastChannel("reason_press_sync");
+    syncChannel.onmessage = (event) => {
+      if (event.data) {
+        if (event.data.type === "catalogue_updated") syncBooksFromFirestore();
+        if (event.data.type === "categories_updated") syncCategoriesFromFirestore();
+      }
+    };
+  } catch(e) {}
+}
+
+// Real-Time Server-Sent Events (SSE) Listener for zero-latency remote sync
+if (typeof window !== "undefined" && typeof EventSource !== "undefined") {
+  try {
+    const sse = new EventSource("/api/events");
+    sse.addEventListener("catalogue_updated", () => {
+      syncBooksFromFirestore();
+    });
+    sse.addEventListener("categories_updated", () => {
+      syncCategoriesFromFirestore();
+    });
+  } catch(e) {}
+}
+
+if (typeof window !== "undefined") {
+  // Re-sync immediately whenever user switches to or focuses the window/tab
+  window.addEventListener("focus", () => {
+    syncBooksFromFirestore();
+    syncCategoriesFromFirestore();
+  });
+
+  // Fast background heartbeat: polls every 4s if tab is active
+  setInterval(() => {
+    if (!document.hidden) {
+      if (typeof syncBooksFromFirestore === "function") syncBooksFromFirestore();
+      if (typeof syncCategoriesFromFirestore === "function") syncCategoriesFromFirestore();
+    }
+  }, 4000);
+}
+
 function getCategories() {
   const saved = localStorage.getItem("rp_categories");
   if (saved) {
@@ -364,6 +442,7 @@ function getCategories() {
 function saveCategories(cats) {
   localStorage.setItem("rp_categories", JSON.stringify(cats));
   if (typeof renderCatalogueGrid === "function") renderCatalogueGrid();
+  broadcastSync("categories_updated");
 }
 
 function getSiteSettings() {

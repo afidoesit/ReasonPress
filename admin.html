@@ -1926,14 +1926,7 @@
         try {
           const remoteBooks = await FirebaseService.getBooks();
           if (Array.isArray(remoteBooks) && remoteBooks.length > 0) {
-            // Merge with local adminBooks so newly created books are never lost
-            const merged = [...remoteBooks];
-            (adminBooks || []).forEach(localB => {
-              if (!merged.some(m => String(m.id) === String(localB.id))) {
-                merged.unshift(localB);
-              }
-            });
-            adminBooks = merged;
+            adminBooks = remoteBooks;
             if (typeof saveBooks === "function") saveBooks(adminBooks);
           } else if (!adminBooks || adminBooks.length === 0) {
             adminBooks = (typeof getBooks === "function") ? getBooks() : JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
@@ -2028,6 +2021,62 @@
       if (typeof updateFirestoreStatusBanner === "function") {
         updateFirestoreStatusBanner().catch(() => {});
       }
+    }
+
+    // Real-time cross-tab and cross-device sync for Admin Panel
+    if (typeof BroadcastChannel !== "undefined") {
+      try {
+        const syncChannel = new BroadcastChannel("reason_press_sync");
+        syncChannel.onmessage = async (event) => {
+          if (event.data) {
+            if (event.data.type === "catalogue_updated") {
+              if (typeof FirebaseService !== "undefined" && FirebaseService.getBooks) {
+                const remoteBooks = await FirebaseService.getBooks();
+                if (Array.isArray(remoteBooks)) {
+                  adminBooks = remoteBooks;
+                  renderAdminStats();
+                  renderAdminBooks();
+                }
+              }
+            } else if (event.data.type === "categories_updated") {
+              if (typeof FirebaseService !== "undefined" && FirebaseService.getCategories) {
+                const remoteCats = await FirebaseService.getCategories();
+                if (Array.isArray(remoteCats)) {
+                  adminCategories = remoteCats;
+                  renderAdminStats();
+                  renderAdminCategories();
+                }
+              }
+            }
+          }
+        };
+      } catch(e) {}
+    }
+
+    if (typeof window !== "undefined" && typeof EventSource !== "undefined") {
+      try {
+        const sse = new EventSource("/api/events");
+        sse.addEventListener("catalogue_updated", async () => {
+          if (typeof FirebaseService !== "undefined" && FirebaseService.getBooks) {
+            const remoteBooks = await FirebaseService.getBooks();
+            if (Array.isArray(remoteBooks)) {
+              adminBooks = remoteBooks;
+              renderAdminStats();
+              renderAdminBooks();
+            }
+          }
+        });
+        sse.addEventListener("categories_updated", async () => {
+          if (typeof FirebaseService !== "undefined" && FirebaseService.getCategories) {
+            const remoteCats = await FirebaseService.getCategories();
+            if (Array.isArray(remoteCats)) {
+              adminCategories = remoteCats;
+              renderAdminStats();
+              renderAdminCategories();
+            }
+          }
+        });
+      } catch(e) {}
     }
 
     function renderAdminStats() {

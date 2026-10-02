@@ -280,6 +280,61 @@ function parseBody(req) {
   });
 }
 
+// Automatically extract Base64 data URLs to disk in assets/uploads so database files remain tiny & super fast
+function extractAndSaveBase64Image(dataUrl, prefix = 'cover') {
+  if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) {
+    return dataUrl;
+  }
+  try {
+    const matches = dataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) return dataUrl;
+
+    const mime = matches[1].toLowerCase();
+    let ext = '.jpg';
+    if (mime.includes('png')) ext = '.png';
+    else if (mime.includes('webp')) ext = '.webp';
+    else if (mime.includes('gif')) ext = '.gif';
+    else if (mime.includes('svg')) ext = '.svg';
+
+    const uploadsDir = path.join(ROOT_DIR, 'assets', 'uploads');
+    if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+
+    const filename = `${Date.now()}_${prefix}_${Math.random().toString(36).substring(2, 8)}${ext}`;
+    const destPath = path.join(uploadsDir, filename);
+    fs.writeFileSync(destPath, Buffer.from(matches[2], 'base64'));
+
+    return `/assets/uploads/${filename}`;
+  } catch (err) {
+    console.warn('Error saving base64 image:', err.message);
+    return dataUrl;
+  }
+}
+
+// Global Real-Time SSE (Server-Sent Events) Clients for zero-latency cross-visitor sync
+let sseClients = [];
+
+function broadcastSse(eventType, data = {}) {
+  const payload = `event: ${eventType}\ndata: ${JSON.stringify(data)}\n\n`;
+  for (let i = sseClients.length - 1; i >= 0; i--) {
+    try {
+      sseClients[i].write(payload);
+    } catch (err) {
+      sseClients.splice(i, 1);
+    }
+  }
+}
+
+// Keep-alive ping every 20s so proxies (Render, Cloudflare, Nginx) keep connections alive
+setInterval(() => {
+  for (let i = sseClients.length - 1; i >= 0; i--) {
+    try {
+      sseClients[i].write(': ping\n\n');
+    } catch (err) {
+      sseClients.splice(i, 1);
+    }
+  }
+}, 20000);
+
 // REST API Handler
 async function handleApi(req, res, pathname) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -289,6 +344,22 @@ async function handleApi(req, res, pathname) {
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
     res.end();
+    return true;
+  }
+
+  // SSE Real-Time Global Synchronization Stream
+  if (pathname === '/api/events') {
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*'
+    });
+    res.write('retry: 3000\n\n');
+    sseClients.push(res);
+    req.on('close', () => {
+      sseClients = sseClients.filter(c => c !== res);
+    });
     return true;
   }
 
@@ -434,6 +505,9 @@ async function handleApi(req, res, pathname) {
     // If batch sync: body is an array, merge rather than wipe
     if (Array.isArray(body)) {
       body.forEach(newDoc => {
+        if (newDoc.coverImage) {
+          newDoc.coverImage = extractAndSaveBase64Image(newDoc.coverImage, 'cover');
+        }
         const id = newDoc.id || newDoc.slug || newDoc.uid;
         const idx = items.findIndex(i => String(i.id || i.slug || i.uid) === String(id));
         if (idx >= 0) {
@@ -443,9 +517,15 @@ async function handleApi(req, res, pathname) {
         }
       });
       writeDataFile(collection, items);
+      broadcastSse(`${collection}_updated`, { action: 'batch', count: items.length });
+      if (collection === 'books') broadcastSse('catalogue_updated', { action: 'batch', count: items.length });
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, count: items.length }));
       return true;
+    }
+
+    if (body.coverImage) {
+      body.coverImage = extractAndSaveBase64Image(body.coverImage, 'cover');
     }
 
     const docId = body.id || itemId || `${collection.slice(0, -1)}_${Date.now()}`;
@@ -468,6 +548,9 @@ async function handleApi(req, res, pathname) {
     }
 
     writeDataFile(collection, items);
+    broadcastSse(`${collection}_updated`, { action: 'create', id: docId });
+    if (collection === 'books') broadcastSse('catalogue_updated', { action: 'create', id: docId });
+    if (collection === 'categories') broadcastSse('categories_updated', { action: 'create', id: docId });
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, item: newDoc }));
     return true;
@@ -476,6 +559,9 @@ async function handleApi(req, res, pathname) {
   // PUT /api/:collection/:id (Update item)
   if (req.method === 'PUT' && itemId) {
     const body = await parseBody(req);
+    if (body.coverImage) {
+      body.coverImage = extractAndSaveBase64Image(body.coverImage, 'cover');
+    }
     const existingIdx = items.findIndex(i => String(i.id || i.slug || i.uid) === itemId);
     if (existingIdx >= 0) {
       items[existingIdx] = {
@@ -485,6 +571,9 @@ async function handleApi(req, res, pathname) {
         updatedAt: new Date().toISOString()
       };
       writeDataFile(collection, items);
+      broadcastSse(`${collection}_updated`, { action: 'update', id: itemId });
+      if (collection === 'books') broadcastSse('catalogue_updated', { action: 'update', id: itemId });
+      if (collection === 'categories') broadcastSse('categories_updated', { action: 'update', id: itemId });
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, item: items[existingIdx] }));
     } else {
@@ -496,6 +585,9 @@ async function handleApi(req, res, pathname) {
       };
       items.push(newDoc);
       writeDataFile(collection, items);
+      broadcastSse(`${collection}_updated`, { action: 'create', id: itemId });
+      if (collection === 'books') broadcastSse('catalogue_updated', { action: 'create', id: itemId });
+      if (collection === 'categories') broadcastSse('categories_updated', { action: 'create', id: itemId });
       res.writeHead(201, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, item: newDoc }));
     }
@@ -507,6 +599,9 @@ async function handleApi(req, res, pathname) {
     const initialLen = items.length;
     items = items.filter(i => String(i.id || i.slug || i.uid) !== itemId);
     writeDataFile(collection, items);
+    broadcastSse(`${collection}_updated`, { action: 'delete', id: itemId });
+    if (collection === 'books') broadcastSse('catalogue_updated', { action: 'delete', id: itemId });
+    if (collection === 'categories') broadcastSse('categories_updated', { action: 'delete', id: itemId });
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, deleted: initialLen !== items.length }));
     return true;

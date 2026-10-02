@@ -488,27 +488,28 @@ const FirebaseService = {
       }
     }
 
-    // 3. Merge with localStorage cache if it has any additional unsynced books
-    try {
-      const local = JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
-      if (Array.isArray(local)) {
-        local.forEach(b => {
-          if (!combined.some(x => String(x.id) === String(b.id))) {
-            combined.push(b);
-          }
-        });
-      }
-    } catch(e) {}
+    // 3. Fallback: if both server API and Firestore had no items, only then fall back to local cache
+    if (combined.length === 0) {
+      try {
+        const local = JSON.parse(localStorage.getItem("rp_custom_books") || "[]");
+        if (Array.isArray(local) && local.length > 0) {
+          combined = [...local];
+        }
+      } catch(e) {}
+    }
 
     // 4. Fallback to default catalog if empty
     if (combined.length === 0 && typeof DEFAULT_BOOKS !== "undefined" && Array.isArray(DEFAULT_BOOKS)) {
       combined = [...DEFAULT_BOOKS];
     }
 
+    // Filter out any stale dummy/test items
+    combined = combined.filter(b => b && b.title && b.title !== "b jhbjbb" && b.title !== "gh" && b.title !== "ss" && !String(b.id).startsWith("test_junk"));
+
     // Sort: featured first
     combined.sort((a, b) => (b.featured || b.isFeatured ? 1 : 0) - (a.featured || a.isFeatured ? 1 : 0));
 
-    // Update local cache with complete merged set
+    // Update local cache with complete authoritative set
     try { localStorage.setItem("rp_custom_books", JSON.stringify(combined)); } catch(e){}
 
     return combined;
@@ -785,17 +786,15 @@ const FirebaseService = {
       }
     }
 
-    // 3. Merge with localStorage cache
-    try {
-      const local = JSON.parse(localStorage.getItem("rp_categories") || "[]");
-      if (Array.isArray(local)) {
-        local.forEach(c => {
-          if (!combined.some(x => String(x.id || x.slug) === String(c.id || c.slug))) {
-            combined.push(c);
-          }
-        });
-      }
-    } catch (e) {}
+    // 3. Fallback: if server and Firestore are unavailable, check local cache
+    if (combined.length === 0) {
+      try {
+        const local = JSON.parse(localStorage.getItem("rp_categories") || "[]");
+        if (Array.isArray(local) && local.length > 0) {
+          combined = [...local];
+        }
+      } catch (e) {}
+    }
 
     if (combined.length === 0 && typeof DEFAULT_CATEGORIES !== "undefined") {
       combined = [...DEFAULT_CATEGORIES];
