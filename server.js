@@ -342,6 +342,21 @@ async function handleApi(req, res, pathname) {
     }
   }
 
+  // Dynamic Firebase environment configuration endpoint
+  if (pathname === '/api/config') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      apiKey: process.env.FIREBASE_API_KEY || "AIzaSyANTLroYdsN8WgbzGvLiYjEyaJ78dtE8gM",
+      authDomain: process.env.FIREBASE_AUTH_DOMAIN || "reasonpress-0.firebaseapp.com",
+      projectId: process.env.FIREBASE_PROJECT_ID || "reasonpress-0",
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "reasonpress-0.firebasestorage.app",
+      messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || "896733398284",
+      appId: process.env.FIREBASE_APP_ID || "1:896733398284:web:5214cc42496882d655f529",
+      measurementId: process.env.FIREBASE_MEASUREMENT_ID || "G-FLK238Y61B"
+    }));
+    return true;
+  }
+
   // Handle file upload endpoint /api/upload
   if (pathname === '/api/upload' && req.method === 'POST') {
     try {
@@ -515,6 +530,47 @@ const server = http.createServer(async (req, res) => {
       res.end(JSON.stringify({ error: err.message || 'Internal Server Error' }));
       return;
     }
+  }
+
+  // Dynamically serve firebase-config.js with injected environment variables if provided
+  if (pathname === '/firebase-config.js') {
+    const configPath = path.join(ROOT_DIR, 'firebase-config.js');
+    fs.readFile(configPath, 'utf8', (err, content) => {
+      if (err) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end('Error reading firebase-config.js');
+        return;
+      }
+      let rendered = content;
+      if (process.env.FIREBASE_API_KEY) {
+        rendered = rendered.replace(/apiKey:\s*"[^"]*"/, `apiKey: "${process.env.FIREBASE_API_KEY}"`);
+      }
+      if (process.env.FIREBASE_AUTH_DOMAIN) {
+        rendered = rendered.replace(/authDomain:\s*"[^"]*"/, `authDomain: "${process.env.FIREBASE_AUTH_DOMAIN}"`);
+      }
+      if (process.env.FIREBASE_PROJECT_ID) {
+        rendered = rendered.replace(/projectId:\s*"[^"]*"/, `projectId: "${process.env.FIREBASE_PROJECT_ID}"`);
+      }
+      if (process.env.FIREBASE_STORAGE_BUCKET) {
+        rendered = rendered.replace(/storageBucket:\s*"[^"]*"/, `storageBucket: "${process.env.FIREBASE_STORAGE_BUCKET}"`);
+      }
+      if (process.env.FIREBASE_MESSAGING_SENDER_ID) {
+        rendered = rendered.replace(/messagingSenderId:\s*"[^"]*"/, `messagingSenderId: "${process.env.FIREBASE_MESSAGING_SENDER_ID}"`);
+      }
+      if (process.env.FIREBASE_APP_ID) {
+        rendered = rendered.replace(/appId:\s*"[^"]*"/, `appId: "${process.env.FIREBASE_APP_ID}"`);
+      }
+      if (process.env.FIREBASE_MEASUREMENT_ID) {
+        rendered = rendered.replace(/measurementId:\s*"[^"]*"/, `measurementId: "${process.env.FIREBASE_MEASUREMENT_ID}"`);
+      }
+      res.writeHead(200, {
+        'Content-Type': 'application/javascript; charset=UTF-8',
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Access-Control-Allow-Origin': '*'
+      });
+      res.end(rendered);
+    });
+    return;
   }
 
   // Static file serving
